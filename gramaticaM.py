@@ -8,7 +8,8 @@ reservadas = {
     'main' : 'MAIN',
     'goto':'GOTO',
     'unset':'UNSET',
-    'print':'PRINT',
+    'printf':'PRINT',
+    'scanf':'SCAN',
     'read':'READ',
     'exit':'EXIT',
     'int':'INT',
@@ -16,7 +17,24 @@ reservadas = {
     'char':'CHAR',
     'array':'ARRAY',
     'abs':'ABS',
-    'xor':'XORLOG'
+    'xor':'XORLOG',
+    'auto':'AUTO',
+    'break':'BREAK',
+    'case':'CASE',
+    'continue':'CONTINUE',
+    'default':'DEFAULT',
+    'do':'DO',
+    'double':'DOUBLE',
+    'enum':'ENUM',
+    'for':'FOR',
+    'extern':'EXTERN',
+    'register':'REGISTER',
+    'return':'RETURN',
+    'sizeof':'SIZEOF',
+    'struct':'STRUCT',
+    'switch':'SWITCH',
+    'void':'VOID',
+    'while':'WHILE'
 }
 
 tokens  = [
@@ -61,7 +79,19 @@ tokens  = [
     'PILAPUNTERO',
     'PARAMETRO',
     'VALORDEVUELTO',
-    'DIRRETORNO'
+    'DIRRETORNO',
+    'MASIGUAL',
+    'MENOSIGUAL' ,
+    'PORIGUAL' , 
+    'DIVIGUAL' , 
+    'RESIGUAL' , 
+    'IZQIGUAL' ,
+    'DERIGUAL' , 
+    'ANDIGUAL' , 
+    'NOTIGUAL' , 
+    'ORIGUAL',
+    'INTERRO',
+    'COMA'
 
     
     
@@ -74,6 +104,16 @@ t_LLAVDER   = r'}'
 t_PARIZQ    = r'\('
 t_PARDER    = r'\)'
 t_IGUAL     = r'='
+t_MASIGUAL  = r'\+='
+t_MENOSIGUAL = r'-='
+t_PORIGUAL  = r'\*='
+t_DIVIGUAL  = r'/='
+t_RESIGUAL  = r'%='
+t_IZQIGUAL  = r'<<='
+t_DERIGUAL  = r'>>='
+t_ANDIGUAL  = r'&='
+t_NOTIGUAL  = r'^='
+t_ORIGUAL   = r'\|='
 t_MAS       = r'\+'
 t_MENOS     = r'-'
 t_POR       = r'\*'
@@ -97,6 +137,8 @@ t_IZQBIT    = r'<<'
 t_DERBIT    = r'>>'
 t_CORIZQ    = r'\['
 t_CORDER    = r'\]'
+t_INTERRO   = r'\?'
+t_COMA      = r','
 
 
 def t_DECIMAL(t):
@@ -118,7 +160,7 @@ def t_ENTERO(t):
     return t
 
 def t_ID(t):
-     r'[a-zA-Z_][a-zA-Z_0-9]*'
+     r'[a-zA-Z][a-zA-Z_0-9]*'
      t.type = reservadas.get(t.value.lower(),'ID')    # Check for reserved words
      return t
 
@@ -193,7 +235,7 @@ def t_COMENTARIO_SIMPLE(t):
     t.lexer.lineno += 1
 
 # Caracteres ignorados
-t_ignore = " \t"
+t_ignore = " \t\"\r\'"
 
 def t_newline(t):
     r'\n+'
@@ -270,14 +312,7 @@ def p_instruccion(t) :
                         | mientras_instr
                         | if_instr
                         | if_else_instr
-                        | INICIO
-                        | UNSETF
-                        | EXITF
                         | ASIGNAARREGLO
-                        | INICIAPILA
-                        | ASIGNAPUNTERO
-                        | ASIGNAPILA
-                        | ASIGNACIONEXTRA
                         | DEFINEL
                         | DEFINEGOTO'''
     t[0] = t[1]
@@ -306,65 +341,49 @@ def p_Goto(t):
     t[0] = Goto(t[2],t.lineno(1),get_clomuna(entry,t.slice[1]))
     asc.append('DEFINEGOTO - GOTO ID PTCOMA')
 
-def p_asigna_para_valorRet_ra(t):
-    'ASIGNACIONEXTRA :  VALORESPARAM IGUAL expresion_log_relacional PTCOMA'
-    t[0] = AsignacionExtra(t[1],t[3],t.lineno(1),get_clomuna(entry,t.slice[2]))
-    asc.append('ASIGNACIONEXTRA -  VALORESPARAM IGUAL expresion_log_relacional PTCOMA')
-
-def p_valoresSimp (t):
-    '''VALORESPARAM :  PARAMETRO
-                    | VALORDEVUELTO
-                    | DIRRETORNO'''
-    t[0]=t[1]
-
-    asc.append('VALORESPARAM - REGISTRO')
-
-def p_acceso_a_pila(t):
-    'ASIGNAPILA : PILAPOS CORIZQ PILAPUNTERO CORDER IGUAL expresion_log_relacional PTCOMA'
-    t[0]=AsignaValorPila(t[1],t[6],t[3],t.lineno(1),get_clomuna(entry,t.slice[1]))
-
-    asc.append('ASIGNAPILA - PILAPOS CORIZQ PILAPUNTERO CORDER IGUAL expresion_log_relacional PTCOMA')
-
-def p_asigna_puntero(t):
-    'ASIGNAPUNTERO : PILAPUNTERO IGUAL expresion_log_relacional PTCOMA'
-    t[0] = AsignaPunteroPila(t[1],t[3],t.lineno(1),get_clomuna(entry,t.slice[1]))
-    asc.append('ASIGNAPUNTERO - PILAPUNTERO IGUAL expresion_log_relacional PTCOMA')
-def p_inicia_pila(t):
-    'INICIAPILA : PILAPOS IGUAL ARRAY PARIZQ PARDER PTCOMA'
-    t[0] = IniciaPila(t[1],t.lineno(1),get_clomuna(entry,t.slice[1]))
-    asc.append('INICIAPILA - PILAPOS IGUAL ARRAY PARIZQ PARDER PTCOMA')
 def p_asigna_arreglo(t):
     'ASIGNAARREGLO : TEMPORAL ACCESO IGUAL expresion_log_relacional PTCOMA'  
     t[0] = Asigna_arreglo(t[1],t[2],t[4],t.lineno(1),get_clomuna(entry,t.slice[1]))
     asc.append('ASIGNAARREGLO - TEMPORAL ACCESO IGUAL expresion_log_relacional PTCOMA')
-#Recibe: destruccion de variable unset($t1);
-def p_UNSETF(t):
-    'UNSETF : UNSET PARIZQ expresion_numerica PARDER PTCOMA'
-    t[0] = Unset(t[3],t.lineno(1),get_clomuna(entry,t.slice[1]))
-    asc.append('UNSETF - UNSET PARIZQ expresion_numerica PARDER PTCOMA')
-#RECIBE main:
-def p_INICIO(t):
-    'INICIO : MAIN DOSP'
-    t[0] = Main(t.lineno(1),get_clomuna(entry,t.slice[1]))
-    asc.append('INICIO - MAIN DOSP')
-#Recibe: exit;
-def p_EXITF(t):
-    'EXITF : EXIT PTCOMA'
-    t[0]= Exit(t.lineno(1),get_clomuna(entry,t.slice[1]))
-    asc.append('EXITF - EXIT PTCOMA')
+
+
 #Recibe: print($t1);
 def p_instruccion_imprimir(t) :
     'imprimir_instr     : PRINT PARIZQ expresion_log_relacional PARDER PTCOMA'
     t[0] =Imprimir(t[3],t.lineno(1),get_clomuna(entry,t.slice[1]))
     asc.append('imprimir_instr  - PRINT PARIZQ expresion_log_relacional PARDER PTCOMA')
+
 def p_instruccion_definicion(t) :
-    'definicion_instr   : NUMERO TEMPORAL PTCOMA'
+    'definicion_instr   : TIPO_VAR LISTAID PTCOMA'
     #t[0] =Definicion(t[2])
+
+def p_lista_id(t):
+    'LISTAID : LISTAID COMA IDDECLA'
+    t[1].append(t[2])
+    t[0]=t[1]
+
+def  p_id_de_lista(t):
+    'LISTAID : IDDECLA'
+    t[0]=[t[1]]
+
+def p_id_decla(t):
+    'IDDECLA  : ID'
+    t[0]=t[1]
+def p_id_decla2(t):
+    'IDDECLA  : ID IGUAL expresion_log_relacional'
+    t[0]=t[1]
+
+def p_tipo_variable(t):
+    '''TIPO_VAR :  INT
+                | DOUBLE
+                | FLOAT
+                | CHAR'''
 
 def p_asignacion_instr(t) :
     'asignacion_instr   : TEMPORAL IGUAL expresion_log_relacional PTCOMA'
     t[0] =Asignacion(t[1], t[3],t.lineno(1),get_clomuna(entry,t.slice[1]))
     asc.append('asignacion_instr   - TEMPORAL IGUAL expresion_log_relacional PTCOMA')
+
 def p_mientras_instr(t) :
     'mientras_instr     : MIENTRAS PARIZQ expresion_log_relacional PARDER LLAVIZQ instrucciones LLAVDER'
     t[0] =Mientras(t[3], t[6])

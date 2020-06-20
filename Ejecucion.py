@@ -7,10 +7,10 @@ from ts import TIPO_DATO as td
 from _pydecimal import Decimal
 import copy
 import re
-from Interfaz import MainWindow as M
+
 
 class Ejecucion_MinorC ():
-
+    
 #----------------------------------------VARIABLES GLOBALES
     ts_global = TS.TablaDeSimbolos()
     gram = []
@@ -23,10 +23,10 @@ class Ejecucion_MinorC ():
     Etiqueta = ''
 #--------------------------------------METODOS/FUNCIONES DE EJECUCION EN INTERFAZ
     def ejecutar_asc(self, input):
-        import gramatica as g
-        self.gram = g.verGramatica()
+        import gramaticaM as g
+        #self.gram = g.verGramatica()
         self.instrucciones = g.parse(input) 
-        self.procesar_instrucciones(self.instrucciones, self.ts_global)   
+        #self.procesar_instrucciones(self.instrucciones, self.ts_global)   
         
     def errores_asc(self):
         import gramatica as g
@@ -44,9 +44,10 @@ class Ejecucion_MinorC ():
             self.instrucciones = l.parse(input) 
             procesar_instrucciones_debugger(self.instrucciones,self.ts_global,i)
         except :
-            s = M()
-            s.OkMessage()
-            s.cerrar()
+            print('sad')
+            #s = M()
+            #s.OkMessage()
+            #s.cerrar()
 #----------------------------------------------------------------------REPORTES
     def ReporteGramatical(self):
         generado = '<<table border=\'0\' cellborder=\'1\' color=\'blue\' cellspacing='+'\'0\''+'><tr><td colspan=\'2\'>REPORTE GRAMATICAL</td></tr><tr><td>No.</td><td>Producciones</td></tr>'
@@ -1008,7 +1009,7 @@ class Ejecucion_MinorC ():
             return temporal            
         
         elif isinstance(expNum,Read):
-            val = M()
+            val = "SAD"
             res = val.getInteger()
             val.cerrar()
             patronFloat = re.compile('([0-9]+(\.)[0-9]+){1}')
@@ -1208,11 +1209,16 @@ class Ejecucion_MinorC ():
                     err = 'Error: instrucción no válida', instrucciones[i],' En la linea: ',instrucciones[i].linea,' En la columna: ',instrucciones[i].columna, 'Tipo: SEMANTICO'
                     self.errores.append(err) 
             else:
-                insta = M()
-                insta.OkMessage()
-                insta.cerrar()
+                print('sad')
                 return
         else:
             print('Error la etiqueta main no esta al inicio del programa o no existe')
             err = 'Error la etiqueta main no esta al inicio del programa o no existe',' En la linea: ',instrucciones[i].linea,' En la columna: ',instrucciones[i].columna, 'Tipo: SEMANTICO'
             self.errores.append(err) 
+
+
+a = Ejecucion_MinorC()
+
+f = open("./entrada.txt", "r")
+input = f.read()
+a.ejecutar_asc(input)
