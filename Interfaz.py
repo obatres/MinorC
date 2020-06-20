@@ -3,7 +3,7 @@ from PyQt5.QtGui import QColor, QSyntaxHighlighter, QTextFormat, QColor, QTextCh
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 from PyQt5.QtPrintSupport import *
-
+import Ejecucion as EJ
 import copy
 import os
 import sys
@@ -584,16 +584,19 @@ class MainWindow(QMainWindow):
         return self.editor.toPlainText()
 
     def EjecutarAsc(self):
-        import principal as f
+        #import principal as f
+        j = EJ.Ejecucion_MinorC()
         self.consola.clear()
+        
+        j.ejecutar_asc(self.editor.toPlainText())
+        j.errores_asc()
         try:
-            f.ejecutar_asc(self.editor.toPlainText())
-            f.errores_asc()
-            f.ReporteErrores()
-            f.ReporteTS()
-            f.ReporteGramatical()
-            f.GenerarAST()
-            s = f.RecibirSalida()
+            
+            j.ReporteErrores()
+            j.ReporteTS()
+            j.ReporteGramatical()
+            j.GenerarAST()
+            s = j.RecibirSalida()
             self.consola.setPlainText(s)
         except:
             btn = QMessageBox.information(self, 'FIN',
