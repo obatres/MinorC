@@ -2,3 +2,25 @@ int a,a=654,s,d;
 float s,ds,sa_0=021;
 char sad,sda,sa2;
 double as,sd,fds54;
+char a[]= "asd",b[]="Asdsad";
+int b[1][3][4];
+
+a+=a+1;
+a-=a+1;
+a*=a+1;
+a/=a+1;
+a%=a+1;
+a<<=a+1;
+a>>=a+1;
+a&=a+1;
+a^=a+1;
+a|=a+1;
+struct punto {
+    int alto;
+    int ancho;
+};
+
+struct movies_t {
+  char title;
+  int year;
+};

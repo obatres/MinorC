@@ -112,7 +112,7 @@ t_RESIGUAL  = r'%='
 t_IZQIGUAL  = r'<<='
 t_DERIGUAL  = r'>>='
 t_ANDIGUAL  = r'&='
-t_NOTIGUAL  = r'^='
+t_NOTIGUAL  = r'\^='
 t_ORIGUAL   = r'\|='
 t_MAS       = r'\+'
 t_MENOS     = r'-'
@@ -219,10 +219,6 @@ def t_CADE(t):
     t.value = t.value[1:-1] # remuevo las comillas
     return t 
 
-def t_LABEL(t):
-    r'[a-zA-Z]+'
-    t.value = str(t.value)
-    return t 
 
 # Comentario de múltiples líneas /* .. */
 def t_COMENTARIO_MULTILINEA(t):
@@ -314,7 +310,8 @@ def p_instruccion(t) :
                         | if_else_instr
                         | ASIGNAARREGLO
                         | DEFINEL
-                        | DEFINEGOTO'''
+                        | DEFINEGOTO
+                        | STRUCTDEF'''
     t[0] = t[1]
     if isinstance(t[1],Label): asc.append("instruccion - DEFINEL")
     elif isinstance(t[1],Imprimir): asc.append('instruccion - imprimir_instr')
@@ -336,6 +333,7 @@ def p_Label(t):
     'DEFINEL : ID DOSP'
     t[0] = Label(t[1],t.lineno(1),get_clomuna(entry,t.slice[1]))
     asc.append('DEFINEL - ID DOSP')
+
 def p_Goto(t):
     'DEFINEGOTO : GOTO ID PTCOMA'
     t[0] = Goto(t[2],t.lineno(1),get_clomuna(entry,t.slice[1]))
@@ -345,7 +343,6 @@ def p_asigna_arreglo(t):
     'ASIGNAARREGLO : TEMPORAL ACCESO IGUAL expresion_log_relacional PTCOMA'  
     t[0] = Asigna_arreglo(t[1],t[2],t[4],t.lineno(1),get_clomuna(entry,t.slice[1]))
     asc.append('ASIGNAARREGLO - TEMPORAL ACCESO IGUAL expresion_log_relacional PTCOMA')
-
 
 #Recibe: print($t1);
 def p_instruccion_imprimir(t) :
@@ -367,11 +364,42 @@ def  p_id_de_lista(t):
     t[0]=[t[1]]
 
 def p_id_decla(t):
-    'IDDECLA  : ID'
+    'IDDECLA  : IDT'
     t[0]=t[1]
+    
 def p_id_decla2(t):
-    'IDDECLA  : ID IGUAL expresion_log_relacional'
+    'IDDECLA  : IDT IGUAL expresion_log_relacional'
     t[0]=t[1]
+
+def p_idt_1(t):
+    'IDT : ID'
+
+def p_idt_2(t):
+    'IDT : ID LIND'
+
+def p_lista_indices(t):
+    'LIND : LIND IND'
+
+def p_lista_indice(t):
+    'LIND : IND'
+
+def p_indice_vacio(t):
+    'IND : CORIZQ CORDER'
+
+def p_indice_lleno(t):
+    'IND : CORIZQ expresion_log_relacional CORDER ' 
+
+
+def p_struct_definicion(t):
+    'STRUCTDEF : STRUCT ID LLAVIZQ IDSTRUCT  LLAVDER PTCOMA'
+
+def p_lista_id_struct(t):
+    'IDSTRUCT : IDSTRUCT TIPO_VAR ID PTCOMA'
+    t[1].append(t[3])
+    t[0] = t[1]
+def p_id_struct_def(t):
+    'IDSTRUCT :  TIPO_VAR ID PTCOMA'
+    t[0]=[t[2]]
 
 def p_tipo_variable(t):
     '''TIPO_VAR :  INT
@@ -380,10 +408,23 @@ def p_tipo_variable(t):
                 | CHAR'''
 
 def p_asignacion_instr(t) :
-    'asignacion_instr   : TEMPORAL IGUAL expresion_log_relacional PTCOMA'
-    t[0] =Asignacion(t[1], t[3],t.lineno(1),get_clomuna(entry,t.slice[1]))
-    asc.append('asignacion_instr   - TEMPORAL IGUAL expresion_log_relacional PTCOMA')
+    'asignacion_instr   : ID TIPO_AS expresion_log_relacional PTCOMA'
+    #t[0] =Asignacion(t[1], t[3],t.lineno(1),get_clomuna(entry,t.slice[1]))
+    asc.append('asignacion_instr   : TEMPORAL IGUAL expresion_log_relacional PTCOMA')
 
+def p_tipo_asigna(t):
+    '''TIPO_AS :  IGUAL
+                | MASIGUAL
+                | MENOSIGUAL
+                | PORIGUAL  
+                | DIVIGUAL  
+                | RESIGUAL  
+                | IZQIGUAL  
+                | DERIGUAL  
+                | ANDIGUAL  
+                | NOTIGUAL  
+                | ORIGUAL   '''
+                
 def p_mientras_instr(t) :
     'mientras_instr     : MIENTRAS PARIZQ expresion_log_relacional PARDER LLAVIZQ instrucciones LLAVDER'
     t[0] =Mientras(t[3], t[6])
@@ -393,6 +434,7 @@ def p_if_instr(t) :
     'if_instr           : IF expresion_numerica DEFINEGOTO'
     t[0] =If(t[2], t[3],t.lineno(1),get_clomuna(entry,t.slice[1]))
     asc.append('if_instr  - IF expresion_numerica DEFINEGOTO')
+
 def p_if_else_instr(t) :
     'if_else_instr      : IF PARIZQ expresion_log_relacional PARDER LLAVIZQ instrucciones LLAVDER ELSE LLAVIZQ instrucciones LLAVDER'
     t[0] =IfElse(t[3], t[6], t[10])
@@ -444,6 +486,7 @@ def p_expresion_bit_not(t):
     'expresion_numerica : NOTBIT expresion_numerica'
     t[0] = ExpresionBitNot(t[2],t.lineno(1),get_clomuna(entry,t.slice[1]))
     asc.append('expresion_numerica - NOTBIT expresion_numerica')
+
 def p_expresion_unaria(t):
     'expresion_numerica : MENOS expresion_numerica %prec UMENOS'
     t[0] = ExpresionNegativo(t[2],t.lineno(1),get_clomuna(entry,t.slice[1]))
@@ -531,6 +574,7 @@ def p_acceso_lista_array(t):
     t[1].append(t[3])
     t[0] = t[1]
     asc.append('ACCESO - ACCESO CORIZQ expresion_numerica CORDER')
+
 def p_acceso_array(t):
     'ACCESO : CORIZQ expresion_numerica CORDER '
     t[0] = [t[2]]
@@ -602,12 +646,14 @@ def p_expresion_expresionnumerica(t):
     'expresion_log_relacional :  expresion_numerica'
     t[0]=t[1]
     asc.append('expresion_log_relacional -  expresion_numerica') 
+
 def p_error(t):
      # Read ahead looking for a terminating ";"
     while True:
-         tok = parser.token()             # Get the next token
+         tok = pars.token() 
+                     # Get the next token
          if not tok or tok.type == 'PTCOMA': break
-    parser.errok()
+    pars.errok()
     err = "Error en el token \'" + str(t.value) +"\' en la linea: "+ str(t.lineno) + ' de tipo: SINTACTICO'
     lista_errores.append(err)
     print("Error sintactico en el token ",t.value,t.lineno)
@@ -621,14 +667,13 @@ def p_error(t):
 import ts as TS
 import ply.yacc as yacc
 parser = yacc.yacc()
+pars = yacc.yacc()
 lista_errores = []
 entry = ''
 def parse(input) :
-    lexer = lex.lex()
-    parser = yacc.yacc()
     global entry
     entry = input
-    return parser.parse(input)
+    return pars.parse(input)
 
 def retornalista():
     return lista_errores

@@ -29,7 +29,7 @@ class Ejecucion_MinorC ():
         #self.procesar_instrucciones(self.instrucciones, self.ts_global)   
         
     def errores_asc(self):
-        import gramatica as g
+        import gramaticaM as g
         self.errores = g.retornalista()
         return self.errores 
 
@@ -38,7 +38,7 @@ class Ejecucion_MinorC ():
         return nuevo
 
     def ejecutar_debug(self,input,i):
-        import gramatica as l
+        import gramaticaM as l
         try:
             self.gram = l.verGramatica()
             self.instrucciones = l.parse(input) 
