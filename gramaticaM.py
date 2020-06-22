@@ -79,7 +79,6 @@ tokens  = [
     'PILAPOS',
     'PILAPUNTERO',
     'VALORDEVUELTO',
-    'DIRRETORNO',
     'MASIGUAL',
     'MENOSIGUAL' ,
     'PORIGUAL' , 
@@ -283,6 +282,7 @@ def p_instruccion(t) :
 
 def p_funcion_main(t):
     'FUNCMAIN : TIPO_VAR MAIN PARIZQ PARDER BLOQUE '
+
 def p_Label(t):
     'DEFINEL : ID DOSP'
     t[0] = Label(t[1],t.lineno(1),get_clomuna(entry,t.slice[1]))
@@ -408,8 +408,11 @@ def p_Sentencia(t):
                     | IFFUN
                     | SWITCHFUN
                     | BREAKF
+                    | CONTINUEF
+                    | RETURNF
                     | WHILEF
                     | DOFUN 
+
                     '''
 def p_do_while_fun(t):
     'DOFUN : DO LLAVIZQ SENTENCIAS LLAVDER WHILE expresion_numerica PTCOMA '
@@ -436,6 +439,14 @@ def p_cases_def(t):
 def p_break(t):
     'BREAKF : BREAK PTCOMA'
 
+def p_continue(t):
+    'CONTINUEF : CONTINUE PTCOMA'
+
+def p_return(t):
+    'RETURNF : RETURN expresion_log_relacional PTCOMA'
+def p_return(t):
+    'RETURNF : RETURN PTCOMA'
+    
 def p_instrucciones_if(t):
     '''IFFUN :   if_instr
             | if_instr LISTA_ELSEIF

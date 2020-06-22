@@ -50,6 +50,7 @@ char prueba (int a){
 
     if(b>k){
       printf("hola");
+      continue;
     }
   }
   
@@ -68,6 +69,7 @@ char prueba (int a){
   int i = 0;
   do {
     i+=1;
+    continue;
   }
   while (i < 5);
 
