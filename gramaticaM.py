@@ -90,7 +90,9 @@ tokens  = [
     'NOTIGUAL' , 
     'ORIGUAL',
     'INTERRO',
-    'COMA'
+    'COMA',
+    'MASMAS',
+    'MENOSMENOS'
 
     
     
@@ -138,6 +140,8 @@ t_CORIZQ    = r'\['
 t_CORDER    = r'\]'
 t_INTERRO   = r'\?'
 t_COMA      = r','
+t_MENOSMENOS= r'\-\-'
+t_MASMAS    = r'\+\+'
 
 
 def t_DECIMAL(t):
@@ -361,6 +365,10 @@ def p_asignacion_instr(t) :
     #t[0] =Asignacion(t[1], t[3],t.lineno(1),get_clomuna(entry,t.slice[1]))
     asc.append('asignacion_instr   : TEMPORAL IGUAL expresion_log_relacional PTCOMA')
 
+def p_asignacion_instr_incremento(t):
+    'asignacion_instr : expresion_log_relacional'
+    #incremento/decremento
+
 def p_tipo_asigna(t):
     '''TIPO_AS :  IGUAL
                 | MASIGUAL
@@ -412,11 +420,27 @@ def p_Sentencia(t):
                     | RETURNF
                     | WHILEF
                     | DOFUN 
-
+                    | FORF
+                    | LLAMADA PTCOMA
                     '''
+
+def p_Llamada_fun(t):
+    'LLAMADA : ID PARIZQ PARAM_LLAMADA PARDER'
+
+def p_parametros_llamada(t):
+    'PARAM_LLAMADA : PARAM_LLAMADA COMA PARAM'
+
+def p_parametros_llamada_parametro(t):
+    'PARAM_LLAMADA : PARAM'
+
+def p_param(t):
+    'PARAM : expresion_log_relacional'
+
+def p_for_fun(t):
+    'FORF : FOR PARIZQ definicion_instr expresion_log_relacional PTCOMA asignacion_instr PARDER BLOQUE '
+    
 def p_do_while_fun(t):
     'DOFUN : DO LLAVIZQ SENTENCIAS LLAVDER WHILE expresion_numerica PTCOMA '
-    print("reconoce do while")
 
 def p_while_fun(t):
     'WHILEF : WHILE expresion_numerica LLAVIZQ SENTENCIAS LLAVDER'
@@ -444,7 +468,8 @@ def p_continue(t):
 
 def p_return(t):
     'RETURNF : RETURN expresion_log_relacional PTCOMA'
-def p_return(t):
+
+def p_return_vacio(t):
     'RETURNF : RETURN PTCOMA'
     
 def p_instrucciones_if(t):
@@ -472,16 +497,16 @@ def p_else_instr(t):
 
 #RECIBE: expresiones aritmeticas y bit a bit
 def p_expresion_binaria(t):
-    '''expresion_numerica : expresion_numerica MAS expresion_numerica
-                        | expresion_numerica MENOS expresion_numerica
-                        | expresion_numerica POR expresion_numerica
-                        | expresion_numerica DIVIDIDO expresion_numerica
-                        | expresion_numerica RES expresion_numerica
-                        | expresion_numerica ANDBIT expresion_numerica
-                        | expresion_numerica ORBIT expresion_numerica
-                        | expresion_numerica XORBIT expresion_numerica
-                        | expresion_numerica IZQBIT expresion_numerica
-                        | expresion_numerica DERBIT expresion_numerica'''
+    '''expresion_numerica : expresion_log_relacional MAS expresion_log_relacional
+                        | expresion_log_relacional MENOS expresion_log_relacional
+                        | expresion_log_relacional POR expresion_log_relacional
+                        | expresion_log_relacional DIVIDIDO expresion_log_relacional
+                        | expresion_log_relacional RES expresion_log_relacional
+                        | expresion_log_relacional ANDBIT expresion_log_relacional
+                        | expresion_log_relacional ORBIT expresion_log_relacional
+                        | expresion_log_relacional XORBIT expresion_log_relacional
+                        | expresion_log_relacional IZQBIT expresion_log_relacional
+                        | expresion_log_relacional DERBIT expresion_log_relacional'''
     if t[2] == '+'  : 
         t[0] = ExpresionBinaria(t[1], t[3], OPERACION_ARITMETICA.MAS,t.lineno(1),get_clomuna(entry,t.slice[2]))
         asc.append('expresion_numerica - expresion_numerica MAS expresion_numerica')
@@ -514,12 +539,12 @@ def p_expresion_binaria(t):
         asc.append('expresion_numerica - expresion_numerica DERBIT expresion_numerica')
 
 def p_expresion_bit_not(t):
-    'expresion_numerica : NOTBIT expresion_numerica'
+    'expresion_numerica : NOTBIT expresion_log_relacional'
     t[0] = ExpresionBitNot(t[2],t.lineno(1),get_clomuna(entry,t.slice[1]))
     asc.append('expresion_numerica - NOTBIT expresion_numerica')
 
 def p_expresion_unaria(t):
-    'expresion_numerica : MENOS expresion_numerica %prec UMENOS'
+    'expresion_numerica : MENOS expresion_log_relacional %prec UMENOS'
     t[0] = ExpresionNegativo(t[2],t.lineno(1),get_clomuna(entry,t.slice[1]))
     asc.append('expresion_numerica - MENOS expresion_numerica UMENOS')
 
@@ -554,36 +579,27 @@ def p_expresion_cade(t) :
     'expresion_numerica     : CADE'
     t[0] = ExpresionNumero(t[1], TS.TIPO_DATO.CADENA,t.lineno(1),get_clomuna(entry,t.slice[1]))
     asc.append('expresion_numerica - CADE ')
-#recibe: read()
-def p_expresion_read(t):
-    'expresion_numerica : READ PARIZQ PARDER'
-    t[0] = Read (t.lineno(1),get_clomuna(entry,t.slice[1]))
-    asc.append('expresion_numerica - READ PARIZQ PARDER ')
 
-def p_inicializacion_array(t):
-    'expresion_numerica : ARRAY PARIZQ PARDER'
-    t[0]= InicioArray(t.lineno(1),get_clomuna(entry,t.slice[1]))
-    asc.append('expresion_numerica - ARRAY PARIZQ PARDER')
+def p_ternario(t):
+    'expresion_numerica : expresion_log_relacional INTERRO expresion_log_relacional DOSP expresion_log_relacional'
+    #Ternario
 
-def p_acceso_array_expresion(t):
-    'expresion_numerica : TEMPORAL ACCESO'
-    t[0] = AccesoValorArray(t[1],t[2],t.lineno(1),get_clomuna(entry,t.slice[1]))
-    asc.append('expresion_numerica - TEMPORAL ACCESO')
+def p_sizeof(t):
+    'expresion_numerica : SIZEOF expresion_log_relacional '
 
-def p_acceso_lista_array(t):
-    'ACCESO : ACCESO CORIZQ expresion_numerica CORDER'
-    t[1].append(t[3])
-    t[0] = t[1]
-    asc.append('ACCESO - ACCESO CORIZQ expresion_numerica CORDER')
+def p_expresion_incremento(t):
+    'expresion_numerica : INCREMENTO'
 
-def p_acceso_array(t):
-    'ACCESO : CORIZQ expresion_numerica CORDER '
-    t[0] = [t[2]]
-    asc.append('ACCESO - CORIZQ expresion_numerica CORDER ')
+def p_incremento_pre(t):
+    '''INCREMENTO :   MASMAS  expresion_log_relacional
+                    | MENOSMENOS expresion_log_relacional'''
 
+def p_incremento_post(t):
+    '''INCREMENTO : expresion_log_relacional MASMAS
+                    | expresion_log_relacional MENOSMENOS'''
 #recibe: conversiones TIPOCONVERSION $t1 
 def p_expresion_conversion(t):
-    'expresion_numerica : TIPOCONVERSION expresion_numerica'
+    'expresion_numerica : TIPOCONVERSION expresion_log_relacional'
     t[0] = ExpresionConversion(t[1],t[2],t.lineno(1),0)
     asc.append('expresion_numerica - TIPOCONVERSION expresion_numerica ')
 #recibe: tipo de conversion (int) (float) (char)
@@ -600,12 +616,12 @@ def p_expresion_valorabs(t):
     asc.append('expresion_numerica - ABS PARIZQ expresion_numerica PARDER ')
 #Recibe expresiones logicas y relacionales
 def p_expresion_log_relacional(t) :
-    '''expresion_log_relacional : expresion_numerica MAYQUE expresion_numerica
-                            | expresion_numerica MENQUE expresion_numerica
-                            | expresion_numerica IGUALQUE expresion_numerica
-                            | expresion_numerica NIGUALQUE expresion_numerica
-                            | expresion_numerica MAYORIG expresion_numerica
-                            | expresion_numerica MENORIG expresion_numerica
+    '''expresion_log_relacional : expresion_log_relacional MAYQUE expresion_log_relacional
+                            | expresion_log_relacional MENQUE expresion_log_relacional
+                            | expresion_log_relacional IGUALQUE expresion_log_relacional
+                            | expresion_log_relacional NIGUALQUE expresion_log_relacional
+                            | expresion_log_relacional MAYORIG expresion_log_relacional
+                            | expresion_log_relacional MENORIG expresion_log_relacional
                             | expresion_log_relacional ANDLOG expresion_log_relacional
                             | expresion_log_relacional ORLOG expresion_log_relacional
                             | expresion_log_relacional XORLOG expresion_log_relacional'''

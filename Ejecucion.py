@@ -451,7 +451,11 @@ class Ejecucion_MinorC ():
             err = 'Error No se puede resolver la expresion a comparar en el if ',instr.exp ,' En la linea: ',instr.linea,' En la columna: ',instr.columna, 'Tipo: SEMANTICO'
             self.errores.append(err)
 
-        if condicion == 1: self.Llamada_goto(instr.goto,ts,self.instrucciones)
+        if condicion == 1: 
+            self.Llamada_goto(instr.goto,ts,self.instrucciones)
+            return 1
+        else:
+            return 0
 
     def procesar_if_else(self,instr, ts) :
         val = resolver_expresion_logica(instr.expLogica, ts)
@@ -1131,7 +1135,8 @@ class Ejecucion_MinorC ():
                 elif isinstance(instr, Asignacion) : self.procesar_asignacion(instr, ts)
                 elif isinstance(instr, Mientras) : self.procesar_mientras(instr, ts)
                 elif isinstance(instr, If) : self.procesar_if(instr, ts)
-                elif isinstance(instr, IfElse) : self.procesar_if_else(instr, ts)
+                elif isinstance(instr, IfElse) : 
+                    if self.procesar_if_else(instr, ts) == 1 : return
                 elif isinstance(instr, Unset) : self.procesar_unset(instr,ts)
                 elif isinstance(instr,IniciaPila): self.procesar_inicioPila(instr,ts)
                 elif isinstance(instr,AsignaPunteroPila): self.procesar_asignacion_punteropila(instr,ts)
@@ -1158,7 +1163,9 @@ class Ejecucion_MinorC ():
                 elif isinstance(instr, Definicion) : self.procesar_definicion(instr, ts)
                 elif isinstance(instr, Asignacion) : self.procesar_asignacion(instr, ts)
                 elif isinstance(instr, Mientras) : self.procesar_mientras(instr, ts)
-                elif isinstance(instr, If) : self.procesar_if(instr, ts)
+                elif isinstance(instr, If) : 
+                    if self.procesar_if(instr, ts)==1: 
+                        return
                 elif isinstance(instr, IfElse) : self.procesar_if_else(instr, ts)
                 elif isinstance(instr, Unset) : self.procesar_unset(instr,ts)
                 elif isinstance(instr,IniciaPila): self.procesar_inicioPila(instr,ts)
@@ -1190,7 +1197,9 @@ class Ejecucion_MinorC ():
                 elif isinstance(instrucciones[i], Definicion) : self.procesar_definicion(instrucciones[i], ts)
                 elif isinstance(instrucciones[i], Asignacion) : self.procesar_asignacion(instrucciones[i], ts)
                 elif isinstance(instrucciones[i], Mientras) : self.procesar_mientras(instrucciones[i], ts)
-                elif isinstance(instrucciones[i], If) :self.procesar_if(instrucciones[i], ts)
+                elif isinstance(instrucciones[i], If) :
+                    if self.procesar_if(instrucciones[i], ts)==1 : 
+                        return
                 elif isinstance(instrucciones[i], IfElse) : self.procesar_if_else(instrucciones[i], ts)
                 elif isinstance(instrucciones[i], Unset) : self.procesar_unset(instrucciones[i],ts)
                 elif isinstance(instrucciones[i],IniciaPila): self.procesar_inicioPila(instrucciones[i],ts)

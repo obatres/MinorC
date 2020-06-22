@@ -10,8 +10,8 @@ a-=a+1;
 a*=a+1;
 a/=a+1;
 a%=a+1;
-a<<=a+1;
-a>>=a+1;
+a<<=a++;
+a>>=--a;
 a&=a+1;
 a^=a+1;
 a|=a+1;
@@ -26,8 +26,8 @@ struct movies_t {
 };
 
 int main( ){
-  a&=a+1;
-  a^=a+1;
+  a&=a>b?4:2;
+  a^=sizeof(a);
   a|=a+1;
   printf(a);
 eti:
@@ -73,5 +73,11 @@ char prueba (int a){
   }
   while (i < 5);
 
+  for (int i = 0; i <= 10; i++) {
+    if(i>2){
+      printf("sad");
+      funcion(a,5+5,2>3);
+    }
+  }
 
 }
