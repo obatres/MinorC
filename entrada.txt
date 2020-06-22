@@ -24,3 +24,35 @@ struct movies_t {
   char title;
   int year;
 };
+
+int main( ){
+  a&=a+1;
+  a^=a+1;
+  a|=a+1;
+  printf(a);
+eti:
+
+goto eti;
+
+if (a>b){
+  printf(s);
+}else if(a>b){
+  printf(a);
+}else{
+  printf(b);
+}
+}
+
+char prueba (int a){
+  switch(b){
+    case cons:
+      printf("asdsd");
+      break;
+    case con2:
+      printf(5);
+      break;
+    default:
+      printf(def);
+      break;
+  }
+}

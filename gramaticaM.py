@@ -34,7 +34,8 @@ reservadas = {
     'struct':'STRUCT',
     'switch':'SWITCH',
     'void':'VOID',
-    'while':'WHILE'
+    'while':'WHILE',
+    'void':'VOID'
 }
 
 tokens  = [
@@ -77,7 +78,6 @@ tokens  = [
     'CORDER',
     'PILAPOS',
     'PILAPUNTERO',
-    'PARAMETRO',
     'VALORDEVUELTO',
     'DIRRETORNO',
     'MASIGUAL',
@@ -164,50 +164,7 @@ def t_ID(t):
      t.type = reservadas.get(t.value.lower(),'ID')    # Check for reserved words
      return t
 
-def t_TEMPORAL(t):
-    r'\$(t[0-9]+)'
-    t.value = str(t.value)
-    return t
 
-def t_PTEMPORAL(t):
-    r'\&\$(t[0-9]+)'
-    t.value = str(t.value)
-    return t
-
-def t_PARAMETRO(t):
-    r'\$[a][0-9]+'
-    t.value = str(t.value)
-    return t
-
-def t_VALORDEVUELTO(t):
-    r'\$[v][0-9]+'
-    t.value = str(t.value)
-    return t
-
-def t_DIRRETORNO(t):
-    r'\$[r][a]'
-    t.value = str(t.value)
-    return t
-
-def t_PILAPOS(t):
-    r'\$[s][0-9]+'
-    t.value = str(t.value)
-    return t
-
-def t_PILAPUNTERO(t):
-    r'\$[s][p]'
-    t.value = str(t.value)
-    return t
-
-def t_FUNCION(t):
-    r'[f][0-9]+'
-    t.value = str(t.value)
-    return t
-
-def t_RETORNO(t):
-    r'[r][0-9]+'
-    t.value = str(t.value)
-    return t
 
 def t_CADENA(t):
     r'\'.*?\''
@@ -302,16 +259,11 @@ def p_instrucciones_instruccion(t) :
     asc.append('instrucciones - instruccion')
 
 def p_instruccion(t) :
-    '''instruccion      : imprimir_instr
-                        | definicion_instr
+    '''instruccion     : definicion_instr
                         | asignacion_instr
-                        | mientras_instr
-                        | if_instr
-                        | if_else_instr
-                        | ASIGNAARREGLO
-                        | DEFINEL
-                        | DEFINEGOTO
-                        | STRUCTDEF'''
+                        | STRUCTDEF
+                        | FUNCION
+                        | FUNCMAIN'''
     t[0] = t[1]
     if isinstance(t[1],Label): asc.append("instruccion - DEFINEL")
     elif isinstance(t[1],Imprimir): asc.append('instruccion - imprimir_instr')
@@ -329,6 +281,8 @@ def p_instruccion(t) :
     else:
         asc.append('instruccion - OTRO')
 
+def p_funcion_main(t):
+    'FUNCMAIN : TIPO_VAR MAIN PARIZQ PARDER BLOQUE '
 def p_Label(t):
     'DEFINEL : ID DOSP'
     t[0] = Label(t[1],t.lineno(1),get_clomuna(entry,t.slice[1]))
@@ -338,11 +292,6 @@ def p_Goto(t):
     'DEFINEGOTO : GOTO ID PTCOMA'
     t[0] = Goto(t[2],t.lineno(1),get_clomuna(entry,t.slice[1]))
     asc.append('DEFINEGOTO - GOTO ID PTCOMA')
-
-def p_asigna_arreglo(t):
-    'ASIGNAARREGLO : TEMPORAL ACCESO IGUAL expresion_log_relacional PTCOMA'  
-    t[0] = Asigna_arreglo(t[1],t[2],t[4],t.lineno(1),get_clomuna(entry,t.slice[1]))
-    asc.append('ASIGNAARREGLO - TEMPORAL ACCESO IGUAL expresion_log_relacional PTCOMA')
 
 #Recibe: print($t1);
 def p_instruccion_imprimir(t) :
@@ -389,7 +338,6 @@ def p_indice_vacio(t):
 def p_indice_lleno(t):
     'IND : CORIZQ expresion_log_relacional CORDER ' 
 
-
 def p_struct_definicion(t):
     'STRUCTDEF : STRUCT ID LLAVIZQ IDSTRUCT  LLAVDER PTCOMA'
 
@@ -405,7 +353,8 @@ def p_tipo_variable(t):
     '''TIPO_VAR :  INT
                 | DOUBLE
                 | FLOAT
-                | CHAR'''
+                | CHAR
+                | VOID'''
 
 def p_asignacion_instr(t) :
     'asignacion_instr   : ID TIPO_AS expresion_log_relacional PTCOMA'
@@ -425,19 +374,82 @@ def p_tipo_asigna(t):
                 | NOTIGUAL  
                 | ORIGUAL   '''
                 
-def p_mientras_instr(t) :
-    'mientras_instr     : MIENTRAS PARIZQ expresion_log_relacional PARDER LLAVIZQ instrucciones LLAVDER'
-    t[0] =Mientras(t[3], t[6])
+def p_Funcion(t):
+    'FUNCION : TIPO_VAR ID PARIZQ PARAMETROS PARDER BLOQUE'
 
-#Recibe if ($t1) goto label;
+def p_Funcion_parametros(t):
+    'PARAMETROS : PARAMETROS COMA PARAMETRO'
+
+def p_Funcion_parametros_1(t):
+    'PARAMETROS : PARAMETRO'
+
+def p_Parametro(t):
+    'PARAMETRO : TIPO_VAR ID'
+
+def p_Parametro_vacio(t):
+    'PARAMETRO : '
+
+def p_bloque(t):
+    '''BLOQUE : LLAVIZQ SENTENCIAS LLAVDER
+                | SENTENCIAS'''
+
+def p_Sentencias(t):
+    'SENTENCIAS : SENTENCIAS SENTENCIA'
+
+def p_Sentencias_sentencias(t):
+    'SENTENCIAS : SENTENCIA'
+
+def p_Sentencia(t):
+    '''SENTENCIA :    definicion_instr 
+                    | asignacion_instr
+                    | imprimir_instr
+                    | DEFINEL
+                    | DEFINEGOTO
+                    | IFFUN
+                    | SWITCHFUN
+                    | BREAKF
+                    '''
+
+def p_switch_fun(t):
+    'SWITCHFUN : SWITCH expresion_numerica LLAVIZQ LISTACASE LLAVDER'
+    print("reconoce print")
+def p_listacase(t):
+    'LISTACASE : LISTACASE CASES '
+
+def p_listacase_case(t):
+    'LISTACASE : CASES'
+
+def p_cases_case(t):
+    'CASES : CASE expresion_log_relacional DOSP SENTENCIAS'
+
+def p_cases_def(t):
+    'CASES : DEFAULT DOSP SENTENCIAS'
+
+def p_break(t):
+    'BREAKF : BREAK PTCOMA'
+
+def p_instrucciones_if(t):
+    '''IFFUN :   if_instr
+            | if_instr LISTA_ELSEIF
+            | if_instr LISTA_ELSEIF else_instr
+            | if_instr else_instr'''
+
 def p_if_instr(t) :
-    'if_instr           : IF expresion_numerica DEFINEGOTO'
-    t[0] =If(t[2], t[3],t.lineno(1),get_clomuna(entry,t.slice[1]))
+    'if_instr           : IF expresion_numerica BLOQUE'
+    #t[0] =If(t[2], t[3],t.lineno(1),get_clomuna(entry,t.slice[1]))
     asc.append('if_instr  - IF expresion_numerica DEFINEGOTO')
 
+def p_lista_else_if(t):
+    'LISTA_ELSEIF : LISTA_ELSEIF if_else_instr'
+
+def p_lista_else_if_1(t):
+    'LISTA_ELSEIF : if_else_instr'
+
 def p_if_else_instr(t) :
-    'if_else_instr      : IF PARIZQ expresion_log_relacional PARDER LLAVIZQ instrucciones LLAVDER ELSE LLAVIZQ instrucciones LLAVDER'
-    t[0] =IfElse(t[3], t[6], t[10])
+    'if_else_instr      : ELSE if_instr '
+
+def p_else_instr(t):
+    'else_instr : ELSE BLOQUE'
 
 #RECIBE: expresiones aritmeticas y bit a bit
 def p_expresion_binaria(t):
@@ -513,36 +525,6 @@ def p_expresion_id(t):
     t[0] = ExpresionNumero(t[1],t.lineno(1),get_clomuna(entry,t.slice[1]))
     asc.append('expresion_numerica - ID ')
 
-def p_expresion_pila(t):
-    'expresion_numerica   : PILAPOS'
-    t[0] = ExpresionPila(t[1],t.lineno(1),get_clomuna(entry,t.slice[1]))
-    asc.append('expresion_numerica - PILAPOS ')
-
-def p_puntero_pila(t):
-    'expresion_numerica : PILAPUNTERO'
-    t[0] = ExpresionPunteroPila(t[1],t.lineno(1),get_clomuna(entry,t.slice[1]))
-    asc.append('expresion_numerica - PILAPUNTERO ')
-def p_pop_pila(t):
-    'expresion_numerica : PILAPOS CORIZQ PILAPUNTERO CORDER'
-    t[0] = Expresion_Pop_pila(t[1],t[3],t.lineno(1),get_clomuna(entry,t.slice[1]))
-    asc.append('expresion_numerica - PILAPOS CORIZQ PILAPUNTERO CORDER ')
-def p_expresion_parametro(t):
-    '''expresion_numerica :    PARAMETRO
-                            | VALORDEVUELTO
-                            | DIRRETORNO'''
-    t[0] = Expresion_param(t[1],t.lineno(1),get_clomuna(entry,t.slice[1]))
-    asc.append('expresion_numerica - REGISTRO ')
-
-# Recibe temporales $t2
-def p_expresion_tempo(t):
-    'expresion_numerica : TEMPORAL'
-    t[0] = ExpresionTemporal(t[1],t.lineno(1),get_clomuna(entry,t.slice[1]))                   
-    asc.append('expresion_numerica - TEMPORAL ')
-# recibe: punteros  &$t1  
-def p_expresion_puntero(t):
-    'expresion_numerica : PTEMPORAL'
-    t[0] = ExpresionPunteroTemp(t[1],t.lineno(1),get_clomuna(entry,t.slice[1]))
-    asc.append('expresion_numerica - PTEMPORAL ')
 #recibe: cadena 'hola'
 def p_expresion_cadena(t) :
     'expresion_numerica     : CADENA'
