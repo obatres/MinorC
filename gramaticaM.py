@@ -409,14 +409,18 @@ def p_Sentencia(t):
                     | SWITCHFUN
                     | BREAKF
                     | WHILEF
+                    | DOFUN 
                     '''
+def p_do_while_fun(t):
+    'DOFUN : DO LLAVIZQ SENTENCIAS LLAVDER WHILE expresion_numerica PTCOMA '
+    print("reconoce do while")
 
 def p_while_fun(t):
     'WHILEF : WHILE expresion_numerica LLAVIZQ SENTENCIAS LLAVDER'
-    print("reconoce while")
+
 def p_switch_fun(t):
     'SWITCHFUN : SWITCH expresion_numerica LLAVIZQ LISTACASE LLAVDER'
-    
+
 def p_listacase(t):
     'LISTACASE : LISTACASE CASES '
 
