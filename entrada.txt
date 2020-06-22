@@ -44,6 +44,15 @@ if (a>b){
 }
 
 char prueba (int a){
+
+  while (5>=a) {
+    printf(as);
+
+    if(b>k){
+      printf("hola");
+    }
+  }
+  
   switch(b){
     case cons:
       printf("asdsd");
@@ -55,4 +64,6 @@ char prueba (int a){
       printf(def);
       break;
   }
+
+
 }

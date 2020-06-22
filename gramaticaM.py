@@ -408,11 +408,15 @@ def p_Sentencia(t):
                     | IFFUN
                     | SWITCHFUN
                     | BREAKF
+                    | WHILEF
                     '''
 
+def p_while_fun(t):
+    'WHILEF : WHILE expresion_numerica LLAVIZQ SENTENCIAS LLAVDER'
+    print("reconoce while")
 def p_switch_fun(t):
     'SWITCHFUN : SWITCH expresion_numerica LLAVIZQ LISTACASE LLAVDER'
-    print("reconoce print")
+    
 def p_listacase(t):
     'LISTACASE : LISTACASE CASES '
 
