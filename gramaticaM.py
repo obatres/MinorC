@@ -92,7 +92,8 @@ tokens  = [
     'INTERRO',
     'COMA',
     'MASMAS',
-    'MENOSMENOS'
+    'MENOSMENOS',
+    'PUNTO'
 
     
     
@@ -142,6 +143,7 @@ t_INTERRO   = r'\?'
 t_COMA      = r','
 t_MENOSMENOS= r'\-\-'
 t_MASMAS    = r'\+\+'
+t_PUNTO     = r'\.'
 
 
 def t_DECIMAL(t):
@@ -436,6 +438,9 @@ def p_parametros_llamada_parametro(t):
 def p_param(t):
     'PARAM : expresion_log_relacional'
 
+def p_param_vacio(t):
+    'PARAM : '
+
 def p_for_fun(t):
     'FORF : FOR PARIZQ definicion_instr expresion_log_relacional PTCOMA asignacion_instr PARDER BLOQUE '
     
@@ -597,6 +602,16 @@ def p_incremento_pre(t):
 def p_incremento_post(t):
     '''INCREMENTO : expresion_log_relacional MASMAS
                     | expresion_log_relacional MENOSMENOS'''
+
+def p_expresion_llamada(t):
+    'expresion_numerica : LLAMADA'
+
+def p_expresion_acceso_struct(t):
+    'expresion_numerica : ID PUNTO ID'
+
+def p_expresion_apuntador(t):
+    'expresion_numerica : ANDBIT ID'
+    
 #recibe: conversiones TIPOCONVERSION $t1 
 def p_expresion_conversion(t):
     'expresion_numerica : TIPOCONVERSION expresion_log_relacional'

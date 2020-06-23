@@ -8,8 +8,8 @@ int b[1][3][4];
 a+=a+1;
 a-=a+1;
 a*=a+1;
-a/=a+1;
-a%=a+1;
+a/=a.ide;
+a%=&a;
 a<<=a++;
 a>>=--a;
 a&=a+1;
@@ -69,6 +69,7 @@ char prueba (int a){
   int i = 0;
   do {
     i+=1;
+    i=llamada();
     continue;
   }
   while (i < 5);
