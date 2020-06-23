@@ -278,10 +278,6 @@ def p_instruccion(t) :
     elif isinstance(t[1],Unset): asc.append('instruccion - UNSETF')
     elif isinstance(t[1],Exit): asc.append('instruccion - EXITF')
     elif isinstance(t[1],Asigna_arreglo): asc.append('instruccion - ASIGNAARREGLO')
-    elif isinstance(t[1],IniciaPila): asc.append('instruccion - INICIAPILA')
-    elif isinstance(t[1],AsignaPunteroPila): asc.append('instruccion - ASIGNAPUNTERO')
-    elif isinstance(t[1],AsignaValorPila): asc.append('instruccion - ASIGNAPILA')
-    elif isinstance(t[1],AsignacionExtra): asc.append('instruccion - ASIGNACIONEXTRA')
     elif isinstance(t[1],Goto): asc.append('instruccion - DEFINEGOTO')
     else:
         asc.append('instruccion - OTRO')
@@ -307,6 +303,7 @@ def p_instruccion_imprimir(t) :
 
 def p_instruccion_definicion(t) :
     'definicion_instr   : TIPO_VAR LISTAID PTCOMA'
+    
     #t[0] =Definicion(t[2])
 
 def p_lista_id(t):
@@ -425,22 +422,24 @@ def p_Sentencia(t):
                     | FORF
                     | LLAMADA PTCOMA
                     '''
+    t[0]=t[1]
 
 def p_Llamada_fun(t):
     'LLAMADA : ID PARIZQ PARAM_LLAMADA PARDER'
-
+    t[0] = ExpresionLlamada(t[1],t[3],t.lineno(1),get_clomuna(entry,t.slice[1]))
 def p_parametros_llamada(t):
     'PARAM_LLAMADA : PARAM_LLAMADA COMA PARAM'
-
+    t[1].append(t[3])
+    t[0]=t[1]
 def p_parametros_llamada_parametro(t):
     'PARAM_LLAMADA : PARAM'
-
+    t[0] = [t[1]]
 def p_param(t):
     'PARAM : expresion_log_relacional'
-
+    t[0] = t[1]
 def p_param_vacio(t):
     'PARAM : '
-
+    t[0]= 0
 def p_for_fun(t):
     'FORF : FOR PARIZQ definicion_instr expresion_log_relacional PTCOMA asignacion_instr PARDER BLOQUE '
     
@@ -467,39 +466,54 @@ def p_cases_def(t):
 
 def p_break(t):
     'BREAKF : BREAK PTCOMA'
+    t[0] = Break(t.lineno(1),get_clomuna(entry,t.slice[1]))
 
 def p_continue(t):
     'CONTINUEF : CONTINUE PTCOMA'
+    t[0] = Continue(t.lineno(1),get_clomuna(entry,t.slice[1]))
 
 def p_return(t):
     'RETURNF : RETURN expresion_log_relacional PTCOMA'
+    t[0] = Return(t[2],t.lineno(1),get_clomuna(entry,t.slice[1]))
 
 def p_return_vacio(t):
     'RETURNF : RETURN PTCOMA'
-    
-def p_instrucciones_if(t):
-    '''IFFUN :   if_instr
-            | if_instr LISTA_ELSEIF
-            | if_instr LISTA_ELSEIF else_instr
-            | if_instr else_instr'''
+    t[0]= Return(t.lineno(1),get_clomuna(entry,t.slice[1]))
+
+def p_instrucciones_if_simple(t):
+    '''IFFUN :   if_instr'''
+    t[0] = t[1]
+
+def p_instrucciones_if_listaelseif(t):
+    'IFFUN :  if_instr LISTA_ELSEIF'
+    t[0] = IfAnidado(t[0],t[1],t.lineno(1),get_clomuna(entry,t.slice[1]))
+
+def p_instrucciones_if_listaelseif_else(t):
+    'IFFUN : if_instr LISTA_ELSEIF else_instr'  
+    t[0] = IfAnidadoElse(t[1],t[2],t[3],t.lineno(1),get_clomuna(entry,t.slice[1]))
+
+def p_instrucciones_if_else(t):
+    'IFFUN :  if_instr else_instr'
+    t[0] = IfElse(t[1],t[2],t.lineno(1),get_clomuna(entry,t.slice[1]))
 
 def p_if_instr(t) :
     'if_instr           : IF expresion_numerica BLOQUE'
-    #t[0] =If(t[2], t[3],t.lineno(1),get_clomuna(entry,t.slice[1]))
+    t[0] = IfSimple(t[2],t[3],t.lineno(1),get_clomuna(entry,t.slice[1]))
     asc.append('if_instr  - IF expresion_numerica DEFINEGOTO')
 
 def p_lista_else_if(t):
     'LISTA_ELSEIF : LISTA_ELSEIF if_else_instr'
-
+    t[1].append(t[2])
+    t[0] = t[1]
 def p_lista_else_if_1(t):
     'LISTA_ELSEIF : if_else_instr'
-
+    t[0]=[t[1]]
 def p_if_else_instr(t) :
     'if_else_instr      : ELSE if_instr '
-
+    t[0]=t[2]
 def p_else_instr(t):
     'else_instr : ELSE BLOQUE'
-
+    t[0] = t[2]
 #RECIBE: expresiones aritmeticas y bit a bit
 def p_expresion_binaria(t):
     '''expresion_numerica : expresion_log_relacional MAS expresion_log_relacional
@@ -574,12 +588,11 @@ def p_expresion_id(t):
     t[0] = ExpresionNumero(t[1],t.lineno(1),get_clomuna(entry,t.slice[1]))
     asc.append('expresion_numerica - ID ')
 
-#recibe: cadena 'hola'
 def p_expresion_cadena(t) :
     'expresion_numerica     : CADENA'
     t[0] = ExpresionNumero(t[1], TS.TIPO_DATO.CADENA,t.lineno(1),get_clomuna(entry,t.slice[1]))
     asc.append('expresion_numerica - CADENA ')
-#recibe: cadena "hola"
+
 def p_expresion_cade(t) :
     'expresion_numerica     : CADE'
     t[0] = ExpresionNumero(t[1], TS.TIPO_DATO.CADENA,t.lineno(1),get_clomuna(entry,t.slice[1]))
@@ -587,7 +600,7 @@ def p_expresion_cade(t) :
 
 def p_ternario(t):
     'expresion_numerica : expresion_log_relacional INTERRO expresion_log_relacional DOSP expresion_log_relacional'
-    #Ternario
+    t[0]= ExpresionTernario(t[1],t[3],t[5],t.lineno(1),get_clomuna(entry,t.slice[1]))
 
 def p_sizeof(t):
     'expresion_numerica : SIZEOF expresion_log_relacional '
@@ -605,31 +618,35 @@ def p_incremento_post(t):
 
 def p_expresion_llamada(t):
     'expresion_numerica : LLAMADA'
+    
 
 def p_expresion_acceso_struct(t):
     'expresion_numerica : ID PUNTO ID'
+    t[0]=ExpresionAccesoStruct(t[1],t[3],t.lineno(1),get_clomuna(entry,t.slice[1]))
+    asc.append('expresion_numerica - ID PUNTO ID')
 
 def p_expresion_apuntador(t):
     'expresion_numerica : ANDBIT ID'
-    
-#recibe: conversiones TIPOCONVERSION $t1 
+    t[0] = ExpresionPuntero(t[2],t.lineno(1),get_clomuna(entry,t.slice[1]))
+    asc.append('expresion_numerica - ANDBIT ID ')
+
 def p_expresion_conversion(t):
     'expresion_numerica : TIPOCONVERSION expresion_log_relacional'
-    t[0] = ExpresionConversion(t[1],t[2],t.lineno(1),0)
+    t[0] = ExpresionConversion(t[1],t[2],t.lineno(1),get_clomuna(entry,t.slice[2]))
     asc.append('expresion_numerica - TIPOCONVERSION expresion_numerica ')
-#recibe: tipo de conversion (int) (float) (char)
+
 def p_expresion_tipoConversion(t):
     '''TIPOCONVERSION : PARIZQ INT PARDER
                     | PARIZQ FLOAT PARDER
                     | PARIZQ CHAR PARDER '''
     t[0]=t[2]
     asc.append('TIPOCONVERSION  - PARIZQ TIPOC PARDER ')
-#Recibe: valor absoluto
+
 def p_expresion_valorabs(t):
     'expresion_numerica : ABS PARIZQ expresion_numerica PARDER'
     t[0] =  ExpresionValorAbsoluto(t[3],t.lineno(1),get_clomuna(entry,t.slice[1]))
     asc.append('expresion_numerica - ABS PARIZQ expresion_numerica PARDER ')
-#Recibe expresiones logicas y relacionales
+
 def p_expresion_log_relacional(t) :
     '''expresion_log_relacional : expresion_log_relacional MAYQUE expresion_log_relacional
                             | expresion_log_relacional MENQUE expresion_log_relacional
@@ -642,38 +659,38 @@ def p_expresion_log_relacional(t) :
                             | expresion_log_relacional XORLOG expresion_log_relacional'''
     if t[2] == '>'    : 
         t[0] = ExpresionLogica(t[1], t[3], OPERACION_LOGICA.MAYOR_QUE,t.lineno(1),get_clomuna(entry,t.slice[2]))
-        asc.append('expresion_log_relacional : expresion_numerica MAYQUE expresion_numerica')
+        asc.append('expresion_log_relacional : expresion_log_relacional MAYQUE expresion_log_relacional')
     elif t[2] == '<'  : 
         t[0] = ExpresionLogica(t[1], t[3], OPERACION_LOGICA.MENOR_QUE,t.lineno(1),get_clomuna(entry,t.slice[2]))
-        asc.append('expresion_log_relacional : expresion_numerica MENQUE expresion_numerica')
+        asc.append('expresion_log_relacional : expresion_log_relacional MENQUE expresion_log_relacional')
     elif t[2] == '==' : 
         t[0] = ExpresionLogica(t[1], t[3], OPERACION_LOGICA.IGUAL,t.lineno(1),get_clomuna(entry,t.slice[2]))
-        asc.append('expresion_log_relacional : expresion_numerica IGUALQUE expresion_numerica')
+        asc.append('expresion_log_relacional : expresion_log_relacional IGUALQUE expresion_log_relacional')
     elif t[2] == '!=' : 
         t[0] = ExpresionLogica(t[1], t[3], OPERACION_LOGICA.DIFERENTE,t.lineno(1),get_clomuna(entry,t.slice[2]))
-        asc.append('expresion_log_relacional : expresion_numerica NIGUALQUE expresion_numerica')
+        asc.append('expresion_log_relacional : expresion_log_relacional NIGUALQUE expresion_log_relacional')
     elif t[2] == '>=' : 
         t[0] = ExpresionLogica(t[1], t[3], OPERACION_LOGICA.MAYORQUE,t.lineno(1),get_clomuna(entry,t.slice[2]))
-        asc.append('expresion_log_relacional : expresion_numerica MAYORIG expresion_numerica')
+        asc.append('expresion_log_relacional : expresion_log_relacional MAYORIG expresion_log_relacional')
     elif t[2] == '<=' : 
         t[0] = ExpresionLogica(t[1], t[3], OPERACION_LOGICA.MENORQUE,t.lineno(1),get_clomuna(entry,t.slice[2]))
-        asc.append('expresion_log_relacional : expresion_numerica MENORIG expresion_numerica')
+        asc.append('expresion_log_relacional : expresion_log_relacional MENORIG expresion_log_relacional')
     elif t[2] == 'xor' :
         t[0] = ExpresionLogicaXOR(t[1], t[3],t.lineno(1),get_clomuna(entry,t.slice[2]))
-        asc.append('expresion_log_relacional : expresion_numerica XOR expresion_numerica') 
+        asc.append('expresion_log_relacional : expresion_log_relacional XOR expresion_log_relacional') 
     elif t[2] == '&&' : 
         t[0] = ExpresionLogicaAND(t[1], t[3],t.lineno(1),get_clomuna(entry,t.slice[2]))
-        asc.append('expresion_log_relacional : expresion_numerica ANDLOG expresion_numerica') 
+        asc.append('expresion_log_relacional : expresion_log_relacional ANDLOG expresion_log_relacional') 
     elif t[2] == '||' : 
         t[0] = ExpresionLogicaOR(t[1], t[3],t.lineno(1),get_clomuna(entry,t.slice[2]))
-        asc.append('expresion_log_relacional : expresion_numerica ORLOG expresion_numerica') 
+        asc.append('expresion_log_relacional : expresion_log_relacional ORLOG expresion_log_relacional') 
 
-#RECIBE !$t3
+
 def p_expresion_logica_not(t):
     'expresion_log_relacional : NOTLOG expresion_log_relacional'
     t[0] = ExpresionLogicaNot(t[2],t.lineno(1),get_clomuna(entry,t.slice[1]))
     asc.append('expresion_log_relacional - NOTLOG expresion_log_relacional') 
-#Sintetiza la expresion de expresion_log_relacional
+
 def p_expresion_expresionnumerica(t):
     'expresion_log_relacional :  expresion_numerica'
     t[0]=t[1]
