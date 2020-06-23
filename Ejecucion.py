@@ -7,10 +7,10 @@ from ts import TIPO_DATO as td
 from _pydecimal import Decimal
 import copy
 import re
-from Interfaz import MainWindow as M
+
 
 class Ejecucion_MinorC ():
-
+    
 #----------------------------------------VARIABLES GLOBALES
     ts_global = TS.TablaDeSimbolos()
     gram = []
@@ -23,13 +23,13 @@ class Ejecucion_MinorC ():
     Etiqueta = ''
 #--------------------------------------METODOS/FUNCIONES DE EJECUCION EN INTERFAZ
     def ejecutar_asc(self, input):
-        import gramatica as g
-        self.gram = g.verGramatica()
+        import gramaticaM as g
+        #self.gram = g.verGramatica()
         self.instrucciones = g.parse(input) 
-        self.procesar_instrucciones(self.instrucciones, self.ts_global)   
+        #self.procesar_instrucciones(self.instrucciones, self.ts_global)   
         
     def errores_asc(self):
-        import gramatica as g
+        import gramaticaM as g
         self.errores = g.retornalista()
         return self.errores 
 
@@ -38,15 +38,16 @@ class Ejecucion_MinorC ():
         return nuevo
 
     def ejecutar_debug(self,input,i):
-        import gramatica as l
+        import gramaticaM as l
         try:
             self.gram = l.verGramatica()
             self.instrucciones = l.parse(input) 
             procesar_instrucciones_debugger(self.instrucciones,self.ts_global,i)
         except :
-            s = M()
-            s.OkMessage()
-            s.cerrar()
+            print('sad')
+            #s = M()
+            #s.OkMessage()
+            #s.cerrar()
 #----------------------------------------------------------------------REPORTES
     def ReporteGramatical(self):
         generado = '<<table border=\'0\' cellborder=\'1\' color=\'blue\' cellspacing='+'\'0\''+'><tr><td colspan=\'2\'>REPORTE GRAMATICAL</td></tr><tr><td>No.</td><td>Producciones</td></tr>'
@@ -450,7 +451,11 @@ class Ejecucion_MinorC ():
             err = 'Error No se puede resolver la expresion a comparar en el if ',instr.exp ,' En la linea: ',instr.linea,' En la columna: ',instr.columna, 'Tipo: SEMANTICO'
             self.errores.append(err)
 
-        if condicion == 1: self.Llamada_goto(instr.goto,ts,self.instrucciones)
+        if condicion == 1: 
+            self.Llamada_goto(instr.goto,ts,self.instrucciones)
+            return 1
+        else:
+            return 0
 
     def procesar_if_else(self,instr, ts) :
         val = resolver_expresion_logica(instr.expLogica, ts)
@@ -1008,7 +1013,7 @@ class Ejecucion_MinorC ():
             return temporal            
         
         elif isinstance(expNum,Read):
-            val = M()
+            val = "SAD"
             res = val.getInteger()
             val.cerrar()
             patronFloat = re.compile('([0-9]+(\.)[0-9]+){1}')
@@ -1130,7 +1135,8 @@ class Ejecucion_MinorC ():
                 elif isinstance(instr, Asignacion) : self.procesar_asignacion(instr, ts)
                 elif isinstance(instr, Mientras) : self.procesar_mientras(instr, ts)
                 elif isinstance(instr, If) : self.procesar_if(instr, ts)
-                elif isinstance(instr, IfElse) : self.procesar_if_else(instr, ts)
+                elif isinstance(instr, IfElse) : 
+                    if self.procesar_if_else(instr, ts) == 1 : return
                 elif isinstance(instr, Unset) : self.procesar_unset(instr,ts)
                 elif isinstance(instr,IniciaPila): self.procesar_inicioPila(instr,ts)
                 elif isinstance(instr,AsignaPunteroPila): self.procesar_asignacion_punteropila(instr,ts)
@@ -1157,7 +1163,9 @@ class Ejecucion_MinorC ():
                 elif isinstance(instr, Definicion) : self.procesar_definicion(instr, ts)
                 elif isinstance(instr, Asignacion) : self.procesar_asignacion(instr, ts)
                 elif isinstance(instr, Mientras) : self.procesar_mientras(instr, ts)
-                elif isinstance(instr, If) : self.procesar_if(instr, ts)
+                elif isinstance(instr, If) : 
+                    if self.procesar_if(instr, ts)==1: 
+                        return
                 elif isinstance(instr, IfElse) : self.procesar_if_else(instr, ts)
                 elif isinstance(instr, Unset) : self.procesar_unset(instr,ts)
                 elif isinstance(instr,IniciaPila): self.procesar_inicioPila(instr,ts)
@@ -1189,7 +1197,9 @@ class Ejecucion_MinorC ():
                 elif isinstance(instrucciones[i], Definicion) : self.procesar_definicion(instrucciones[i], ts)
                 elif isinstance(instrucciones[i], Asignacion) : self.procesar_asignacion(instrucciones[i], ts)
                 elif isinstance(instrucciones[i], Mientras) : self.procesar_mientras(instrucciones[i], ts)
-                elif isinstance(instrucciones[i], If) :self.procesar_if(instrucciones[i], ts)
+                elif isinstance(instrucciones[i], If) :
+                    if self.procesar_if(instrucciones[i], ts)==1 : 
+                        return
                 elif isinstance(instrucciones[i], IfElse) : self.procesar_if_else(instrucciones[i], ts)
                 elif isinstance(instrucciones[i], Unset) : self.procesar_unset(instrucciones[i],ts)
                 elif isinstance(instrucciones[i],IniciaPila): self.procesar_inicioPila(instrucciones[i],ts)
@@ -1208,11 +1218,16 @@ class Ejecucion_MinorC ():
                     err = 'Error: instrucción no válida', instrucciones[i],' En la linea: ',instrucciones[i].linea,' En la columna: ',instrucciones[i].columna, 'Tipo: SEMANTICO'
                     self.errores.append(err) 
             else:
-                insta = M()
-                insta.OkMessage()
-                insta.cerrar()
+                print('sad')
                 return
         else:
             print('Error la etiqueta main no esta al inicio del programa o no existe')
             err = 'Error la etiqueta main no esta al inicio del programa o no existe',' En la linea: ',instrucciones[i].linea,' En la columna: ',instrucciones[i].columna, 'Tipo: SEMANTICO'
             self.errores.append(err) 
+
+
+a = Ejecucion_MinorC()
+
+f = open("./entrada.txt", "r")
+input = f.read()
+a.ejecutar_asc(input)

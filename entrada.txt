@@ -1,20 +1,84 @@
-main:
-    #$t1=array();
-    #$t1['as'][1][2][5]="Hola mundo";
-    $t1=5;
-    print($t1);
-    goto label2;
-label1:
-    $t1 = 'Estoy en label 1';
-    print($t1);
-label2:
-    $t2 = "Estoy en label 2";
-    print($t2);
-    if (4>3) goto label4;
-label3:
-    $t3 = 'Estoy en label 3';
-    print($t3);
-label4:
-    $t4 = 'estoy en label 4';
-    print($t4);
- 
+int a,a=654,s,d;
+float s,ds,sa_0=021;
+char sad,sda,sa2;
+double as,sd,fds54;
+char a[]= "asd",b[]="Asdsad";
+int b[1][3][4];
+
+a+=a+1;
+a-=a+1;
+a*=a+1;
+a/=a.ide;
+a%=&a;
+a<<=a++;
+a>>=--a;
+a&=a+1;
+a^=a+1;
+a|=a+1;
+struct punto {
+    int alto;
+    int ancho;
+};
+
+struct movies_t {
+  char title;
+  int year;
+};
+
+int main( ){
+  a&=a>b?4:2;
+  a^=sizeof(a);
+  a|=a+1;
+  printf(a);
+eti:
+
+goto eti;
+
+if (a>b){
+  printf(s);
+}else if(a>b){
+  printf(a);
+}else{
+  printf(b);
+}
+}
+
+char prueba (int a){
+
+  while (5>=a) {
+    printf(as);
+
+    if(b>k){
+      printf("hola");
+      continue;
+    }
+  }
+  
+  switch(b){
+    case cons:
+      printf("asdsd");
+      break;
+    case con2:
+      printf(5);
+      break;
+    default:
+      printf(def);
+      break;
+  }
+
+  int i = 0;
+  do {
+    i+=1;
+    i=llamada();
+    continue;
+  }
+  while (i < 5);
+
+  for (int i = 0; i <= 10; i++) {
+    if(i>2){
+      printf("sad");
+      funcion(a,5+5,2>3);
+    }
+  }
+
+}
