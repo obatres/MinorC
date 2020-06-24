@@ -396,7 +396,7 @@ class Ejecucion_MinorC ():
             #salida = resolver_registro(instr.exp,ts)
             salida = self.resolver_expresion_aritmetica(instr.exp,ts)
             #print('>', salida)
-            self.CodigoGenerado += 'print('+str(salida)+');'+"\n"    
+            self.CodigoGenerado += '\t'+'print('+str(salida)+');'+"\n"    
             #self.resultado += '>'+str(salida)+'\n'
             return  str(salida) + '\n'
         except:
@@ -538,7 +538,7 @@ class Ejecucion_MinorC ():
                     if expNum.operador == OPERACION_ARITMETICA.MAS : 
                         expNum.tipo = TS.TIPO_DATO.INT
                         temporal = self.generarTemp()
-                        self.CodigoGenerado += temporal+'='+str(exp1)+'+'+str(exp2)+";"+"\n"
+                        self.CodigoGenerado += '\t'+temporal+'='+str(exp1)+'+'+str(exp2)+";"+"\n"
                         return temporal
                     if expNum.operador == OPERACION_ARITMETICA.MENOS : 
                         expNum.val =exp1-exp2
@@ -564,7 +564,7 @@ class Ejecucion_MinorC ():
                         #expNum.val =exp1+exp2                        
                         expNum.tipo = TS.TIPO_DATO.FLOAT
                         temporal = self.generarTemp()
-                        self.CodigoGenerado += temporal+'='+str(exp1)+'+'+str(exp2)+";"
+                        self.CodigoGenerado += '\t'+temporal+'='+str(exp1)+'+'+str(exp2)+";"
                         return temporal
                     if expNum.operador == OPERACION_ARITMETICA.MENOS : 
                         expNum.val =exp1-exp2
@@ -1046,7 +1046,7 @@ class Ejecucion_MinorC ():
             ts.agregar(pila)
 
     def procesar_main(self, instr, ts):
-
+        self.CodigoGenerado += "main:"+"\n"
 
         for sent in instr.sentencias:
             if isinstance(sent,Imprimir): self.procesar_imprimir(sent,ts)
