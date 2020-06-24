@@ -541,47 +541,52 @@ class Ejecucion_MinorC ():
                         self.CodigoGenerado += '\t'+temporal+'='+str(exp1)+'+'+str(exp2)+";"+"\n"
                         return temporal
                     if expNum.operador == OPERACION_ARITMETICA.MENOS : 
-                        expNum.val =exp1-exp2
                         expNum.tipo = TS.TIPO_DATO.INT
-                        return expNum.val
+                        temporal = self.generarTemp()
+                        self.CodigoGenerado += '\t'+temporal+'='+str(exp1)+'-'+str(exp2)+";"+"\n"
+                        return temporal
                     if expNum.operador == OPERACION_ARITMETICA.POR : 
-                        expNum.val =exp1*exp2
-                        expNum.tipo = TS.TIPO_DATO.INT
-                        return expNum.val
+                        temporal = self.generarTemp()
+                        self.CodigoGenerado += '\t'+temporal+'='+str(exp1)+'*'+str(exp2)+";"+"\n"
+                        return temporal
                     if expNum.operador == OPERACION_ARITMETICA.DIVIDIDO : 
-                        expNum.val =exp1/exp2
                         expNum.tipo = TS.TIPO_DATO.INT
-                        return expNum.val
+                        temporal = self.generarTemp()
+                        self.CodigoGenerado += '\t'+temporal+'='+str(exp1)+'/'+str(exp2)+";"+"\n"
+                        return temporal
                     if expNum.operador == OPERACION_ARITMETICA.RESIDUO : 
-                        expNum.val =exp1%exp2
                         expNum.tipo = TS.TIPO_DATO.INT
-                        return expNum.val
+                        temporal = self.generarTemp()
+                        self.CodigoGenerado += '\t'+temporal+'='+str(exp1)+'%'+str(exp2)+";"+"\n"
+                        return temporal
                         
                 elif (expNum.exp2.tipo==td.FLOAT):
 
-
-                    if expNum.operador == OPERACION_ARITMETICA.MAS : 
-                        #expNum.val =exp1+exp2                        
+                    if expNum.operador == OPERACION_ARITMETICA.MAS :                      
                         expNum.tipo = TS.TIPO_DATO.FLOAT
                         temporal = self.generarTemp()
-                        self.CodigoGenerado += '\t'+temporal+'='+str(exp1)+'+'+str(exp2)+";"
+                        self.CodigoGenerado += '\t'+temporal+'='+str(exp1)+'+'+str(exp2)+";"+"\n"
                         return temporal
                     if expNum.operador == OPERACION_ARITMETICA.MENOS : 
-                        expNum.val =exp1-exp2
                         expNum.tipo = TS.TIPO_DATO.FLOAT
-                        return expNum.val
+                        temporal = self.generarTemp()
+                        self.CodigoGenerado += '\t'+temporal+'='+str(exp1)+'-'+str(exp2)+";"+"\n"
+                        return temporal
                     if expNum.operador == OPERACION_ARITMETICA.POR : 
-                        expNum.val =exp1*exp2
                         expNum.tipo = TS.TIPO_DATO.FLOAT
-                        return expNum.val
+                        temporal = self.generarTemp()
+                        self.CodigoGenerado += '\t'+temporal+'='+str(exp1)+'*'+str(exp2)+";"+"\n"
+                        return temporal
                     if expNum.operador == OPERACION_ARITMETICA.DIVIDIDO : 
-                        expNum.val =exp1/exp2
                         expNum.tipo = TS.TIPO_DATO.FLOAT
-                        return expNum.val
+                        temporal = self.generarTemp()
+                        self.CodigoGenerado += '\t'+temporal+'='+str(exp1)+'/'+str(exp2)+";"+"\n"
+                        return temporal
                     if expNum.operador == OPERACION_ARITMETICA.RESIDUO : 
-                        expNum.val =exp1%exp2
                         expNum.tipo = TS.TIPO_DATO.FLOAT
-                        return expNum.val
+                        temporal = self.generarTemp()
+                        self.CodigoGenerado += '\t'+temporal+'='+str(exp1)+'%'+str(exp2)+";"+"\n"
+                        return temporal
                     else:
                         print('Error de operacion: el operador '+str(expNum.exp1.val)+' y el operador'+str(expNum.exp2.val)+' no reconocen este tipo de operacion')
                         err = 'Error de operacion: el operador '+str(expNum.exp1.val)+' y el operador'+str(expNum.exp2.val)+' no reconocen este tipo de operacion' ,' En la linea: ',expNum.linea,' En la columna: ',expNum.columna, 'Tipo: SEMANTICO'
@@ -595,25 +600,30 @@ class Ejecucion_MinorC ():
         
                 if(expNum.exp2.tipo==td.INT or expNum.exp2.tipo==td.FLOAT):
                     if expNum.operador == OPERACION_ARITMETICA.MAS : 
-                        expNum.val =exp1+exp2
                         expNum.tipo = TS.TIPO_DATO.FLOAT
-                        return expNum.val
+                        temporal = self.generarTemp()
+                        self.CodigoGenerado += '\t'+temporal+'='+str(exp1)+'+'+str(exp2)+";"+"\n"
+                        return temporal
                     if expNum.operador == OPERACION_ARITMETICA.MENOS : 
-                        expNum.val =exp1-exp2
                         expNum.tipo = TS.TIPO_DATO.FLOAT
-                        return expNum.val
+                        temporal = self.generarTemp()
+                        self.CodigoGenerado += '\t'+temporal+'='+str(exp1)+'-'+str(exp2)+";"+"\n"
+                        return temporal
                     if expNum.operador == OPERACION_ARITMETICA.POR : 
-                        expNum.val =exp1*exp2
                         expNum.tipo = TS.TIPO_DATO.FLOAT
-                        return expNum.val
+                        temporal = self.generarTemp()
+                        self.CodigoGenerado += '\t'+temporal+'='+str(exp1)+'*'+str(exp2)+";"+"\n"
+                        return temporal
                     if expNum.operador == OPERACION_ARITMETICA.DIVIDIDO : 
-                        expNum.val =exp1/exp2
                         expNum.tipo = TS.TIPO_DATO.FLOAT
-                        return expNum.val
+                        temporal = self.generarTemp()
+                        self.CodigoGenerado += '\t'+temporal+'='+str(exp1)+'/'+str(exp2)+";"+"\n"
+                        return temporal
                     if expNum.operador == OPERACION_ARITMETICA.RESIDUO : 
-                        expNum.val =exp1%exp2
                         expNum.tipo = TS.TIPO_DATO.FLOAT
-                        return expNum.val
+                        temporal = self.generarTemp()
+                        self.CodigoGenerado += '\t'+temporal+'='+str(exp1)+'%'+str(exp2)+";"+"\n"
+                        return temporal
                     else:
                         print('Error de operacion: el operador '+str(expNum.exp1.val)+' y el operador'+str(expNum.exp2.val)+' no reconocen este tipo de operacion')
                         err = 'Error de operacion: el operador '+str(expNum.exp1.val)+' y el operador'+str(expNum.exp2.val)+' no reconocen este tipo de operacion' ,' En la linea: ',expNum.linea,' En la columna: ',expNum.columna, 'Tipo: SEMANTICO'
@@ -626,9 +636,10 @@ class Ejecucion_MinorC ():
             elif (expNum.exp1.tipo==td.CADENA):
                 if(expNum.exp2.tipo==td.CADENA):
                     if expNum.operador == OPERACION_ARITMETICA.MAS : 
-                        expNum.val =exp1+exp2
                         expNum.tipo = TS.TIPO_DATO.CADENA
-                        return expNum.val
+                        temporal = self.generarTemp()
+                        self.CodigoGenerado += '\t'+temporal+'='+str(exp1)+'+'+str(exp2)+";"+"\n"
+                        return temporal
                     else:
                         print('Error de operacion: el operador '+str(expNum.exp1.val)+' y el operador'+str(expNum.exp2.val)+' no reconocen este tipo de operacion')
                         err = 'Error de operacion: el operador '+str(expNum.exp1.val)+' y el operador'+str(expNum.exp2.val)+' no reconocen este tipo de operacion ' ,' En la linea: ',expNum.linea,' En la columna: ',expNum.columna, 'Tipo: SEMANTICO'
@@ -640,9 +651,10 @@ class Ejecucion_MinorC ():
         
         elif isinstance(expNum, ExpresionNegativo) :
             exp = self.resolver_expresion_aritmetica(expNum.exp, ts)
-            expNum.val=exp*-1
             expNum.tipo = expNum.exp.tipo
-            return expNum.val
+            temporal = self.generarTemp()
+            self.CodigoGenerado += '\t'+temporal+'='+"-"+str(exp)+";"+"\n"
+            return temporal
 
         elif isinstance(expNum, ExpresionNumero) :
             expNum.tipo = expNum.tipo
