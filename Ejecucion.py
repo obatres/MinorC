@@ -23,6 +23,7 @@ class Ejecucion_MinorC ():
     Etiqueta = ''
     CodigoGenerado=''
     cont = 0
+    contLabel=0
 #--------------------------------------METODOS/FUNCIONES DE EJECUCION EN INTERFAZ
     def ejecutar_asc(self, input):
         import gramaticaM as g
@@ -661,12 +662,8 @@ class Ejecucion_MinorC ():
             return expNum.val
 
         elif isinstance(expNum, ExpresionIdentificador) :
+            
             return ts.obtener(expNum.id).valor
-
-        elif isinstance(expNum, ExpresionTemporal):
-            expNum.val = ts.obtener(expNum.id).valor
-            expNum.tipo = ts.obtener(expNum.id).tipo
-            return expNum.val
 
         elif isinstance (expNum, ExpresionPuntero):
             temp = str(expNum.id).lstrip('&')
@@ -753,105 +750,45 @@ class Ejecucion_MinorC ():
             
         elif isinstance (expNum, ExpresionLogicaNot):
             temp = self.resolver_expresion_aritmetica(expNum.exp,ts)
-            if temp==self.false: expNum.val=self.true
-            elif temp==self.true: expNum.val=self.false
-            else: 
-                expNum.val=1964
-                print('Valor',temp,' no asociado a una condicion logica')
-                err = 'Error: Valor',temp,' no asociado a una condicion logica',' En la linea: ',expNum.linea,' En la columna: ',expNum.columna, 'Tipo: SEMANTICO'
-                self.errores.append(err)
             expNum.tipo=TS.TIPO_DATO.INT
-            return expNum.val
+            temporal = self.generarTemp()
+            self.CodigoGenerado += '\t'+temp+'= !'+str(temp)+'\n'
+            return temporal
     
         elif isinstance (expNum, ExpresionLogicaXOR):
             exp1 = self.resolver_expresion_aritmetica(expNum.exp1,ts)
             exp2 = self.resolver_expresion_aritmetica(expNum.exp2,ts)
             if expNum.exp1.tipo==TS.TIPO_DATO.INT and expNum.exp1.tipo==TS.TIPO_DATO.INT :
                 expNum.tipo = TS.TIPO_DATO.INT
-                if exp1==self.true:
-                    if exp2==self.true:
-                        return self.false
-                    elif exp2==self.false:
-                        return self.true
-                    else:
-                        print("error de valor ",exp2," no puede ser comparado en un XOR") 
-                        err = 'Error de valor ',exp2,'no puede ser comparado en un XOR',' En la linea: ',expNum.linea,' En la columna: ',expNum.columna, 'Tipo: SEMANTICO'
-                        self.errores.append(err)        
-                elif exp1==self.false:
-                    if exp2==self.true:
-                        return self.true
-                    elif exp2==self.false:
-                        return self.false
-                    else:
-                        print("error de valor ",exp2,", no puede ser comparado en un XOR")
-                        err = 'Error de valor ',exp2,'no puede ser comparado en un XOR',' En la linea: ',expNum.linea,' En la columna: ',expNum.columna, 'Tipo: SEMANTICO'
-                        self.errores.append(err)    
-                else:
-                    print("error de valor ",exp1," no puede ser comparado en un XOR")    
-                    err = 'Error de valor ',exp1,'no puede ser comparado en un XOR',' En la linea: ',expNum.linea,' En la columna: ',expNum.columna, 'Tipo: SEMANTICO'
-                    self.errores.append(err)    
+                temp = self.generarTemp
+                self.CodigoGenerado += '\t'+temp+'='+str(exp1)+' xor '+str(exp2)+';'+'\n'
+                return temp
             else:
                 print('error de tipos ',exp2,'y ',exp2,' no pueden operarse en un XOR, ambos deben ser INT')
                 err = 'Error de tipos ',exp2,'y ',exp2,' no pueden operarse en un XOR, ambos deben ser INT',' En la linea: ',expNum.linea,' En la columna: ',expNum.columna, 'Tipo: SEMANTICO'
                 self.errores.append(err)  
+        
         elif isinstance (expNum, ExpresionLogicaOR):
             exp1 = self.resolver_expresion_aritmetica(expNum.exp1,ts)
             exp2 = self.resolver_expresion_aritmetica(expNum.exp2,ts)
             if expNum.exp1.tipo==TS.TIPO_DATO.INT and expNum.exp1.tipo==TS.TIPO_DATO.INT :
                 expNum.tipo = TS.TIPO_DATO.INT
-                if exp1==self.true:
-                    if exp2==self.true:
-                        return self.true
-                    elif exp2==self.false:
-                        return self.true
-                    else:
-                        print("error de valor ",exp2," no puede ser comparado en un OR") 
-                        err = 'Error de valor ',exp2,' no puede ser comparado en un OR',' En la linea: ',expNum.linea,' En la columna: ',expNum.columna, 'Tipo: SEMANTICO'
-                        self.errores.append(err)         
-                elif exp1==self.false:
-                    if exp2==self.true:
-                        return self.true
-                    elif exp2==self.false:
-                        return self.false
-                    else:
-                        print("error de valor ",exp2,", no puede ser comparado en un OR") 
-                        err = 'Error de valor ',exp2,' no puede ser comparado en un OR',' En la linea: ',expNum.linea,' En la columna: ',expNum.columna, 'Tipo: SEMANTICO'
-                        self.errores.append(err)  
-                else:
-                    print("error de valor ",exp1," no puede ser comparado en un OR")    
-                    err = 'Error de valor ',exp1,' no puede ser comparado en un OR',' En la linea: ',expNum.linea,' En la columna: ',expNum.columna, 'Tipo: SEMANTICO'
-                    self.errores.append(err)  
+                temp = self.generarTemp
+                self.CodigoGenerado += '\t'+temp+'='+str(exp1)+' || '+str(exp2)+';'+'\n'
+                return temp
             else:
                 print('error de tipos ',exp2,'y ',exp2,' no pueden operarse en un OR, ambos deben ser INT')
                 err = 'Error de tipos ',exp1,'y ',exp2,' no pueden operarse en un OR, ambos deben ser INT',' En la linea: ',expNum.linea,' En la columna: ',expNum.columna, 'Tipo: SEMANTICO'
                 self.errores.append(err) 
+        
         elif isinstance (expNum, ExpresionLogicaAND):   
             exp1 = self.resolver_expresion_aritmetica(expNum.exp1,ts)
             exp2 = self.resolver_expresion_aritmetica(expNum.exp2,ts)
             if expNum.exp1.tipo==TS.TIPO_DATO.INT and expNum.exp1.tipo==TS.TIPO_DATO.INT :
                 expNum.tipo = TS.TIPO_DATO.INT
-                if exp1==self.true:
-                    if exp2==self.true:
-                        return self.true
-                    elif exp2==self.false:
-                        return self.false
-                    else:
-                        print("error de valor ",exp2," no puede ser comparado en un AND")   
-                        err = 'Error de valor ',exp2,' no puede ser comparado en un AND',' En la linea: ',expNum.linea,' En la columna: ',expNum.columna, 'Tipo: SEMANTICO'
-                        self.errores.append(err)   
-                elif exp1==self.false:
-                    if exp2==self.true:
-                        return self.false
-                    elif exp2==self.false:
-                        return self.true
-                    else:
-                        print("error de valor ",exp2,", no puede ser comparado en un AND") 
-                        err = 'Error de valor ',exp2,' no puede ser comparado en un AND',' En la linea: ',expNum.linea,' En la columna: ',expNum.columna, 'Tipo: SEMANTICO'
-                        self.errores.append(err)  
-                else:
-                    print("error de valor ",exp1,", no puede ser comparado en un AND") 
-                    err = 'Error de valor ',exp1,' no puede ser comparado en un AND',' En la linea: ',expNum.linea,' En la columna: ',expNum.columna, 'Tipo: SEMANTICO'
-                    self.errores.append(err)       
+                temp = self.generarTemp
+                self.CodigoGenerado += '\t'+temp+'='+str(exp1)+' && '+str(exp2)+';'+'\n'
+                return temp     
             else:
                 print('error de tipos ',exp1,' y "=',exp2,' no pueden operarse en un AND, ambos deben ser INT')
                 err = 'Error de tipos ',exp1,' y "=',exp2,' no pueden operarse en un AND, ambos deben ser INT',' En la linea: ',expNum.linea,' En la columna: ',expNum.columna, 'Tipo: SEMANTICO'
@@ -860,10 +797,10 @@ class Ejecucion_MinorC ():
         elif isinstance (expNum, ExpresionBitNot):
             temp = self.resolver_expresion_aritmetica(expNum.exp,ts)
             if expNum.exp.tipo == TS.TIPO_DATO.INT or expNum.exp.tipo == TS.TIPO_DATO.FLOAT:       
-                t = int(Decimal(temp))
-                expNum.val=~t
                 expNum.tipo = TS.TIPO_DATO.INT
-                return expNum.val
+                temporal = self.generarTemp
+                self.CodigoGenerado += '\t'+temporal+'= ~'+str(temp)+';'+'\n'
+                return temporal   
             else:
                 print('El valor ',temp,'no pude ser operado en binario por un NOT, se esperaba un tipo INT o FLOAT')
                 err = 'Error el valor ',temp,'no pude ser operado en binario por un NOT, se esperaba un tipo INT o FLOAT',' En la linea: ',expNum.linea,' En la columna: ',expNum.columna, 'Tipo: SEMANTICO'
@@ -872,12 +809,12 @@ class Ejecucion_MinorC ():
         elif isinstance (expNum, ExpresionBitAnd):
             exp1 = self.resolver_expresion_aritmetica(expNum.exp1,ts)
             exp2 = self.resolver_expresion_aritmetica(expNum.exp2,ts)
-            if expNum.exp1.tipo == TS.TIPO_DATO.INT or expNum.exp1.tipo == TS.TIPO_DATO.FLOAT: 
-                t1 = int(Decimal(exp1))     
+            if expNum.exp1.tipo == TS.TIPO_DATO.INT or expNum.exp1.tipo == TS.TIPO_DATO.FLOAT:     
                 if expNum.exp2.tipo == TS.TIPO_DATO.INT or expNum.exp2.tipo == TS.TIPO_DATO.FLOAT: 
-                    t2 = int(Decimal(exp2))
                     expNum.tipo = TS.TIPO_DATO.INT
-                    return t1 & t2
+                    temp = self.generarTemp
+                    self.CodigoGenerado += '\t'+temp+'='+str(exp1)+' & '+str(exp2)+';'+'\n'
+                    return temp
                 else:
                     print ('error de tipos ',exp1,' y ',exp2,'no se pueden operar en un AND bit a bit se espera que ambos sean INT o FLOAT')
                     err = 'Error de tipos ',exp1,' y ',exp2,'no se pueden operar en un AND bit a bit se espera que ambos sean INT o FLOAT',' En la linea: ',expNum.linea,' En la columna: ',expNum.columna, 'Tipo: SEMANTICO'
@@ -886,15 +823,15 @@ class Ejecucion_MinorC ():
                 print ('error de tipos ',exp1,' y ',exp2,'no se pueden operar en un AND bit a bit se espera que ambos sean INT o FLOAT')
                 err = 'Error de tipos ',exp1,' y ',exp2,'no se pueden operar en un AND bit a bit se espera que ambos sean INT o FLOAT',' En la linea: ',expNum.linea,' En la columna: ',expNum.columna, 'Tipo: SEMANTICO'
                 self.errores.append(err) 
+        
         elif isinstance (expNum, ExpresionBitOr):
             exp1 = self.resolver_expresion_aritmetica(expNum.exp1,ts)
             exp2 = self.resolver_expresion_aritmetica(expNum.exp2,ts)
-            if expNum.exp1.tipo == TS.TIPO_DATO.INT or expNum.exp1.tipo == TS.TIPO_DATO.FLOAT: 
-                t1 = int(Decimal(exp1))     
+            if expNum.exp1.tipo == TS.TIPO_DATO.INT or expNum.exp1.tipo == TS.TIPO_DATO.FLOAT:    
                 if expNum.exp2.tipo == TS.TIPO_DATO.INT or expNum.exp2.tipo == TS.TIPO_DATO.FLOAT: 
-                    t2 = int(Decimal(exp2))
-                    expNum.tipo = TS.TIPO_DATO.INT
-                    return t1 | t2
+                    temp = self.generarTemp
+                    self.CodigoGenerado += '\t'+temp+'='+str(exp1)+' | '+str(exp2)+';'+'\n'
+                    return temp
                 else:
                     print ('error de tipos ',exp1,' y ',exp2,'no se pueden operar en un OR bit a bit se espera que ambos sean INT o FLOAT')
                     err = 'Error de tipos ',exp1,' y ',exp2,'no se pueden operar en un OR bit a bit se espera que ambos sean INT o FLOAT',' En la linea: ',expNum.linea,' En la columna: ',expNum.columna, 'Tipo: SEMANTICO'
@@ -903,15 +840,16 @@ class Ejecucion_MinorC ():
                 print ('error de tipos ',exp1,' y ',exp2,'no se pueden operar en un OR bit a bit se espera que ambos sean INT o FLOAT')
                 err = 'Error de tipos ',exp1,' y ',exp2,'no se pueden operar en un OR bit a bit se espera que ambos sean INT o FLOAT',' En la linea: ',expNum.linea,' En la columna: ',expNum.columna, 'Tipo: SEMANTICO'
                 self.errores.append(err) 
+        
         elif isinstance (expNum, ExpresionBitXor):
             exp1 = self.resolver_expresion_aritmetica(expNum.exp1,ts)
             exp2 = self.resolver_expresion_aritmetica(expNum.exp2,ts)
-            if expNum.exp1.tipo == TS.TIPO_DATO.INT or expNum.exp1.tipo == TS.TIPO_DATO.FLOAT: 
-                t1 = int(Decimal(exp1))     
+            if expNum.exp1.tipo == TS.TIPO_DATO.INT or expNum.exp1.tipo == TS.TIPO_DATO.FLOAT:  
                 if expNum.exp2.tipo == TS.TIPO_DATO.INT or expNum.exp2.tipo == TS.TIPO_DATO.FLOAT: 
-                    t2 = int(Decimal(exp2))
                     expNum.tipo = TS.TIPO_DATO.INT
-                    return t1 ^ t2
+                    temp = self.generarTemp
+                    self.CodigoGenerado += '\t'+temp+'='+str(exp1)+' ^ '+str(exp2)+';'+'\n'
+                    return temp
                 else:
                     print ('error de tipos ',exp1,' y ',exp2,'no se pueden operar en un XOR bit a bit se espera que ambos sean INT o FLOAT')
                     err = 'Error de tipos ',exp1,' y ',exp2,'no se pueden operar en un XOR bit a bit se espera que ambos sean INT o FLOAT',' En la linea: ',expNum.linea,' En la columna: ',expNum.columna, 'Tipo: SEMANTICO'
@@ -920,15 +858,16 @@ class Ejecucion_MinorC ():
                 print ('error de tipos ',exp1,' y ',exp2,'no se pueden operar en un XOR bit a bit se espera que ambos sean INT o FLOAT')
                 err = 'Error de tipos ',exp1,' y ',exp2,'no se pueden operar en un XOR bit a bit se espera que ambos sean INT o FLOAT',' En la linea: ',expNum.linea,' En la columna: ',expNum.columna, 'Tipo: SEMANTICO'
                 self.errores.append(err) 
+        
         elif isinstance (expNum, ExpresionBitIzq):
             exp1 = self.resolver_expresion_aritmetica(expNum.exp1,ts)
             exp2 = self.resolver_expresion_aritmetica(expNum.exp2,ts)
-            if expNum.exp1.tipo == TS.TIPO_DATO.INT or expNum.exp1.tipo == TS.TIPO_DATO.FLOAT: 
-                t1 = int(Decimal(exp1))     
+            if expNum.exp1.tipo == TS.TIPO_DATO.INT or expNum.exp1.tipo == TS.TIPO_DATO.FLOAT:    
                 if expNum.exp2.tipo == TS.TIPO_DATO.INT or expNum.exp2.tipo == TS.TIPO_DATO.FLOAT: 
-                    t2 = int(Decimal(exp2))
                     expNum.tipo = TS.TIPO_DATO.INT
-                    return t1 << t2
+                    temp = self.generarTemp
+                    self.CodigoGenerado += '\t'+temp+'='+str(exp1)+' << '+str(exp2)+';'+'\n'
+                    return temp
                 else:
                     print ('error de tipos ',exp1,' y ',exp2,'no se pueden operar en un CORR IZQ bit a bit se espera que ambos sean INT o FLOAT')
                     err = 'Error de tipos ',exp1,' y ',exp2,'no se pueden operar en un CORR IZQ bit a bit se espera que ambos sean INT o FLOAT',' En la linea: ',expNum.linea,' En la columna: ',expNum.columna, 'Tipo: SEMANTICO'
@@ -937,15 +876,16 @@ class Ejecucion_MinorC ():
                 print ('error de tipos ',exp1,' y ',exp2,'no se pueden operar en un CORR IZQ bit a bit se espera que ambos sean INT o FLOAT')
                 err = 'Error de tipos ',exp1,' y ',exp2,'no se pueden operar en un CORR IZQ bit a bit se espera que ambos sean INT o FLOAT',' En la linea: ',expNum.linea,' En la columna: ',expNum.columna, 'Tipo: SEMANTICO'
                 self.errores.append(err) 
+        
         elif isinstance (expNum, ExpresionBitDer):
             exp1 = self.resolver_expresion_aritmetica(expNum.exp1,ts)
             exp2 = self.resolver_expresion_aritmetica(expNum.exp2,ts)
-            if expNum.exp1.tipo == TS.TIPO_DATO.INT or expNum.exp1.tipo == TS.TIPO_DATO.FLOAT: 
-                t1 = int(Decimal(exp1))     
+            if expNum.exp1.tipo == TS.TIPO_DATO.INT or expNum.exp1.tipo == TS.TIPO_DATO.FLOAT:   
                 if expNum.exp2.tipo == TS.TIPO_DATO.INT or expNum.exp2.tipo == TS.TIPO_DATO.FLOAT: 
-                    t2 = int(Decimal(exp2))
                     expNum.tipo = TS.TIPO_DATO.INT
-                    return t1 >> t2
+                    temp = self.generarTemp
+                    self.CodigoGenerado += '\t'+temp+'='+str(exp1)+' >> '+str(exp2)+';'+'\n'
+                    return temp
                 else:
                     print ('error de tipos ',exp1,' y ',exp2,'no se pueden operar en un CORR DER bit a bit se espera que ambos sean INT o FLOAT')
                     err = 'Error de tipos ',exp1,' y ',exp2,'no se pueden operar en un CORR DER bit a bit se espera que ambos sean INT o FLOAT',' En la linea: ',expNum.linea,' En la columna: ',expNum.columna, 'Tipo: SEMANTICO'
@@ -954,6 +894,7 @@ class Ejecucion_MinorC ():
                 print ('error de tipos ',exp1,' y ',exp2,'no se pueden operar en un CORR DER bit a bit se espera que ambos sean INT o FLOAT')
                 err = 'Error de tipos ',exp1,' y ',exp2,'no se pueden operar en un CORR DER bit a bit se espera que ambos sean INT o FLOAT',' En la linea: ',expNum.linea,' En la columna: ',expNum.columna, 'Tipo: SEMANTICO'
                 self.errores.append(err) 
+        
         elif isinstance (expNum,ExpresionLogica):
             return self.resolver_expresion_logica(expNum,ts)
         
@@ -1204,6 +1145,10 @@ class Ejecucion_MinorC ():
         self.cont+=1
         return temp
 
+    def generaLabel(self):
+        eti = 'Label'+str(self.contLabel)+":"
+        self.contLabel+=1
+        return eti
 a = Ejecucion_MinorC()
 
 f = open("./entrada.txt", "r")
