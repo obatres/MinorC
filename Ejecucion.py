@@ -478,23 +478,29 @@ class Ejecucion_MinorC ():
             if expLog.exp2.tipo == TS.TIPO_DATO.INT or expLog.exp2.tipo == TS.TIPO_DATO.FLOAT:
                 expLog.tipo = TS.TIPO_DATO.INT
                 if expLog.operador == OPERACION_LOGICA.MAYOR_QUE : 
-                    if exp1 > exp2: return self.true
-                    else:           return self.false 
+                    temp = self.generarTemp()
+                    self.CodigoGenerado += '\t'+temp+'='+str(exp1)+' > '+str(exp2)+';'+'\n'
+                    return temp
                 if expLog.operador == OPERACION_LOGICA.MENOR_QUE :
-                    if exp1 < exp2: return self.true
-                    else:           return self.false 
+                    temp = self.generarTemp()
+                    self.CodigoGenerado += '\t'+temp+'='+str(exp1)+' < '+str(exp2)+';'+'\n'
+                    return temp
                 if expLog.operador == OPERACION_LOGICA.IGUAL : 
-                    if exp1 == exp2: return self.true
-                    else:            return self.false 
+                    temp = self.generarTemp()
+                    self.CodigoGenerado += '\t'+temp+'='+str(exp1)+' == '+str(exp2)+';'+'\n'
+                    return temp
                 if expLog.operador == OPERACION_LOGICA.DIFERENTE : 
-                    if exp1 != exp2: return self.true
-                    else:            return self.false 
+                    temp = self.generarTemp()
+                    self.CodigoGenerado += '\t'+temp+'='+str(exp1)+' != '+str(exp2)+';'+'\n'
+                    return temp
                 if expLog.operador == OPERACION_LOGICA.MAYORQUE : 
-                    if exp1 >= exp2: return self.true
-                    else:            return self.false 
+                    temp = self.generarTemp()
+                    self.CodigoGenerado += '\t'+temp+'='+str(exp1)+' >= '+str(exp2)+';'+'\n'
+                    return temp
                 if expLog.operador == OPERACION_LOGICA.MENORQUE : 
-                    if exp1 <= exp2: return self.true
-                    else:            return self.false 
+                    temp = self.generarTemp()
+                    self.CodigoGenerado += '\t'+temp+'='+str(exp1)+' <= '+str(exp2)+';'+'\n'
+                    return temp
             else:
                 print('Error de tipos ',exp1,'y ',exp2,' no pueden ser operados en una operacion relacional, se espera que ambos tengan el mismo tipo')
                 err = 'Error de tipos ',exp1,'y ',exp2,' no pueden ser operados en una operacion relacional, se espera que ambos tengan el mismo tipo' ,' En la linea: ',expLog.linea,' En la columna: ',expLog.columna, 'Tipo: SEMANTICO'
@@ -503,23 +509,29 @@ class Ejecucion_MinorC ():
             if expLog.exp2.tipo == TS.TIPO_DATO.CADENA:
                 expLog.tipo = TS.TIPO_DATO.INT
                 if expLog.operador == OPERACION_LOGICA.MAYOR_QUE : 
-                    if exp1 > exp2: return self.true
-                    else:           return self.false 
+                    temp = self.generarTemp()
+                    self.CodigoGenerado += '\t'+temp+'='+str(exp1)+' > '+str(exp2)+';'+'\n'
+                    return temp
                 if expLog.operador == OPERACION_LOGICA.MENOR_QUE :
-                    if exp1 < exp2: return self.true
-                    else:           return self.false 
+                    temp = self.generarTemp()
+                    self.CodigoGenerado += '\t'+temp+'='+str(exp1)+' < '+str(exp2)+';'+'\n'
+                    return temp
                 if expLog.operador == OPERACION_LOGICA.IGUAL : 
-                    if exp1 == exp2: return self.true
-                    else:            return self.false   
+                    temp = self.generarTemp()
+                    self.CodigoGenerado += '\t'+temp+'='+str(exp1)+' == '+str(exp2)+';'+'\n'
+                    return temp 
                 if expLog.operador == OPERACION_LOGICA.DIFERENTE : 
-                    if exp1 != exp2: return self.true
-                    else:            return self.false        
+                    temp = self.generarTemp()
+                    self.CodigoGenerado += '\t'+temp+'='+str(exp1)+' != '+str(exp2)+';'+'\n'
+                    return temp  
                 if expLog.operador == OPERACION_LOGICA.MAYORQUE : 
-                    if exp1 >= exp2: return self.true
-                    else:            return self.false  
+                    temp = self.generarTemp()
+                    self.CodigoGenerado += '\t'+temp+'='+str(exp1)+' >= '+str(exp2)+';'+'\n'
+                    return temp  
                 if expLog.operador == OPERACION_LOGICA.MENORQUE : 
-                    if exp1 <= exp2: return self.true
-                    else:            return self.false                                                                      
+                    temp = self.generarTemp()
+                    self.CodigoGenerado += '\t'+temp+'='+str(exp1)+' <= '+str(exp2)+';'+'\n'
+                    return temp                                                                    
             else:
                 print('error de tipos ',exp1,'y ',exp2,' no pueden ser operados en una operacion relacional, \n se espera que ambos tengan el mismo tipo')
                 err = 'Error de tipos ',exp1,'y ',exp2,' no pueden ser operados en una operacion relacional, se espera que ambos tengan el mismo tipo' ,' En la linea: ',expLog.linea,' En la columna: ',expLog.columna, 'Tipo: SEMANTICO'
@@ -547,6 +559,7 @@ class Ejecucion_MinorC ():
                         self.CodigoGenerado += '\t'+temporal+'='+str(exp1)+'-'+str(exp2)+";"+"\n"
                         return temporal
                     if expNum.operador == OPERACION_ARITMETICA.POR : 
+                        expNum.tipo = TS.TIPO_DATO.INT
                         temporal = self.generarTemp()
                         self.CodigoGenerado += '\t'+temporal+'='+str(exp1)+'*'+str(exp2)+";"+"\n"
                         return temporal
@@ -760,7 +773,7 @@ class Ejecucion_MinorC ():
             exp2 = self.resolver_expresion_aritmetica(expNum.exp2,ts)
             if expNum.exp1.tipo==TS.TIPO_DATO.INT and expNum.exp1.tipo==TS.TIPO_DATO.INT :
                 expNum.tipo = TS.TIPO_DATO.INT
-                temp = self.generarTemp
+                temp = self.generarTemp()
                 self.CodigoGenerado += '\t'+temp+'='+str(exp1)+' xor '+str(exp2)+';'+'\n'
                 return temp
             else:
@@ -773,7 +786,7 @@ class Ejecucion_MinorC ():
             exp2 = self.resolver_expresion_aritmetica(expNum.exp2,ts)
             if expNum.exp1.tipo==TS.TIPO_DATO.INT and expNum.exp1.tipo==TS.TIPO_DATO.INT :
                 expNum.tipo = TS.TIPO_DATO.INT
-                temp = self.generarTemp
+                temp = self.generarTemp()
                 self.CodigoGenerado += '\t'+temp+'='+str(exp1)+' || '+str(exp2)+';'+'\n'
                 return temp
             else:
@@ -786,7 +799,7 @@ class Ejecucion_MinorC ():
             exp2 = self.resolver_expresion_aritmetica(expNum.exp2,ts)
             if expNum.exp1.tipo==TS.TIPO_DATO.INT and expNum.exp1.tipo==TS.TIPO_DATO.INT :
                 expNum.tipo = TS.TIPO_DATO.INT
-                temp = self.generarTemp
+                temp = self.generarTemp()
                 self.CodigoGenerado += '\t'+temp+'='+str(exp1)+' && '+str(exp2)+';'+'\n'
                 return temp     
             else:
@@ -798,7 +811,7 @@ class Ejecucion_MinorC ():
             temp = self.resolver_expresion_aritmetica(expNum.exp,ts)
             if expNum.exp.tipo == TS.TIPO_DATO.INT or expNum.exp.tipo == TS.TIPO_DATO.FLOAT:       
                 expNum.tipo = TS.TIPO_DATO.INT
-                temporal = self.generarTemp
+                temporal = self.generarTemp()
                 self.CodigoGenerado += '\t'+temporal+'= ~'+str(temp)+';'+'\n'
                 return temporal   
             else:
@@ -812,7 +825,7 @@ class Ejecucion_MinorC ():
             if expNum.exp1.tipo == TS.TIPO_DATO.INT or expNum.exp1.tipo == TS.TIPO_DATO.FLOAT:     
                 if expNum.exp2.tipo == TS.TIPO_DATO.INT or expNum.exp2.tipo == TS.TIPO_DATO.FLOAT: 
                     expNum.tipo = TS.TIPO_DATO.INT
-                    temp = self.generarTemp
+                    temp = self.generarTemp()
                     self.CodigoGenerado += '\t'+temp+'='+str(exp1)+' & '+str(exp2)+';'+'\n'
                     return temp
                 else:
@@ -829,7 +842,7 @@ class Ejecucion_MinorC ():
             exp2 = self.resolver_expresion_aritmetica(expNum.exp2,ts)
             if expNum.exp1.tipo == TS.TIPO_DATO.INT or expNum.exp1.tipo == TS.TIPO_DATO.FLOAT:    
                 if expNum.exp2.tipo == TS.TIPO_DATO.INT or expNum.exp2.tipo == TS.TIPO_DATO.FLOAT: 
-                    temp = self.generarTemp
+                    temp = self.generarTemp()
                     self.CodigoGenerado += '\t'+temp+'='+str(exp1)+' | '+str(exp2)+';'+'\n'
                     return temp
                 else:
@@ -847,7 +860,7 @@ class Ejecucion_MinorC ():
             if expNum.exp1.tipo == TS.TIPO_DATO.INT or expNum.exp1.tipo == TS.TIPO_DATO.FLOAT:  
                 if expNum.exp2.tipo == TS.TIPO_DATO.INT or expNum.exp2.tipo == TS.TIPO_DATO.FLOAT: 
                     expNum.tipo = TS.TIPO_DATO.INT
-                    temp = self.generarTemp
+                    temp = self.generarTemp()
                     self.CodigoGenerado += '\t'+temp+'='+str(exp1)+' ^ '+str(exp2)+';'+'\n'
                     return temp
                 else:
@@ -865,7 +878,7 @@ class Ejecucion_MinorC ():
             if expNum.exp1.tipo == TS.TIPO_DATO.INT or expNum.exp1.tipo == TS.TIPO_DATO.FLOAT:    
                 if expNum.exp2.tipo == TS.TIPO_DATO.INT or expNum.exp2.tipo == TS.TIPO_DATO.FLOAT: 
                     expNum.tipo = TS.TIPO_DATO.INT
-                    temp = self.generarTemp
+                    temp = self.generarTemp()
                     self.CodigoGenerado += '\t'+temp+'='+str(exp1)+' << '+str(exp2)+';'+'\n'
                     return temp
                 else:
@@ -883,7 +896,7 @@ class Ejecucion_MinorC ():
             if expNum.exp1.tipo == TS.TIPO_DATO.INT or expNum.exp1.tipo == TS.TIPO_DATO.FLOAT:   
                 if expNum.exp2.tipo == TS.TIPO_DATO.INT or expNum.exp2.tipo == TS.TIPO_DATO.FLOAT: 
                     expNum.tipo = TS.TIPO_DATO.INT
-                    temp = self.generarTemp
+                    temp = self.generarTemp()
                     self.CodigoGenerado += '\t'+temp+'='+str(exp1)+' >> '+str(exp2)+';'+'\n'
                     return temp
                 else:
