@@ -21,12 +21,15 @@ class Ejecucion_MinorC ():
     true = 1
     false = 0
     Etiqueta = ''
+    CodigoGenerado=''
+    cont = 0
 #--------------------------------------METODOS/FUNCIONES DE EJECUCION EN INTERFAZ
     def ejecutar_asc(self, input):
         import gramaticaM as g
         #self.gram = g.verGramatica()
         self.instrucciones = g.parse(input) 
-        #self.procesar_instrucciones(self.instrucciones, self.ts_global)   
+        print(self.instrucciones)
+        self.procesar_instrucciones(self.instrucciones, self.ts_global)   
         
     def errores_asc(self):
         import gramaticaM as g
@@ -317,12 +320,6 @@ class Ejecucion_MinorC ():
             cont = self.dibujar_expresion(instr.exp1,nodo1,cont) 
             self.dot.node(nodo1,'Corr Der')
             cont = self.dibujar_expresion(instr.exp2,nodo1,cont)     
-        elif isinstance(instr, ExpresionPunteroTemp):  
-            self.dot.node(nodo1,instr.id)
-        elif isinstance(instr,ExpresionConversion):
-            self.dot.node(nodo1,'Conversion')
-            self.dot.node(nodo1,str(instr.tipo))
-            cont = self.dibujar_expresion(instr.exp,nodo,cont)
         elif isinstance(instr, ExpresionPila):  
             self.dot.node(nodo1,instr.id)
         elif isinstance(instr, ExpresionPunteroPila):  
@@ -381,8 +378,6 @@ class Ejecucion_MinorC ():
             elif isinstance(instr,Imprimir) : cont = self.dibujar_print(instr,root,cont)
             elif isinstance(instr,If): cont = self.dibujar_if(instr,root,cont)
             elif isinstance(instr,Unset): cont = self.dibujar_unset(instr,root,cont)
-            elif isinstance(instr,IniciaPila): cont = self.dibujar_IniciaPila(instr,root,cont)
-            elif isinstance(instr,AsignaPunteroPila): cont = self.dibujar_AsignaPunteroPila(instr,root,cont)
             elif isinstance(instr,AsignaValorPila): cont = self.dibujar_AsignaValorPila(instr,root,cont)
             elif isinstance(instr,AsignacionExtra): cont = self.dibujar_AsignaRegistro(instr,root,cont)
             elif isinstance(instr,Main): cont = self.dibujar_main(instr,root,cont)
@@ -397,19 +392,13 @@ class Ejecucion_MinorC ():
 #--------------------------------------------------------------------PROCESAR INSTRUCCIONES
     def procesar_imprimir(self,instr, ts) :
 
-        try:
-                
-            if not ts.obtener(instr.exp.id).tipo == td.ARRAY or ts.obtener(instr.exp.id).tipo == td.PILA:
-                #salida = resolver_registro(instr.exp,ts)
-                salida = self.resolver_expresion_aritmetica(instr.exp,ts)
-                print('>', salida)
-                
-                self.resultado += '>'+str(salida)+'\n'
-                return  str(salida) + '\n'
-            else:
-                #print('Error, no se puede imprimir un arreglo')
-                err = 'Error de tipo, no se puede imprimir el valor',instr.exp.id ,'En la linea: ',instr.linea,'En la columna: ',instr.columna, 'Tipo: SEMANTICO'
-                self.errores.append(err)
+        try:          
+            #salida = resolver_registro(instr.exp,ts)
+            salida = self.resolver_expresion_aritmetica(instr.exp,ts)
+            #print('>', salida)
+            self.CodigoGenerado += 'print('+str(salida)+');'+"\n"    
+            #self.resultado += '>'+str(salida)+'\n'
+            return  str(salida) + '\n'
         except:
             print('error de impresion, valor o variabe no encontrados: ',instr.exp.id ) 
             print(instr.linea,instr.columna)
@@ -547,9 +536,10 @@ class Ejecucion_MinorC ():
 
 
                     if expNum.operador == OPERACION_ARITMETICA.MAS : 
-                        expNum.val =exp1+exp2
                         expNum.tipo = TS.TIPO_DATO.INT
-                        return expNum.val
+                        temporal = self.generarTemp()
+                        self.CodigoGenerado += temporal+'='+str(exp1)+'+'+str(exp2)+";"+"\n"
+                        return temporal
                     if expNum.operador == OPERACION_ARITMETICA.MENOS : 
                         expNum.val =exp1-exp2
                         expNum.tipo = TS.TIPO_DATO.INT
@@ -571,9 +561,11 @@ class Ejecucion_MinorC ():
 
 
                     if expNum.operador == OPERACION_ARITMETICA.MAS : 
-                        expNum.val =exp1+exp2
+                        #expNum.val =exp1+exp2                        
                         expNum.tipo = TS.TIPO_DATO.FLOAT
-                        return expNum.val
+                        temporal = self.generarTemp()
+                        self.CodigoGenerado += temporal+'='+str(exp1)+'+'+str(exp2)+";"
+                        return temporal
                     if expNum.operador == OPERACION_ARITMETICA.MENOS : 
                         expNum.val =exp1-exp2
                         expNum.tipo = TS.TIPO_DATO.FLOAT
@@ -664,7 +656,7 @@ class Ejecucion_MinorC ():
             expNum.tipo = ts.obtener(expNum.id).tipo
             return expNum.val
 
-        elif isinstance (expNum, ExpresionPunteroTemp):
+        elif isinstance (expNum, ExpresionPuntero):
             temp = str(expNum.id).lstrip('&')
             expNum.val = ts.obtenerPuntero(temp)
             expNum.tipo = TS.TIPO_DATO.INT
@@ -1053,31 +1045,13 @@ class Ejecucion_MinorC ():
         else:
             ts.agregar(pila)
 
-    def procesar_asignacion_punteropila(self,instr,ts):
-        valor=self.resolver_expresion_aritmetica(instr.exp,ts)
-        punteropila = TS.Simbolo(instr.id,td.INT,valor,self.Etiqueta)
-        if ts.existeSimbolo(punteropila):
-            ts.actualizar(punteropila)
-        else:
-            ts.agregar(punteropila)
+    def procesar_main(self, instr, ts):
 
-    def procesar_asignacion_pila (self,instr,ts):
-        try:
-            pila = ts.obtener(instr.id).valor
-            pos = ts.obtener(instr.puntero).valor
-            valor = self.resolver_expresion_aritmetica(instr.exp,ts)
-            pila.insert(pos,valor)
 
-            nuevapila = TS.Simbolo(instr.id,td.PILA,pila,self.Etiqueta)
-
-            if ts.existeSimbolo(nuevapila):
-                ts.actualizar(nuevapila)
+        for sent in instr.sentencias:
+            if isinstance(sent,Imprimir): self.procesar_imprimir(sent,ts)
             else:
-                print('error pila',instr.id,'no existe')
-                err = 'Error pila',instr.id,'no existe',' En la linea: ',instr.linea,' En la columna: ',instr.columna, 'Tipo: SEMANTICO'
-                self.errores.append(err) 
-        except :
-            print('error en asignacion de valor a la pila')
+                print('error, sentencia no posible de realizar')
 
     def procesar_asignacion_extra (self,instr,ts):
         try:
@@ -1138,7 +1112,6 @@ class Ejecucion_MinorC ():
                 elif isinstance(instr, IfElse) : 
                     if self.procesar_if_else(instr, ts) == 1 : return
                 elif isinstance(instr, Unset) : self.procesar_unset(instr,ts)
-                elif isinstance(instr,IniciaPila): self.procesar_inicioPila(instr,ts)
                 elif isinstance(instr,AsignaPunteroPila): self.procesar_asignacion_punteropila(instr,ts)
                 elif isinstance(instr,AsignaValorPila): self.procesar_asignacion_pila(instr,ts)
                 elif isinstance(instr, AsignacionExtra): self.procesar_asignacion_extra(instr,ts)
@@ -1154,40 +1127,30 @@ class Ejecucion_MinorC ():
                     err = 'Error: instrucción no válida', instr,' En la linea: ',instr.linea,' En la columna: ',instr.columna, 'Tipo: SEMANTICO'
                     self.errores.append(err) 
 
-
     def procesar_instrucciones(self,instrucciones, ts) :
         ## lista de instrucciones recolectadas
-        if isinstance(instrucciones[0],Main):
             for instr in instrucciones :
-                if isinstance(instr, Imprimir) : self.procesar_imprimir(instr, ts)
-                elif isinstance(instr, Definicion) : self.procesar_definicion(instr, ts)
-                elif isinstance(instr, Asignacion) : self.procesar_asignacion(instr, ts)
-                elif isinstance(instr, Mientras) : self.procesar_mientras(instr, ts)
-                elif isinstance(instr, If) : 
-                    if self.procesar_if(instr, ts)==1: 
-                        return
-                elif isinstance(instr, IfElse) : self.procesar_if_else(instr, ts)
-                elif isinstance(instr, Unset) : self.procesar_unset(instr,ts)
-                elif isinstance(instr,IniciaPila): self.procesar_inicioPila(instr,ts)
-                elif isinstance(instr,AsignaPunteroPila): self.procesar_asignacion_punteropila(instr,ts)
-                elif isinstance(instr,AsignaValorPila): self.procesar_asignacion_pila(instr,ts)
-                elif isinstance(instr, AsignacionExtra): self.procesar_asignacion_extra(instr,ts)
-                elif isinstance(instr, Main): self.Etiqueta = 'Main'
-                elif isinstance(instr,Asigna_arreglo): self.procesar_asignacion_arreglo(instr,ts)
-                elif isinstance(instr,Label): self.procesa_Label(instr,ts)
-                elif isinstance(instr,Exit): return
-                elif isinstance(instr,Goto): 
-                    self.Llamada_goto(instr,ts, instrucciones)
-                    return
+                if isinstance(instr, Main) : self.procesar_main(instr,ts)
+                #elif isinstance(instr, Definicion) : self.procesar_definicion(instr, ts)
+                #elif isinstance(instr, Asignacion) : self.procesar_asignacion(instr, ts)
+                #elif isinstance(instr, Mientras) : self.procesar_mientras(instr, ts)
+                #elif isinstance(instr, If) : 
+                #elif isinstance(instr, IfElse) : self.procesar_if_else(instr, ts)
+                #elif isinstance(instr, Unset) : self.procesar_unset(instr,ts)
+                #elif isinstance(instr,AsignaPunteroPila): self.procesar_asignacion_punteropila(instr,ts)
+                #elif isinstance(instr,AsignaValorPila): self.procesar_asignacion_pila(instr,ts)
+                #elif isinstance(instr, AsignacionExtra): self.procesar_asignacion_extra(instr,ts)
+                #elif isinstance(instr, Main): self.Etiqueta = 'Main'
+                #elif isinstance(instr,Asigna_arreglo): self.procesar_asignacion_arreglo(instr,ts)
+                #elif isinstance(instr,Label): self.procesa_Label(instr,ts)
+                #elif isinstance(instr,Exit): return
+                #elif isinstance(instr,Goto): 
+                    #self.Llamada_goto(instr,ts, instrucciones)
+                    #return
                 
                 else : 
-                    err = 'Error: instrucción no válida', instr,' En la linea: ',instr.linea,' En la columna: ',instr.columna, 'Tipo: SEMANTICO'
+                    err = 'Error: instrucción no válida', instr,' En la linea: ',instr,' En la columna: ',instr, 'Tipo: SEMANTICO'
                     self.errores.append(err) 
-
-        else:
-            print('Error la etiqueta main no esta al inicio del programa o no existe')
-            err = 'Error la etiqueta main no esta al inicio del programa o no existe',' En la linea: ',instr.linea,' En la columna: ',instr.columna, 'Tipo: SEMANTICO'
-            self.errores.append(err) 
 
     def procesar_instrucciones_debugger(self,instrucciones, ts, i) :
         ## lista de instrucciones recolectadas
@@ -1202,7 +1165,6 @@ class Ejecucion_MinorC ():
                         return
                 elif isinstance(instrucciones[i], IfElse) : self.procesar_if_else(instrucciones[i], ts)
                 elif isinstance(instrucciones[i], Unset) : self.procesar_unset(instrucciones[i],ts)
-                elif isinstance(instrucciones[i],IniciaPila): self.procesar_inicioPila(instrucciones[i],ts)
                 elif isinstance(instrucciones[i],AsignaPunteroPila): self.procesar_asignacion_punteropila(instrucciones[i],ts)
                 elif isinstance(instrucciones[i],AsignaValorPila): self.procesar_asignacion_pila(instrucciones[i],ts)
                 elif isinstance(instrucciones[i], AsignacionExtra): self.procesar_asignacion_extra(instrucciones[i],ts)
@@ -1225,9 +1187,15 @@ class Ejecucion_MinorC ():
             err = 'Error la etiqueta main no esta al inicio del programa o no existe',' En la linea: ',instrucciones[i].linea,' En la columna: ',instrucciones[i].columna, 'Tipo: SEMANTICO'
             self.errores.append(err) 
 
+    def generarTemp(self):
+        temp = '$t'+str(self.cont)
+        self.cont+=1
+        return temp
 
 a = Ejecucion_MinorC()
 
 f = open("./entrada.txt", "r")
 input = f.read()
 a.ejecutar_asc(input)
+print('SALIDA C3D: \n')
+print(a.CodigoGenerado)

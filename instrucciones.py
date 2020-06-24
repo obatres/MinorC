@@ -57,6 +57,38 @@ class If(Instruccion) :
         self.linea = linea
         self.columna = columna
 
+class IfSimple(Instruccion):
+    '''
+        Esta clase representa la instruccion if Simple
+    '''
+
+    def __init__(self, cond, bloqueSentenciasIf, linea, columna):
+        self.cond = cond
+        self.bloqueSentenciasIf = bloqueSentenciasIf
+        self.linea = linea
+        self.columna=columna
+        
+class IfAnidado(Instruccion):
+    '''
+        Esta clase representa la instruccion if anidado
+    '''
+    def __init__(self, IfIni, listaif, linea, columna):
+        self.IfIni = IfIni
+        self.listaif = listaif
+        self.linea = linea
+        self.columna=columna
+
+class IfAnidadoElse(Instruccion):
+    '''
+        Esta clase representa la instruccion if anidado y un else
+    '''
+    def __init__(self, IfIni, listaif, instelse, linea, columna):
+        self.IfIni = IfIni
+        self.listaif = listaif
+        self.instelse = instelse
+        self.linea = linea
+        self.columna=columna
+
 class IfElse(Instruccion) : 
     '''
         Esta clase representa la instrucción if-else.
@@ -65,10 +97,21 @@ class IfElse(Instruccion) :
         a ejecutar si la expresión lógica es falsa.
     '''
 
-    def __init__(self, expLogica, instrIfVerdadero = [], instrIfFalso = []) :
-        self.expLogica = expLogica
-        self.instrIfVerdadero = instrIfVerdadero
-        self.instrIfFalso = instrIfFalso
+    def __init__(self, ifinst, elseinst, linea, columna) :
+        self.ifinst = ifinst
+        self.elseinst = elseinst
+        self.linea = linea
+        self.columna=columna
+
+class Else(Instruccion):
+    '''
+        Esta clase representa el bloque de sentencias de una instruccion else
+    '''
+
+    def __init__(self, bloqueSentenciasElse, linea =0, columna=0):
+        self.bloqueSentenciasElse = bloqueSentenciasElse
+        self.linea=linea
+        self.columna=columna
 
 class Unset(Instruccion):
     '''
@@ -81,21 +124,29 @@ class Unset(Instruccion):
         self.linea = linea
         self.columna = columna
 
-class ErrorSin(Instruccion):
+class Return(Instruccion):
     '''
-        Esta clase representa la instrucción error sintactico.
-        La instrucción unset únicamente tiene como parámetro un registro
+        Esta clase representa la instrucción return
     '''
-    '''
-    def __init__(self,  exp) :
-        self.exp = exp  '''    
 
-class IniciaPila (Instruccion):
+    def __init__(self,  exp=0,  linea =0, columna=0) :
+        self.exp = exp    
+        self.linea = linea
+        self.columna = columna
+
+class Continue(Instruccion):
     '''
-        Inicia una pila
+        Esta clase representa la instrucción return
     '''
-    def __init__(self,  id,  linea =0, columna=0) :
-        self.id = id  
+    def __init__(self,  linea =0, columna=0) :   
+        self.linea = linea
+        self.columna = columna
+
+class Break(Instruccion):
+    '''
+        Esta clase representa la instrucción break
+    '''
+    def __init__(self,  linea =0, columna=0) :   
         self.linea = linea
         self.columna = columna
 
@@ -135,7 +186,8 @@ class Main (Instruccion):
         Nodo de tipo main
    
     '''
-    def __init__(self,  linea=0 , columna=0) :
+    def __init__(self, sentencias, linea=0 , columna=0) :
+        self.sentencias=sentencias
         self.linea = linea
         self.columna = columna
 

@@ -107,9 +107,9 @@ class ExpresionBitDer(ExpresionNumerica):
         self.linea = linea
         self.columna = columna
 
-class ExpresionPunteroTemp(ExpresionNumerica):
+class ExpresionPuntero(ExpresionNumerica):
     '''
-        Esta clase representa el puntero un temporal.
+        Esta clase representa el puntero de una variable
     '''
 
     def __init__(self, id ,  linea =0, columna=0) :
@@ -117,7 +117,60 @@ class ExpresionPunteroTemp(ExpresionNumerica):
         self.linea = linea
         self.columna = columna
  
+class ExpresionAccesoStruct(ExpresionNumerica):
+    '''
+        Esta clase representa el acceso al contenido de un struct
+    '''
 
+    def __init__(self, idPadre, idHijo ,  linea =0, columna=0) :
+        self.idPadre = idPadre
+        self.idHijo = idHijo
+        self.linea = linea
+        self.columna = columna
+
+class ExpresionLlamada(ExpresionNumerica):
+    '''
+        Esta clase representa la llamada a una funcion-metodo
+    '''
+
+    def __init__(self, id, parametros ,  linea =0, columna=0) :
+        self.id = id
+        self.parametros = parametros
+        self.linea = linea
+        self.columna = columna
+
+class ExpresionTernario(ExpresionNumerica):
+    '''
+        Esta clase representa el operador ternario
+    '''
+
+    def __init__(self, cond, exp1, exp2,  linea =0, columna=0) :
+        self.cond=cond
+        self.exp1 = exp1
+        self.exp2 = exp2       
+        self.linea = linea
+        self.columna = columna
+
+class ExpresionSizeof(ExpresionNumerica):
+    '''
+        Esta clase representa la funcion Sizeof
+    '''
+
+    def __init__(self, exp,  linea =0, columna=0) :
+        self.exp=exp    
+        self.linea = linea
+        self.columna = columna
+
+class ExpresionIncremento(ExpresionNumerica):
+    '''
+        Esta clase representa la funcion incremento o decremento
+    '''
+
+    def __init__(self, exp, tipo,  linea =0, columna=0) :
+        self.exp=exp   
+        self.tipo=tipo 
+        self.linea = linea
+        self.columna = columna
 class ExpresionConversion (ExpresionNumerica):
     '''
         Esta clase representa la conversion de tipo de un valor.
