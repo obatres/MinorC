@@ -186,7 +186,8 @@ class Main (Instruccion):
         Nodo de tipo main
    
     '''
-    def __init__(self,  linea=0 , columna=0) :
+    def __init__(self, sentencias, linea=0 , columna=0) :
+        self.sentencias=sentencias
         self.linea = linea
         self.columna = columna
 

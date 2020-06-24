@@ -151,6 +151,26 @@ class ExpresionTernario(ExpresionNumerica):
         self.linea = linea
         self.columna = columna
 
+class ExpresionSizeof(ExpresionNumerica):
+    '''
+        Esta clase representa la funcion Sizeof
+    '''
+
+    def __init__(self, exp,  linea =0, columna=0) :
+        self.exp=exp    
+        self.linea = linea
+        self.columna = columna
+
+class ExpresionIncremento(ExpresionNumerica):
+    '''
+        Esta clase representa la funcion incremento o decremento
+    '''
+
+    def __init__(self, exp, tipo,  linea =0, columna=0) :
+        self.exp=exp   
+        self.tipo=tipo 
+        self.linea = linea
+        self.columna = columna
 class ExpresionConversion (ExpresionNumerica):
     '''
         Esta clase representa la conversion de tipo de un valor.

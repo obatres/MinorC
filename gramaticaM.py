@@ -284,7 +284,7 @@ def p_instruccion(t) :
 
 def p_funcion_main(t):
     'FUNCMAIN : TIPO_VAR MAIN PARIZQ PARDER BLOQUE '
-
+    t[0]= Main(t[5],get_clomuna(entry,t.slice[2]))
 def p_Label(t):
     'DEFINEL : ID DOSP'
     t[0] = Label(t[1],t.lineno(1),get_clomuna(entry,t.slice[1]))
@@ -301,6 +301,14 @@ def p_instruccion_imprimir(t) :
     t[0] =Imprimir(t[3],t.lineno(1),get_clomuna(entry,t.slice[1]))
     asc.append('imprimir_instr  - PRINT PARIZQ expresion_log_relacional PARDER PTCOMA')
 
+def p_lista_expresiones_print(t):
+    'LISTA_PRINT : LISTA_PRINT COMA expresion_log_relacional'
+    t[1].append(t[3])
+    t[0]=t[1]
+
+def p_lista_expresion_print(t):
+    'LISTA_PRINT : expresion_log_relacional'
+    t[0]=[t[1]]
 def p_instruccion_definicion(t) :
     'definicion_instr   : TIPO_VAR LISTAID PTCOMA'
     
@@ -397,15 +405,18 @@ def p_Parametro_vacio(t):
     'PARAMETRO : '
 
 def p_bloque(t):
-    '''BLOQUE : LLAVIZQ SENTENCIAS LLAVDER
-                | SENTENCIAS'''
-
+    '''BLOQUE : LLAVIZQ SENTENCIAS LLAVDER'''
+    t[0]=t[2]
+def p_bloque_2(t):
+    'BLOQUE : SENTENCIAS'
+    t[0]=t[1]
 def p_Sentencias(t):
     'SENTENCIAS : SENTENCIAS SENTENCIA'
-
+    t[1].append(t[2])
+    t[0]=t[1]
 def p_Sentencias_sentencias(t):
     'SENTENCIAS : SENTENCIA'
-
+    t[0]=[t[1]]
 def p_Sentencia(t):
     '''SENTENCIA :    definicion_instr 
                     | asignacion_instr
@@ -604,21 +615,25 @@ def p_ternario(t):
 
 def p_sizeof(t):
     'expresion_numerica : SIZEOF expresion_log_relacional '
+    t[0]= ExpresionSizeof(t[2],t.lineno(1),get_clomuna(entry,t.slice[1]))
 
 def p_expresion_incremento(t):
     'expresion_numerica : INCREMENTO'
+    t[0]=t[1]
 
 def p_incremento_pre(t):
     '''INCREMENTO :   MASMAS  expresion_log_relacional
                     | MENOSMENOS expresion_log_relacional'''
+    t[0]= ExpresionIncremento(t[2],t[1], t.lineno(1),get_clomuna(entry,t.slice[1]))
 
 def p_incremento_post(t):
     '''INCREMENTO : expresion_log_relacional MASMAS
                     | expresion_log_relacional MENOSMENOS'''
+    t[0] = ExpresionIncremento(t[1],t[2],t.lineno(1),get_clomuna(entry,t.slice[2]))
 
 def p_expresion_llamada(t):
     'expresion_numerica : LLAMADA'
-    
+    t[0]=t[1]
 
 def p_expresion_acceso_struct(t):
     'expresion_numerica : ID PUNTO ID'
