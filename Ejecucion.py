@@ -29,7 +29,7 @@ class Ejecucion_MinorC ():
         import gramaticaM as g
         #self.gram = g.verGramatica()
         self.instrucciones = g.parse(input) 
-        print(self.instrucciones)
+        #print(self.instrucciones)
         self.procesar_instrucciones(self.instrucciones, self.ts_global)   
         
     def errores_asc(self):
@@ -412,9 +412,76 @@ class Ejecucion_MinorC ():
         return ts.obtener(exp.id).valor
 
     def procesar_definicion(self,instr, ts) :
-        simbolo = TS.Simbolo(instr.id, TS.TIPO_DATO.NUMERO, 0)      # inicializamos con 0 como valor por defecto
-        ts.agregar(simbolo)
+        tipoReg = instr.tipo
+        
+        for d in instr.listaid:
+            if isinstance (d,DefinicionSinValor): self.procesar_definicion_sinValor(d,ts,tipoReg)
+            elif isinstance(d,DefinicionConvalor): self.procesar_definicion_conValor(d,ts,tipoReg)
+            
+        return 
 
+    def procesar_definicion_sinValor(self, instr, ts, tipo):
+        temp = instr.id
+        if isinstance (temp,ExpresionInicioSimple):
+            registro =self.generarTemp()
+            if tipo ==td.INT:
+                nuevo = TS.Simbolo(temp.id,tipo,0,registro)
+                if ts.existeSimbolo(nuevo)==False:
+                    self.CodigoGenerado += '\t' + registro + '= 0;'+'\n'
+                    ts.agregar(nuevo)
+                elif ts.existeSimbolo(nuevo)==True:
+                    print('Error, la variable '+str(temp.id)+' ya ha sido declarada anteriormente')
+            elif tipo == td.FLOAT:
+                nuevo = TS.Simbolo(temp.id,tipo,0.0,registro)
+                if ts.existeSimbolo(nuevo)==False:
+                    self.CodigoGenerado += '\t' + registro + '= 0.0;'+'\n'
+                    ts.agregar(nuevo)
+                elif ts.existeSimbolo(nuevo)==True:
+                    print('Error, la variable '+str(temp.id)+' ya ha sido declarada anteriormente')
+            elif tipo == td.CADENA:
+                nuevo = TS.Simbolo(temp.id,tipo," ",registro)
+                if ts.existeSimbolo(nuevo)==False:
+                    self.CodigoGenerado += '\t' + registro + '= \' \';'+'\n'
+                    ts.agregar(nuevo)
+                elif ts.existeSimbolo(nuevo)==True:
+                    print('Error, la variable '+str(temp.id)+' ya ha sido declarada anteriormente')
+            else:
+                print('Error, tipo '+str(tipo)+' no aplicable en la definicion')
+        
+        elif isinstance (temp,ExpresionListaIndices):
+            print('Lista indices')
+        else:
+            print(type(instr.id))
+        return
+    
+    def procesar_definicion_conValor(self,instr,ts,tipo):
+        temp = instr.id
+        if isinstance(temp,ExpresionInicioSimple):
+            registro = self.generarTemp()
+            valor  = self.resolver_expresion_aritmetica(instr.exp,ts)
+            nuevo = TS.Simbolo(temp.id,tipo,valor,registro)
+            if ts.existeSimbolo(nuevo)==False:
+                self.CodigoGenerado += '\t' + registro + '='+str(valor)+';'+'\n'
+                ts.agregar(nuevo)
+            elif ts.existeSimbolo(nuevo)==True:
+                print('Error, la variable '+str(temp.id)+' ya ha sido declarada anteriormente')
+            return
+        elif isinstance(temp,ExpresionListaIndices):
+            valor = self.resolver_expresion_aritmetica(instr.exp,ts)
+            if len(temp.listaindices)<=1:
+                registro = self.generarTemp()
+                nuevo = TS.Simbolo(temp.id,tipo,valor,registro)
+                if ts.existeSimbolo(nuevo) == False:
+                    self.CodigoGenerado += '\t'+registro+ '='+str(valor)+';'+'\n'
+                    ts.agregar(nuevo)
+                return
+            else:
+                print('mas indices')
+            return
+        else:
+            print(type(instr.id))
+        return
+   
     def procesar_asignacion(self,instr, ts) :
         try:
             val = self.resolver_expresion_aritmetica(instr.expNumerica, ts)
@@ -987,9 +1054,18 @@ class Ejecucion_MinorC ():
                 expNum.tipo = td.CADENA
             return expNum.val
         
+        elif isinstance(expNum,ExpresionId):
+            try:
+                registro = ts.obtener(expNum.id)
+                expNum.tipo = registro.tipo
+                return registro.reg
+            except:
+                print('Error, la variable solicitada no existe o no tiene un registro asociado')
+                return
+
         else:
             print(expNum)
-            err = 'Error, no existe un valor en el indice: ',ind,' En la linea: ',expNum.linea,' En la columna: ',expNum.columna, 'Tipo: SEMANTICO'
+            err = 'Error, no existe un valor en el indice: ',expNum,' En la linea: ',expNum.linea,' En la columna: ',expNum.columna, 'Tipo: SEMANTICO'
             self.errores.append(err) 
 
     def procesar_unset(self,exp, ts):
@@ -1097,7 +1173,7 @@ class Ejecucion_MinorC ():
         ## lista de instrucciones recolectadas
             for instr in instrucciones :
                 if isinstance(instr, Main) : self.procesar_main(instr,ts)
-                #elif isinstance(instr, Definicion) : self.procesar_definicion(instr, ts)
+                elif isinstance(instr, Definicion) : self.procesar_definicion(instr, ts)
                 #elif isinstance(instr, Asignacion) : self.procesar_asignacion(instr, ts)
                 #elif isinstance(instr, Mientras) : self.procesar_mientras(instr, ts)
                 #elif isinstance(instr, If) : 
@@ -1162,10 +1238,10 @@ class Ejecucion_MinorC ():
         eti = 'Label'+str(self.contLabel)+":"
         self.contLabel+=1
         return eti
+
 a = Ejecucion_MinorC()
 
 f = open("./entrada.txt", "r")
 input = f.read()
 a.ejecutar_asc(input)
-print('SALIDA C3D: \n')
 print(a.CodigoGenerado)

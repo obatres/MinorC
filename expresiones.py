@@ -171,6 +171,7 @@ class ExpresionIncremento(ExpresionNumerica):
         self.tipo=tipo 
         self.linea = linea
         self.columna = columna
+
 class ExpresionConversion (ExpresionNumerica):
     '''
         Esta clase representa la conversion de tipo de un valor.
@@ -181,7 +182,6 @@ class ExpresionConversion (ExpresionNumerica):
         self.exp = exp
         self.linea = linea
         self.columna = columna
-
 
 class ExpresionNumero(ExpresionNumerica) :
     '''
@@ -194,7 +194,6 @@ class ExpresionNumero(ExpresionNumerica) :
         self.linea = linea
         self.columna = columna
 
-
 class ExpresionIdentificador(ExpresionNumerica) :
     '''
         Esta clase representa un identificador.
@@ -205,7 +204,6 @@ class ExpresionIdentificador(ExpresionNumerica) :
         self.linea = linea
         self.columna = columna
 
-
 class ExpresionPila(ExpresionNumerica):
     '''
         Esta clase representa un identificador de pila.
@@ -215,7 +213,6 @@ class ExpresionPila(ExpresionNumerica):
         self.id = id   
         self.linea = linea
         self.columna = columna
-
 
 class ExpresionPunteroPila(ExpresionNumerica):
     '''
@@ -238,8 +235,6 @@ class Expresion_Pop_pila(ExpresionNumerica):
         self.linea = linea
         self.columna = columna
 
-
-
 class InicioArray(ExpresionNumerica):
     '''
         Esta clase representa la inicializacion de un array.
@@ -257,7 +252,6 @@ class ExpresionValorAbsoluto(ExpresionNumerica):
         self.linea = linea
         self.columna = columna
 
-
 class ExpresionTemporal(ExpresionNumerica) :
     '''
         Esta clase representa un temporal.
@@ -267,7 +261,6 @@ class ExpresionTemporal(ExpresionNumerica) :
         self.id = id
         self.linea = linea
         self.columna = columna
-
 
 class ExpresionCadena :
     '''
@@ -288,7 +281,6 @@ class ExpresionConcatenar(ExpresionCadena) :
         self.exp2 = exp2
         self.linea = linea
         self.columna = columna
-
 
 class ExpresionDobleComilla(ExpresionCadena) :
     '''
@@ -386,5 +378,36 @@ class AccesoValorArray(ExpresionNumerica):
     def __init__(self, id, lista,  linea=0 , columna=0) :
         self.id = id
         self.lista = lista
+        self.linea = linea
+        self.columna = columna
+
+class ExpresionListaIndices():
+    '''
+        Esta clase representa la expresión que tiene el listado de indices con el que se inicializa una variable
+    '''
+
+    def __init__(self, id, listaindices,  linea=0 , columna=0) :
+        self.id = id
+        self.listaindices = listaindices
+        self.linea = linea
+        self.columna = columna
+
+class ExpresionInicioSimple():
+    '''
+        Esta clase representa la expresión que tiene el id de la inicializacion de una vairable
+    '''
+
+    def __init__(self, id,  linea=0 , columna=0) :
+        self.id = id
+        self.linea = linea
+        self.columna = columna
+
+class ExpresionId(ExpresionNumerica):
+    '''
+        Esta clase representa la expresión que tiene un id
+    '''
+
+    def __init__(self, id,  linea=0 , columna=0) :
+        self.id = id
         self.linea = linea
         self.columna = columna

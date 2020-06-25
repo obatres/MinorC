@@ -1,16 +1,5 @@
 
-
+float k;
 int main( ){
-  printf(2+2);
-  printf(-(10+25+8));
-  printf(5>1.0&&6<=7);
-  printf(5+6*8/20%20-3);
-  printf(654<<354);
-  printf(65<=5||65+6<2);
-  printf(1 xor 0);
-  printf(65>>6);
-  printf(5!=6);
-  printf(65==654);
-  printf(~5);
-
+  printf(k);
 }

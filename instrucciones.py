@@ -29,8 +29,11 @@ class Definicion(Instruccion) :
         Recibe como parámetro el nombre del identificador a definir
     '''
 
-    def __init__(self, id) :
-        self.id = id
+    def __init__(self,tipo, listaid,linea=0 , columna=0) :
+        self.tipo = tipo
+        self.listaid = listaid
+        self.linea = linea
+        self.columna = columna
 
 class Asignacion(Instruccion) :
     '''
@@ -238,5 +241,26 @@ class Read():
    
     '''
     def __init__(self,  linea=0 , columna=0) :
+        self.linea = linea
+        self.columna = columna
+
+class DefinicionConvalor():
+    '''
+        Nodo de tipo definicion de un id simple o un arreglo, con valor inicial
+   
+    '''
+    def __init__(self,id,exp,  linea=0 , columna=0) :
+        self.id = id 
+        self.exp = exp
+        self.linea = linea
+        self.columna = columna
+
+class DefinicionSinValor():
+    '''
+        Nodo de tipo definicion de un id simple o un arreglo, sin valor inicial
+   
+    '''
+    def __init__(self,id,  linea=0 , columna=0) :
+        self.id = id 
         self.linea = linea
         self.columna = columna

@@ -173,7 +173,7 @@ def t_ID(t):
 
 def t_CADENA(t):
     r'\'.*?\''
-    t.value = t.value[1:-1] # remuevo las comillas
+    t.value = t.value[1:-1]# remuevo las comillas
     return t 
 
 def t_CADE(t):
@@ -193,7 +193,7 @@ def t_COMENTARIO_SIMPLE(t):
     t.lexer.lineno += 1
 
 # Caracteres ignorados
-t_ignore = " \t\"\r\'"
+t_ignore = " \t"
 
 def t_newline(t):
     r'\n+'
@@ -270,20 +270,16 @@ def p_instruccion(t) :
                         | FUNCION
                         | FUNCMAIN'''
     t[0] = t[1]
-    if isinstance(t[1],Label): asc.append("instruccion - DEFINEL")
-    elif isinstance(t[1],Imprimir): asc.append('instruccion - imprimir_instr')
-    elif isinstance(t[1],Asignacion): asc.append('instruccion - asignacion_instr')
+    if isinstance(t[1],Asignacion): asc.append('instruccion - asignacion_instr')
+    elif isinstance(t[1],Definicion): asc.append('instruccion - definicion_instr')
     elif isinstance(t[1],If): asc.append('instruccion - if_instr')
-    elif isinstance(t[1],Main): asc.append('instruccion - INICIO')
+    elif isinstance(t[1],Main): asc.append('instruccion - FUNCMAIN')
     elif isinstance(t[1],Unset): asc.append('instruccion - UNSETF')
-    elif isinstance(t[1],Exit): asc.append('instruccion - EXITF')
-    elif isinstance(t[1],Asigna_arreglo): asc.append('instruccion - ASIGNAARREGLO')
-    elif isinstance(t[1],Goto): asc.append('instruccion - DEFINEGOTO')
     else:
         asc.append('instruccion - OTRO')
 
 def p_funcion_main(t):
-    'FUNCMAIN : TIPO_VAR MAIN PARIZQ PARDER BLOQUE '
+    'FUNCMAIN : INT MAIN PARIZQ PARDER BLOQUE '
     t[0]= Main(t[5],get_clomuna(entry,t.slice[2]))
 def p_Label(t):
     'DEFINEL : ID DOSP'
@@ -295,7 +291,6 @@ def p_Goto(t):
     t[0] = Goto(t[2],t.lineno(1),get_clomuna(entry,t.slice[1]))
     asc.append('DEFINEGOTO - GOTO ID PTCOMA')
 
-#Recibe: print($t1);
 def p_instruccion_imprimir(t) :
     'imprimir_instr     : PRINT PARIZQ expresion_log_relacional PARDER PTCOMA'
     t[0] =Imprimir(t[3],t.lineno(1),get_clomuna(entry,t.slice[1]))
@@ -309,14 +304,14 @@ def p_lista_expresiones_print(t):
 def p_lista_expresion_print(t):
     'LISTA_PRINT : expresion_log_relacional'
     t[0]=[t[1]]
+
 def p_instruccion_definicion(t) :
     'definicion_instr   : TIPO_VAR LISTAID PTCOMA'
-    
-    #t[0] =Definicion(t[2])
+    t[0] = Definicion(t[1],t[2],t.lineno(1),get_clomuna(entry,t.slice[3]))
 
 def p_lista_id(t):
     'LISTAID : LISTAID COMA IDDECLA'
-    t[1].append(t[2])
+    t[1].append(t[3])
     t[0]=t[1]
 
 def  p_id_de_lista(t):
@@ -325,29 +320,34 @@ def  p_id_de_lista(t):
 
 def p_id_decla(t):
     'IDDECLA  : IDT'
-    t[0]=t[1]
+    t[0]=DefinicionSinValor(t[1],t.lineno(1),t[1].columna)
     
 def p_id_decla2(t):
     'IDDECLA  : IDT IGUAL expresion_log_relacional'
-    t[0]=t[1]
+    t[0]=DefinicionConvalor(t[1],t[3],t.lineno(1),t[1].columna)
 
 def p_idt_1(t):
     'IDT : ID'
+    t[0] = ExpresionInicioSimple(t[1],t.lineno(1),get_clomuna(entry,t.slice[1]))
 
 def p_idt_2(t):
     'IDT : ID LIND'
+    t[0] = ExpresionListaIndices(t[1],t[2],t.lineno(1),get_clomuna(entry,t.slice[1]))
 
 def p_lista_indices(t):
     'LIND : LIND IND'
+    t[1].append(t[2])
+    t[0] = t[1]
 
 def p_lista_indice(t):
     'LIND : IND'
-
+    t[0] = [t[1]]
 def p_indice_vacio(t):
     'IND : CORIZQ CORDER'
-
+    t[0] = 0
 def p_indice_lleno(t):
     'IND : CORIZQ expresion_log_relacional CORDER ' 
+    t[0]=t[2]
 
 def p_struct_definicion(t):
     'STRUCTDEF : STRUCT ID LLAVIZQ IDSTRUCT  LLAVDER PTCOMA'
@@ -356,6 +356,7 @@ def p_lista_id_struct(t):
     'IDSTRUCT : IDSTRUCT TIPO_VAR ID PTCOMA'
     t[1].append(t[3])
     t[0] = t[1]
+
 def p_id_struct_def(t):
     'IDSTRUCT :  TIPO_VAR ID PTCOMA'
     t[0]=[t[2]]
@@ -366,7 +367,12 @@ def p_tipo_variable(t):
                 | FLOAT
                 | CHAR
                 | VOID'''
-
+    if t[1] == 'int' : t[0]=TS.TIPO_DATO.INT
+    elif t[1] == 'double' : t[0]=TS.TIPO_DATO.FLOAT
+    elif t[1] == 'float' : t[0]=TS.TIPO_DATO.FLOAT
+    elif t[1] == 'char' : t[0]=TS.TIPO_DATO.CADENA
+    elif t[1] == 'void' : t[0]=TS.TIPO_DATO.VOID
+    
 def p_asignacion_instr(t) :
     'asignacion_instr   : ID TIPO_AS expresion_log_relacional PTCOMA'
     #t[0] =Asignacion(t[1], t[3],t.lineno(1),get_clomuna(entry,t.slice[1]))
@@ -596,7 +602,7 @@ def p_expresion_decimal(t):
 
 def p_expresion_id(t):
     'expresion_numerica   : ID'
-    t[0] = ExpresionNumero(t[1],t.lineno(1),get_clomuna(entry,t.slice[1]))
+    t[0] = ExpresionId(t[1],t.lineno(1),get_clomuna(entry,t.slice[1]))
     asc.append('expresion_numerica - ID ')
 
 def p_expresion_cadena(t) :
