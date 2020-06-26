@@ -41,8 +41,9 @@ class Asignacion(Instruccion) :
         Recibe como parámetro el identificador a asignar y el valor que será asignado.
     '''
 
-    def __init__(self, id, expNumerica,  linea=0 , columna=0) :
+    def __init__(self, id,tipo, expNumerica,  linea=0 , columna=0) :
         self.id = id
+        self.tipo = tipo
         self.expNumerica = expNumerica
         self.linea = linea
         self.columna = columna

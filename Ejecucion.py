@@ -452,7 +452,7 @@ class Ejecucion_MinorC ():
             
             if temp.listaindices[0]!=0:
                 registro = self.generarTemp()
-                nuevo = TS.Simbolo(temp.id,tipo,{},registro)
+                nuevo = TS.Simbolo(temp.id,td.ARRAY,{},registro)
                 
                 if ts.existeSimbolo(nuevo)==False:
                     self.CodigoGenerado += '\t'+registro+'='+'array()'+';'+'\n'
@@ -511,7 +511,7 @@ class Ejecucion_MinorC ():
                 return
             elif temp.listaindices[0]!=0:
                 registro = self.generarTemp()
-                nuevo = TS.Simbolo(temp.id,tipo,{},registro)
+                nuevo = TS.Simbolo(temp.id,td.ARRAY,{},registro)
                 valores = []
                 for i in instr.exp:
                     i = self.resolver_expresion_aritmetica(i,ts)
@@ -538,18 +538,37 @@ class Ejecucion_MinorC ():
    
     def procesar_asignacion(self,instr, ts) :
         try:
-            val = self.resolver_expresion_aritmetica(instr.expNumerica, ts)
-            simbolo = TS.Simbolo(instr.id, instr.expNumerica.tipo, val,self.Etiqueta)
-            if ts.existeSimbolo(simbolo) :
-                ts.actualizar(simbolo)
-            else:
-                ts.agregar(simbolo)
+            registro = ts.obtener(instr.id).reg
+            valor  = self.resolver_expresion_aritmetica(instr.expNumerica,ts)
         except :
-            print('No se puede realizar la asignacionde',instr.id, instr.linea, instr.columna)
-            err = 'Error No se puede realizar la asignacionde ',instr.id ,' En la linea: ',instr.linea,' En la columna: ',instr.columna, 'Tipo: SEMANTICO'
-            self.errores.append(err)
-            pass
+            print('error, no se pudo obtener el valor a asignar')
 
+
+        if instr.tipo == "=":
+            self.CodigoGenerado += '\t'+registro+'='+str(valor)+';'+'\n'
+        elif instr.tipo =="+=":
+            self.CodigoGenerado += '\t'+registro+'='+registro+'+'+str(valor)+';'+'\n'
+        elif instr.tipo =="-=":
+            self.CodigoGenerado += '\t'+registro+'='+registro+'-'+str(valor)+';'+'\n'
+        elif instr.tipo =="*=":
+            self.CodigoGenerado += '\t'+registro+'='+registro+'*'+str(valor)+';'+'\n' 
+        elif instr.tipo =="/=":
+            self.CodigoGenerado += '\t'+registro+'='+registro+'/'+str(valor)+';'+'\n'
+        elif instr.tipo =="%=":
+            self.CodigoGenerado += '\t'+registro+'='+registro+'%'+str(valor)+';'+'\n'
+        elif instr.tipo =="<<=":
+            self.CodigoGenerado += '\t'+registro+'='+registro+'<<'+str(valor)+';'+'\n'
+        elif instr.tipo ==">>=":
+            self.CodigoGenerado += '\t'+registro+'='+registro+'>>'+str(valor)+';'+'\n'
+        elif instr.tipo =="&=":
+            self.CodigoGenerado += '\t'+registro+'='+registro+'&'+str(valor)+';'+'\n'
+        elif instr.tipo =="|=":
+            self.CodigoGenerado += '\t'+registro+'='+registro+'|'+str(valor)+';'+'\n'
+        elif instr.tipo =="^=":
+            self.CodigoGenerado += '\t'+registro+'='+registro+'^'+str(valor)+';'+'\n'
+            
+            
+        return
     def procesar_mientras(self,instr, ts) :
         while resolver_expresion_logica(instr.expLogica, ts) :
             ts_local = TS.TablaDeSimbolos(ts.simbolos)
@@ -1147,6 +1166,7 @@ class Ejecucion_MinorC ():
         for sent in instr.sentencias:
             if isinstance(sent,Imprimir): self.procesar_imprimir(sent,ts)
             elif isinstance(sent,Definicion): self.procesar_definicion(sent,ts)
+            elif isinstance(sent,Asignacion): self.procesar_asignacion(sent,ts)
             else:
                 print('error, sentencia no posible de realizar')
 
@@ -1236,7 +1256,7 @@ class Ejecucion_MinorC ():
         for instr in instrucciones :
             if isinstance(instr, Main) : self.procesar_main(instr,ts)
             elif isinstance(instr, Definicion) : self.procesar_definicion(instr, ts)
-            #elif isinstance(instr, Asignacion) : self.procesar_asignacion(instr, ts)
+            elif isinstance(instr, Asignacion) : self.procesar_asignacion(instr, ts)
             #elif isinstance(instr, Mientras) : self.procesar_mientras(instr, ts)
             #elif isinstance(instr, If) : 
             #elif isinstance(instr, IfElse) : self.procesar_if_else(instr, ts)

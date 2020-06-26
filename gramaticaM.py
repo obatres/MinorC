@@ -184,12 +184,12 @@ def t_CADE(t):
 
 # Comentario de múltiples líneas /* .. */
 def t_COMENTARIO_MULTILINEA(t):
-    r'/\*(.|\n)*?\*/'
+    r'\/\*(.|\n)*?\*\/'
     t.lexer.lineno += t.value.count('\n')
 
 # Comentario simple #...
 def t_COMENTARIO_SIMPLE(t):
-    r'\#.*\n'
+    r'\/\/.*(\n)?'
     t.lexer.lineno += 1
 
 # Caracteres ignorados
@@ -375,7 +375,7 @@ def p_tipo_variable(t):
     
 def p_asignacion_instr(t) :
     'asignacion_instr   : ID TIPO_AS expresion_log_relacional PTCOMA'
-    #t[0] =Asignacion(t[1], t[3],t.lineno(1),get_clomuna(entry,t.slice[1]))
+    t[0] =Asignacion(t[1], t[2],t[3],t.lineno(1),get_clomuna(entry,t.slice[1]))
     asc.append('asignacion_instr   : TEMPORAL IGUAL expresion_log_relacional PTCOMA')
 
 
@@ -391,7 +391,7 @@ def p_tipo_asigna(t):
                 | ANDIGUAL  
                 | NOTIGUAL  
                 | ORIGUAL   '''
-                
+    t[0]=t[1]   
 def p_Funcion(t):
     'FUNCION : TIPO_VAR ID PARIZQ PARAMETROS PARDER BLOQUE'
 
