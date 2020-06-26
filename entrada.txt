@@ -1,5 +1,14 @@
+int a,c=654, b=654,s,d;
+float k,ds,sa_0=021;
+char sad,sda,sa2;
+double as,sd,fds54;
+char ab[]= "asd",b2[]="Asdsad";
+int bfact[5];
+int bfib[6][3][2];
+int assaASd[3]={0,2,10+20};
 
-float k;
 int main( ){
-  printf(k);
+  int l;
+  printf(l);
+  int prueba;
 }

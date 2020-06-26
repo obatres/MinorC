@@ -378,9 +378,6 @@ def p_asignacion_instr(t) :
     #t[0] =Asignacion(t[1], t[3],t.lineno(1),get_clomuna(entry,t.slice[1]))
     asc.append('asignacion_instr   : TEMPORAL IGUAL expresion_log_relacional PTCOMA')
 
-def p_asignacion_instr_incremento(t):
-    'asignacion_instr : expresion_log_relacional'
-    #incremento/decremento
 
 def p_tipo_asigna(t):
     '''TIPO_AS :  IGUAL
@@ -655,6 +652,19 @@ def p_expresion_conversion(t):
     'expresion_numerica : TIPOCONVERSION expresion_log_relacional'
     t[0] = ExpresionConversion(t[1],t[2],t.lineno(1),get_clomuna(entry,t.slice[2]))
     asc.append('expresion_numerica - TIPOCONVERSION expresion_numerica ')
+
+def p_expresion_valores_arreglo(t):
+    'expresion_numerica : LLAVIZQ LISTA_VALORES_ARREGLO LLAVDER'
+    t[0]=t[2]
+
+def p_expresion_Valores_arreglo_lista(t):
+    'LISTA_VALORES_ARREGLO : LISTA_VALORES_ARREGLO COMA expresion_log_relacional'
+    t[1].append(t[3])
+    t[0]=t[1]
+
+def p_expresion_Valor_arreglo(t):
+    'LISTA_VALORES_ARREGLO : expresion_log_relacional'
+    t[0]=[t[1]]
 
 def p_expresion_tipoConversion(t):
     '''TIPOCONVERSION : PARIZQ INT PARDER

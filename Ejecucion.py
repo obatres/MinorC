@@ -449,7 +449,39 @@ class Ejecucion_MinorC ():
                 print('Error, tipo '+str(tipo)+' no aplicable en la definicion')
         
         elif isinstance (temp,ExpresionListaIndices):
-            print('Lista indices')
+            
+            if temp.listaindices[0]!=0:
+                registro = self.generarTemp()
+                nuevo = TS.Simbolo(temp.id,tipo,{},registro)
+                
+                if ts.existeSimbolo(nuevo)==False:
+                    self.CodigoGenerado += '\t'+registro+'='+'array()'+';'+'\n'
+                    ts.agregar(nuevo)   
+                    if len(temp.listaindices)==1:
+                        for i in temp.listaindices:
+                            indice = self.resolver_expresion_aritmetica(i,ts)
+                            if isinstance(indice,int):
+                                for i in range(indice):
+                                    self.CodigoGenerado += '\t'+registro+'['+str(i)+']=0;'+'\n'
+                    elif len(temp.listaindices)==2:
+                        indice1 = self.resolver_expresion_aritmetica(temp.listaindices[0],ts)
+                        indice2 = self.resolver_expresion_aritmetica(temp.listaindices[1],ts)
+                        for i in range(indice1):
+                            for j in range(indice2):
+                                self.CodigoGenerado+= '\t'+registro+'['+str(i)+']'+'['+str(j)+']=0;'+'\n'
+                    elif len(temp.listaindices)==3:
+                        indice1 = self.resolver_expresion_aritmetica(temp.listaindices[0],ts)
+                        indice2 = self.resolver_expresion_aritmetica(temp.listaindices[1],ts)
+                        indice3 = self.resolver_expresion_aritmetica(temp.listaindices[2],ts)
+                        for i in range(indice1):
+                            for j in range(indice2):
+                                for x in range(indice3):
+                                    self.CodigoGenerado+= '\t'+registro+'['+str(i)+']'+'['+str(j)+']'+'['+str(j)+']=0;'+'\n'
+                elif ts.existeSimbolo(nuevo)==True:
+                    print("Error, esta variable ya se declaro previamente o no tiene un registro asociado")
+            else:
+                print('Error, esta variable: '+temp.id+' debe contener un valor para ser inicializada')
+            return
         else:
             print(type(instr.id))
         return
@@ -466,16 +498,38 @@ class Ejecucion_MinorC ():
             elif ts.existeSimbolo(nuevo)==True:
                 print('Error, la variable '+str(temp.id)+' ya ha sido declarada anteriormente')
             return
-        elif isinstance(temp,ExpresionListaIndices):
-            valor = self.resolver_expresion_aritmetica(instr.exp,ts)
-            if len(temp.listaindices)<=1:
+        elif isinstance(temp,ExpresionListaIndices):            
+            if temp.listaindices[0]==0:
+                valor = self.resolver_expresion_aritmetica(instr.exp,ts)
                 registro = self.generarTemp()
                 nuevo = TS.Simbolo(temp.id,tipo,valor,registro)
                 if ts.existeSimbolo(nuevo) == False:
                     self.CodigoGenerado += '\t'+registro+ '='+str(valor)+';'+'\n'
                     ts.agregar(nuevo)
+                elif ts.existeSimbolo(nuevo)==True:
+                    print('Error, la variable '+str(temp.id)+' ya ha sido declarada anteriormente')
+                return
+            elif temp.listaindices[0]!=0:
+                registro = self.generarTemp()
+                nuevo = TS.Simbolo(temp.id,tipo,{},registro)
+                valores = []
+                for i in instr.exp:
+                    i = self.resolver_expresion_aritmetica(i,ts)
+                    valores.append(i)
+                if ts.existeSimbolo(nuevo)==False:
+                    if len(temp.listaindices)==1:
+                        indice = self.resolver_expresion_aritmetica(temp.listaindices[0],ts)
+                        if(len(valores)==indice):
+                            self.CodigoGenerado += '\t'+registro+'='+'array()'+';'+'\n'  
+                            ts.agregar(nuevo) 
+                            if isinstance(indice,int):
+                                for i in range(indice):
+                                    self.CodigoGenerado += '\t'+registro+'['+str(i)+']='+str(valores[i])+';'+'\n'
+                        else:
+                            print('Error, la cantidad de valores a asignar no es la misma con el tamaño del arreglo')
                 return
             else:
+
                 print('mas indices')
             return
         else:
@@ -1092,6 +1146,7 @@ class Ejecucion_MinorC ():
 
         for sent in instr.sentencias:
             if isinstance(sent,Imprimir): self.procesar_imprimir(sent,ts)
+            elif isinstance(sent,Definicion): self.procesar_definicion(sent,ts)
             else:
                 print('error, sentencia no posible de realizar')
 
@@ -1170,29 +1225,36 @@ class Ejecucion_MinorC ():
                     self.errores.append(err) 
 
     def procesar_instrucciones(self,instrucciones, ts) :
-        ## lista de instrucciones recolectadas
-            for instr in instrucciones :
-                if isinstance(instr, Main) : self.procesar_main(instr,ts)
-                elif isinstance(instr, Definicion) : self.procesar_definicion(instr, ts)
-                #elif isinstance(instr, Asignacion) : self.procesar_asignacion(instr, ts)
-                #elif isinstance(instr, Mientras) : self.procesar_mientras(instr, ts)
-                #elif isinstance(instr, If) : 
-                #elif isinstance(instr, IfElse) : self.procesar_if_else(instr, ts)
-                #elif isinstance(instr, Unset) : self.procesar_unset(instr,ts)
-                #elif isinstance(instr,AsignaPunteroPila): self.procesar_asignacion_punteropila(instr,ts)
-                #elif isinstance(instr,AsignaValorPila): self.procesar_asignacion_pila(instr,ts)
-                #elif isinstance(instr, AsignacionExtra): self.procesar_asignacion_extra(instr,ts)
-                #elif isinstance(instr, Main): self.Etiqueta = 'Main'
-                #elif isinstance(instr,Asigna_arreglo): self.procesar_asignacion_arreglo(instr,ts)
-                #elif isinstance(instr,Label): self.procesa_Label(instr,ts)
-                #elif isinstance(instr,Exit): return
-                #elif isinstance(instr,Goto): 
-                    #self.Llamada_goto(instr,ts, instrucciones)
-                    #return
+        ## lista de instrucciones recolectadas.
+        i =0
+        while i <=len(instrucciones):
+            if isinstance(instrucciones[i],Main):
+                break
+            else:
+                i+=1
+        instrucciones.insert(0,instrucciones.pop(i))
+        for instr in instrucciones :
+            if isinstance(instr, Main) : self.procesar_main(instr,ts)
+            elif isinstance(instr, Definicion) : self.procesar_definicion(instr, ts)
+            #elif isinstance(instr, Asignacion) : self.procesar_asignacion(instr, ts)
+            #elif isinstance(instr, Mientras) : self.procesar_mientras(instr, ts)
+            #elif isinstance(instr, If) : 
+            #elif isinstance(instr, IfElse) : self.procesar_if_else(instr, ts)
+            #elif isinstance(instr, Unset) : self.procesar_unset(instr,ts)
+            #elif isinstance(instr,AsignaPunteroPila): self.procesar_asignacion_punteropila(instr,ts)
+            #elif isinstance(instr,AsignaValorPila): self.procesar_asignacion_pila(instr,ts)
+            #elif isinstance(instr, AsignacionExtra): self.procesar_asignacion_extra(instr,ts)
+            #elif isinstance(instr, Main): self.Etiqueta = 'Main'
+            #elif isinstance(instr,Asigna_arreglo): self.procesar_asignacion_arreglo(instr,ts)
+            #elif isinstance(instr,Label): self.procesa_Label(instr,ts)
+            #elif isinstance(instr,Exit): return
+            #elif isinstance(instr,Goto): 
+                #self.Llamada_goto(instr,ts, instrucciones)
+                #return
                 
-                else : 
-                    err = 'Error: instrucción no válida', instr,' En la linea: ',instr,' En la columna: ',instr, 'Tipo: SEMANTICO'
-                    self.errores.append(err) 
+            else : 
+                err = 'Error: instrucción no válida', instr,' En la linea: ',instr,' En la columna: ',instr, 'Tipo: SEMANTICO'
+                self.errores.append(err) 
 
     def procesar_instrucciones_debugger(self,instrucciones, ts, i) :
         ## lista de instrucciones recolectadas
