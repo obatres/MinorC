@@ -513,6 +513,7 @@ class Ejecucion_MinorC ():
                 registro = self.generarTemp()
                 nuevo = TS.Simbolo(temp.id,td.ARRAY,{},registro)
                 valores = []
+                self.CodigoGenerado += '\t'+registro+'='+'array()'+';'+'\n'
                 for i in instr.exp:
                     i = self.resolver_expresion_aritmetica(i,ts)
                     valores.append(i)
@@ -520,7 +521,6 @@ class Ejecucion_MinorC ():
                     if len(temp.listaindices)==1:
                         indice = self.resolver_expresion_aritmetica(temp.listaindices[0],ts)
                         if(len(valores)==indice):
-                            self.CodigoGenerado += '\t'+registro+'='+'array()'+';'+'\n'  
                             ts.agregar(nuevo) 
                             if isinstance(indice,int):
                                 for i in range(indice):
@@ -588,14 +588,44 @@ class Ejecucion_MinorC ():
         else:
             return 0
 
-    def procesar_if_else(self,instr, ts) :
-        val = resolver_expresion_logica(instr.expLogica, ts)
-        if val :
+    def procesar_ifSimple (self, instr, ts):
+        try:
+            condicion = self.resolver_expresion_aritmetica(instr.cond,ts)
+            etiVer = self.generaLabel()
+            etiFal = self.generaLabel()
+            
+            self.CodigoGenerado += '\t'+'if ('+str(condicion)+') goto '+etiVer+';'+'\n'
+            self.CodigoGenerado += '\t'+'goto '+etiFal+ ';'+'\n'
+
+            self.CodigoGenerado +=etiVer+":"+"\n"
             ts_local = TS.TablaDeSimbolos(ts.simbolos)
-            procesar_instrucciones(instr.instrIfVerdadero, ts_local)
-        else :
-            ts_local = TS.TablaDeSimbolos(ts.simbolos)
-            procesar_instrucciones(instr.instrIfFalso, ts_local)
+            self.procesar_sentencias(instr.bloqueSentenciasIf,ts_local)
+            self.CodigoGenerado +=etiFal+":"+"\n"
+            return 1
+        except :
+            return 0
+
+
+    def procesar_sentencias(self,sentencias,ts):
+        for sent in sentencias:
+            if isinstance(sent,Imprimir): self.procesar_imprimir(sent,ts)
+            elif isinstance(sent,Definicion): self.procesar_definicion(sent,ts)
+            elif isinstance(sent,Asignacion): self.procesar_asignacion(sent,ts)
+            elif isinstance(sent,inc) : self.procesar_incremento(sent,ts)
+            elif isinstance(sent,IfSimple): self.procesar_ifSimple(sent,ts)
+            elif isinstance(sent,IfElse): self.procesar_ifElse(sent,ts)
+            else:
+                print(sent)
+                print('error, sentencia no posible de realizar')
+    
+    def procesar_ifElse(self,instr, ts) :
+        
+        if self.procesar_ifSimple(instr.ifinst,ts) == 1:
+            self.procesar_sentencias(instr.elseinst,ts)
+        else:
+            print("Error, no se puede traducir el if else")
+        
+
 
     def resolver_cadena(self,exp, ts) :
         if isinstance(exp, ExpresionConcatenar) :
@@ -1184,13 +1214,10 @@ class Ejecucion_MinorC ():
 
     def procesar_main(self, instr, ts):
         self.CodigoGenerado += "main:"+"\n"
-        for sent in instr.sentencias:
-            if isinstance(sent,Imprimir): self.procesar_imprimir(sent,ts)
-            elif isinstance(sent,Definicion): self.procesar_definicion(sent,ts)
-            elif isinstance(sent,Asignacion): self.procesar_asignacion(sent,ts)
-            elif isinstance(sent,inc) : self.procesar_incremento(sent,ts)
-            else:
-                print('error, sentencia no posible de realizar')
+        try:
+            self.procesar_sentencias(instr.sentencias,ts)
+        except :
+            print('error, no se pueden ejecutar las sentencias dentro de main')
 
     def procesar_asignacion_extra (self,instr,ts):
         try:
@@ -1340,7 +1367,7 @@ class Ejecucion_MinorC ():
         return temp
 
     def generaLabel(self):
-        eti = 'Label'+str(self.contLabel)+":"
+        eti = 'Label'+str(self.contLabel)
         self.contLabel+=1
         return eti
 

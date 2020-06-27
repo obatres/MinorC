@@ -510,7 +510,7 @@ def p_instrucciones_if_listaelseif_else(t):
 
 def p_instrucciones_if_else(t):
     'IFFUN :  if_instr else_instr'
-    t[0] = IfElse(t[1],t[2],t.lineno(1),get_clomuna(entry,t.slice[1]))
+    t[0] = IfElse(t[1],t[2],t.lineno(1),0)
 
 def p_if_instr(t) :
     'if_instr           : IF expresion_numerica BLOQUE'

@@ -1,21 +1,12 @@
-
 int main( ){
-  int a=10;
-  int b="das";
-  a=12;
-  a+=a+1;
-  a-=a+1;
-  a*=a+1;
-  a/=a.ide;
-  a%=&a;
-  a<<=2;
-  a>>=5;
-  a&=a+1;
-  a^=a+1;
-  a|=a+1;
-  a++;
-  --a;
-  --a;
-  ++a;
-  printf(a);
+  printf(10);
+  if (3>4){
+    printf("Asdasd");
+  }else if(0&&1){
+    printf("hola");
+  }else if(0||1){
+    printf("adios");
+  }else{
+    printf("sale");
+  }
 }
