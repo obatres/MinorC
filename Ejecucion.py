@@ -593,18 +593,19 @@ class Ejecucion_MinorC ():
             condicion = self.resolver_expresion_aritmetica(instr.cond,ts)
             etiVer = self.generaLabel()
             etiFal = self.generaLabel()
-            
+            etiSal = self.generaLabel()
             self.CodigoGenerado += '\t'+'if ('+str(condicion)+') goto '+etiVer+';'+'\n'
             self.CodigoGenerado += '\t'+'goto '+etiFal+ ';'+'\n'
 
             self.CodigoGenerado +=etiVer+":"+"\n"
             ts_local = TS.TablaDeSimbolos(ts.simbolos)
             self.procesar_sentencias(instr.bloqueSentenciasIf,ts_local)
+            self.CodigoGenerado +='\t'+"goto "+etiSal+";"+"\n"
             self.CodigoGenerado +=etiFal+":"+"\n"
-            return 1
+
+            return etiSal
         except :
             return 0
-
 
     def procesar_sentencias(self,sentencias,ts):
         for sent in sentencias:
@@ -612,18 +613,28 @@ class Ejecucion_MinorC ():
             elif isinstance(sent,Definicion): self.procesar_definicion(sent,ts)
             elif isinstance(sent,Asignacion): self.procesar_asignacion(sent,ts)
             elif isinstance(sent,inc) : self.procesar_incremento(sent,ts)
-            elif isinstance(sent,IfSimple): self.procesar_ifSimple(sent,ts)
-            elif isinstance(sent,IfElse): self.procesar_ifElse(sent,ts)
+            elif isinstance(sent,IfSimple): 
+                if self.procesar_ifSimple(sent,ts)==0:
+                    print("error en traducir if")
+                    return
+            elif isinstance(sent,IfElse): 
+                if self.procesar_ifElse(sent,ts) == 0:
+                    print("error en traducir if else")
+                    return
             else:
                 print(sent)
                 print('error, sentencia no posible de realizar')
     
     def procesar_ifElse(self,instr, ts) :
-        
-        if self.procesar_ifSimple(instr.ifinst,ts) == 1:
+        try:
+            salida =self.procesar_ifSimple(instr.ifinst,ts) 
             self.procesar_sentencias(instr.elseinst,ts)
-        else:
-            print("Error, no se puede traducir el if else")
+            self.CodigoGenerado += salida +":"+"\n"
+            return 1
+        except:
+            print('error, no se puede traducir el if else')
+            return 0
+
         
 
 
