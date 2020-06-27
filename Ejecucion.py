@@ -623,7 +623,7 @@ class Ejecucion_MinorC ():
             self.CodigoGenerado +=etiFal+":"+"\n"
         except:
             print("error al traducir el while")  
-            
+
     def procesar_sentencias(self,sentencias,ts):
         for sent in sentencias:
             if isinstance(sent,Imprimir): self.procesar_imprimir(sent,ts)
@@ -643,6 +643,7 @@ class Ejecucion_MinorC ():
                 if self.procesar_ifElse(sent,ts) == 0:
                     print("error en traducir if else")
                     return
+            elif isinstance(sent,Goto): self.Llamada_goto(sent,ts)
             else:
                 print(sent)
                 print('error, sentencia no posible de realizar')
@@ -1288,18 +1289,13 @@ class Ejecucion_MinorC ():
         
         self.Etiqueta=str(instr.id)
 
-    def Llamada_goto(self,instr,ts,listasiguientes):  
-        siguientes = []
-        i = 0
-        for ins in listasiguientes:
-            if isinstance(ins,Label):
-                self.Etiqueta = str(instr.id)
-                if ins.id == instr.id:
-                    siguientes = listasiguientes[i+1:]
-                    self.ejecutar_expresiones_label(siguientes,ts,listasiguientes)
-                    return
-            i = i+1
-        return
+    def Llamada_goto(self,instr,ts):  
+        try:
+            self.CodigoGenerado += "\t"+"goto "+instr.id + ";" + "\n"
+            return
+        except :
+            print("error en traduccion de goto")
+            return
 
     def ejecutar_expresiones_label(self,listainstrucciones,ts,listaglobal):
             for instr in listainstrucciones :

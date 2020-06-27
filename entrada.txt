@@ -3,7 +3,7 @@ int main( ){
   printf(10);
   while (5>=a) {
     printf(50);
-
+    goto la;
     if(12>4){
       printf("hola");
     }
