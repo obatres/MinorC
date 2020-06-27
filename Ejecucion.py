@@ -543,32 +543,32 @@ class Ejecucion_MinorC ():
         except :
             print('error, no se pudo obtener el valor a asignar')
 
-
-        if instr.tipo == "=":
-            self.CodigoGenerado += '\t'+registro+'='+str(valor)+';'+'\n'
-        elif instr.tipo =="+=":
-            self.CodigoGenerado += '\t'+registro+'='+registro+'+'+str(valor)+';'+'\n'
-        elif instr.tipo =="-=":
-            self.CodigoGenerado += '\t'+registro+'='+registro+'-'+str(valor)+';'+'\n'
-        elif instr.tipo =="*=":
-            self.CodigoGenerado += '\t'+registro+'='+registro+'*'+str(valor)+';'+'\n' 
-        elif instr.tipo =="/=":
-            self.CodigoGenerado += '\t'+registro+'='+registro+'/'+str(valor)+';'+'\n'
-        elif instr.tipo =="%=":
-            self.CodigoGenerado += '\t'+registro+'='+registro+'%'+str(valor)+';'+'\n'
-        elif instr.tipo =="<<=":
-            self.CodigoGenerado += '\t'+registro+'='+registro+'<<'+str(valor)+';'+'\n'
-        elif instr.tipo ==">>=":
-            self.CodigoGenerado += '\t'+registro+'='+registro+'>>'+str(valor)+';'+'\n'
-        elif instr.tipo =="&=":
-            self.CodigoGenerado += '\t'+registro+'='+registro+'&'+str(valor)+';'+'\n'
-        elif instr.tipo =="|=":
-            self.CodigoGenerado += '\t'+registro+'='+registro+'|'+str(valor)+';'+'\n'
-        elif instr.tipo =="^=":
-            self.CodigoGenerado += '\t'+registro+'='+registro+'^'+str(valor)+';'+'\n'
-        else:
+        try:
+            if instr.tipo == "=":
+                self.CodigoGenerado += '\t'+registro+'='+str(valor)+';'+'\n'
+            elif instr.tipo =="+=":
+                self.CodigoGenerado += '\t'+registro+'='+registro+'+'+str(valor)+';'+'\n'
+            elif instr.tipo =="-=":
+                self.CodigoGenerado += '\t'+registro+'='+registro+'-'+str(valor)+';'+'\n'
+            elif instr.tipo =="*=":
+                self.CodigoGenerado += '\t'+registro+'='+registro+'*'+str(valor)+';'+'\n' 
+            elif instr.tipo =="/=":
+                self.CodigoGenerado += '\t'+registro+'='+registro+'/'+str(valor)+';'+'\n'
+            elif instr.tipo =="%=":
+                self.CodigoGenerado += '\t'+registro+'='+registro+'%'+str(valor)+';'+'\n'
+            elif instr.tipo =="<<=":
+                self.CodigoGenerado += '\t'+registro+'='+registro+'<<'+str(valor)+';'+'\n'
+            elif instr.tipo ==">>=":
+                self.CodigoGenerado += '\t'+registro+'='+registro+'>>'+str(valor)+';'+'\n'
+            elif instr.tipo =="&=":
+                self.CodigoGenerado += '\t'+registro+'='+registro+'&'+str(valor)+';'+'\n'
+            elif instr.tipo =="|=":
+                self.CodigoGenerado += '\t'+registro+'='+registro+'|'+str(valor)+';'+'\n'
+            elif instr.tipo =="^=":
+                self.CodigoGenerado += '\t'+registro+'='+registro+'^'+str(valor)+';'+'\n'
+        except :
             print("Error, no se puede realizar la traduccion de esta asignacion")   
-            
+ 
         return
     def procesar_mientras(self,instr, ts) :
         while resolver_expresion_logica(instr.expLogica, ts) :
@@ -820,10 +820,16 @@ class Ejecucion_MinorC ():
             return ts.obtener(expNum.id).valor
 
         elif isinstance (expNum, ExpresionPuntero):
-            temp = str(expNum.id).lstrip('&')
-            expNum.val = ts.obtenerPuntero(temp)
-            expNum.tipo = TS.TIPO_DATO.INT
-            return expNum.val
+            temp = str(expNum.id).lstrip('&')           
+            try:
+                reg = ts.obtener(temp).reg
+                r = self.generarTemp()
+                self.CodigoGenerado += '\t'+r+'='+'&'+reg+';'+'\n'
+                expNum.tipo = td.INT
+                return r
+            except :
+                print('error, no existe el registro asociado al puntero')
+                return expNum.val
 
         elif isinstance (expNum,ExpresionValorAbsoluto):
             temp=self.resolver_expresion_aritmetica(expNum.exp,ts)
@@ -1182,7 +1188,7 @@ class Ejecucion_MinorC ():
             if isinstance(sent,Imprimir): self.procesar_imprimir(sent,ts)
             elif isinstance(sent,Definicion): self.procesar_definicion(sent,ts)
             elif isinstance(sent,Asignacion): self.procesar_asignacion(sent,ts)
-            elif isinstance(sent, inc) : self.procesar_incremento(sent,ts)
+            elif isinstance(sent,inc) : self.procesar_incremento(sent,ts)
             else:
                 print('error, sentencia no posible de realizar')
 
