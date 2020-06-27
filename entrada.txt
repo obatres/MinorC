@@ -1,12 +1,11 @@
 int main( ){
+  int a = 20;
   printf(10);
-  if (3>4){
-    printf("Asdasd");
-  }else if(0&&1){
-    printf("hola");
-  }else if(0||1){
-    printf("adios");
-  }else{
-    printf("sale");
+  while (5>=a) {
+    printf(50);
+
+    if(12>4){
+      printf("hola");
+    }
   }
 }

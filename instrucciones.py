@@ -283,3 +283,16 @@ class inc ():
         self.tipo=tipo 
         self.linea = linea
         self.columna = columna
+
+class While(Instruccion):
+    '''
+        Esta clase representa la instrucción mientras.
+        La instrucción mientras recibe como parámetro una expresión lógica y la lista
+        de instrucciones a ejecutar si la expresión lógica es verdadera.
+    '''
+
+    def __init__(self, condicion, instrucciones,linea =0, columna=0) :
+        self.condicion = condicion
+        self.instrucciones = instrucciones
+        self.linea = linea
+        self.columna = columna

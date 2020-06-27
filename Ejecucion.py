@@ -598,8 +598,7 @@ class Ejecucion_MinorC ():
             self.CodigoGenerado += '\t'+'goto '+etiFal+ ';'+'\n'
 
             self.CodigoGenerado +=etiVer+":"+"\n"
-            ts_local = TS.TablaDeSimbolos(ts.simbolos)
-            self.procesar_sentencias(instr.bloqueSentenciasIf,ts_local)
+            self.procesar_sentencias(instr.bloqueSentenciasIf,ts)
             self.CodigoGenerado +='\t'+"goto "+etiSal+";"+"\n"
             self.CodigoGenerado +=etiFal+":"+"\n"
 
@@ -607,15 +606,38 @@ class Ejecucion_MinorC ():
         except :
             return 0
 
+    def procesar_While (self, instr, ts):
+        try:
+            etiVer = self.generaLabel()
+            etiFal = self.generaLabel()
+            etiSal = self.generaLabel()
+
+            self.CodigoGenerado +=etiSal+":"+"\n"
+            condicion = self.resolver_expresion_aritmetica(instr.condicion,ts)
+            self.CodigoGenerado += '\t'+'if ('+str(condicion)+') goto '+etiVer+';'+'\n'
+            self.CodigoGenerado += '\t'+'goto '+etiFal+ ';'+'\n'
+
+            self.CodigoGenerado +=etiVer+":"+"\n"
+            self.procesar_sentencias(instr.instrucciones,ts)
+            self.CodigoGenerado +='\t'+"goto "+etiSal+";"+"\n"
+            self.CodigoGenerado +=etiFal+":"+"\n"
+        except:
+            print("error al traducir el while")  
+            
     def procesar_sentencias(self,sentencias,ts):
         for sent in sentencias:
             if isinstance(sent,Imprimir): self.procesar_imprimir(sent,ts)
             elif isinstance(sent,Definicion): self.procesar_definicion(sent,ts)
             elif isinstance(sent,Asignacion): self.procesar_asignacion(sent,ts)
             elif isinstance(sent,inc) : self.procesar_incremento(sent,ts)
+            elif isinstance(sent,While): self.procesar_While(sent,ts)
             elif isinstance(sent,IfSimple): 
-                if self.procesar_ifSimple(sent,ts)==0:
+                sal =self.procesar_ifSimple(sent,ts)
+                if sal==0:
                     print("error en traducir if")
+                    return
+                else:
+                    self.CodigoGenerado += sal+":"+"\n"
                     return
             elif isinstance(sent,IfElse): 
                 if self.procesar_ifElse(sent,ts) == 0:

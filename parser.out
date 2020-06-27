@@ -101,7 +101,7 @@ Rule 74    PARAM -> expresion_log_relacional
 Rule 75    PARAM -> <empty>
 Rule 76    FORF -> FOR PARIZQ definicion_instr expresion_log_relacional PTCOMA asignacion_instr PARDER BLOQUE
 Rule 77    DOFUN -> DO LLAVIZQ SENTENCIAS LLAVDER WHILE expresion_numerica PTCOMA
-Rule 78    WHILEF -> WHILE expresion_numerica LLAVIZQ SENTENCIAS LLAVDER
+Rule 78    WHILEF -> WHILE expresion_log_relacional LLAVIZQ SENTENCIAS LLAVDER
 Rule 79    SWITCHFUN -> SWITCH expresion_numerica LLAVIZQ LISTACASE LLAVDER
 Rule 80    LISTACASE -> LISTACASE CASES
 Rule 81    LISTACASE -> CASES
@@ -302,8 +302,8 @@ WHILEF               : 66
 asignacion_instr     : 5 57 76
 definicion_instr     : 4 56 76
 else_instr           : 90 91
-expresion_log_relacional : 13 14 15 20 26 35 74 76 82 86 97 97 98 98 99 99 100 100 101 101 102 102 103 103 104 104 105 105 106 106 107 108 109 115 115 115 116 124 126 127 132 132 133 133 134 134 135 135 136 136 137 137 138 138 139 139 140 140 141
-expresion_numerica   : 77 78 79 92 131 142
+expresion_log_relacional : 13 14 15 20 26 35 74 76 78 82 86 97 97 98 98 99 99 100 100 101 101 102 102 103 103 104 104 105 105 106 106 107 108 109 115 115 115 116 124 126 127 132 132 133 133 134 134 135 135 136 136 137 137 138 138 139 139 140 140 141
+expresion_numerica   : 77 79 92 131 142
 if_else_instr        : 93 94
 if_instr             : 88 89 90 91 95
 imprimir_instr       : 58
@@ -4519,7 +4519,7 @@ state 118
     (85) CONTINUEF -> . CONTINUE PTCOMA
     (86) RETURNF -> . RETURN expresion_log_relacional PTCOMA
     (87) RETURNF -> . RETURN PTCOMA
-    (78) WHILEF -> . WHILE expresion_numerica LLAVIZQ SENTENCIAS LLAVDER
+    (78) WHILEF -> . WHILE expresion_log_relacional LLAVIZQ SENTENCIAS LLAVDER
     (77) DOFUN -> . DO LLAVIZQ SENTENCIAS LLAVDER WHILE expresion_numerica PTCOMA
     (76) FORF -> . FOR PARIZQ definicion_instr expresion_log_relacional PTCOMA asignacion_instr PARDER BLOQUE
     (71) LLAMADA -> . ID PARIZQ PARAM_LLAMADA PARDER
@@ -4619,7 +4619,7 @@ state 120
     (85) CONTINUEF -> . CONTINUE PTCOMA
     (86) RETURNF -> . RETURN expresion_log_relacional PTCOMA
     (87) RETURNF -> . RETURN PTCOMA
-    (78) WHILEF -> . WHILE expresion_numerica LLAVIZQ SENTENCIAS LLAVDER
+    (78) WHILEF -> . WHILE expresion_log_relacional LLAVIZQ SENTENCIAS LLAVDER
     (77) DOFUN -> . DO LLAVIZQ SENTENCIAS LLAVDER WHILE expresion_numerica PTCOMA
     (76) FORF -> . FOR PARIZQ definicion_instr expresion_log_relacional PTCOMA asignacion_instr PARDER BLOQUE
     (71) LLAMADA -> . ID PARIZQ PARAM_LLAMADA PARDER
@@ -6985,7 +6985,7 @@ state 159
     (85) CONTINUEF -> . CONTINUE PTCOMA
     (86) RETURNF -> . RETURN expresion_log_relacional PTCOMA
     (87) RETURNF -> . RETURN PTCOMA
-    (78) WHILEF -> . WHILE expresion_numerica LLAVIZQ SENTENCIAS LLAVDER
+    (78) WHILEF -> . WHILE expresion_log_relacional LLAVIZQ SENTENCIAS LLAVDER
     (77) DOFUN -> . DO LLAVIZQ SENTENCIAS LLAVDER WHILE expresion_numerica PTCOMA
     (76) FORF -> . FOR PARIZQ definicion_instr expresion_log_relacional PTCOMA asignacion_instr PARDER BLOQUE
     (71) LLAMADA -> . ID PARIZQ PARAM_LLAMADA PARDER
@@ -7072,7 +7072,7 @@ state 160
     (85) CONTINUEF -> . CONTINUE PTCOMA
     (86) RETURNF -> . RETURN expresion_log_relacional PTCOMA
     (87) RETURNF -> . RETURN PTCOMA
-    (78) WHILEF -> . WHILE expresion_numerica LLAVIZQ SENTENCIAS LLAVDER
+    (78) WHILEF -> . WHILE expresion_log_relacional LLAVIZQ SENTENCIAS LLAVDER
     (77) DOFUN -> . DO LLAVIZQ SENTENCIAS LLAVDER WHILE expresion_numerica PTCOMA
     (76) FORF -> . FOR PARIZQ definicion_instr expresion_log_relacional PTCOMA asignacion_instr PARDER BLOQUE
     (71) LLAMADA -> . ID PARIZQ PARAM_LLAMADA PARDER
@@ -7858,7 +7858,18 @@ state 185
 
 state 186
 
-    (78) WHILEF -> WHILE . expresion_numerica LLAVIZQ SENTENCIAS LLAVDER
+    (78) WHILEF -> WHILE . expresion_log_relacional LLAVIZQ SENTENCIAS LLAVDER
+    (132) expresion_log_relacional -> . expresion_log_relacional MAYQUE expresion_log_relacional
+    (133) expresion_log_relacional -> . expresion_log_relacional MENQUE expresion_log_relacional
+    (134) expresion_log_relacional -> . expresion_log_relacional IGUALQUE expresion_log_relacional
+    (135) expresion_log_relacional -> . expresion_log_relacional NIGUALQUE expresion_log_relacional
+    (136) expresion_log_relacional -> . expresion_log_relacional MAYORIG expresion_log_relacional
+    (137) expresion_log_relacional -> . expresion_log_relacional MENORIG expresion_log_relacional
+    (138) expresion_log_relacional -> . expresion_log_relacional ANDLOG expresion_log_relacional
+    (139) expresion_log_relacional -> . expresion_log_relacional ORLOG expresion_log_relacional
+    (140) expresion_log_relacional -> . expresion_log_relacional XORLOG expresion_log_relacional
+    (141) expresion_log_relacional -> . NOTLOG expresion_log_relacional
+    (142) expresion_log_relacional -> . expresion_numerica
     (97) expresion_numerica -> . expresion_log_relacional MAS expresion_log_relacional
     (98) expresion_numerica -> . expresion_log_relacional MENOS expresion_log_relacional
     (99) expresion_numerica -> . expresion_log_relacional POR expresion_log_relacional
@@ -7885,22 +7896,12 @@ state 186
     (124) expresion_numerica -> . TIPOCONVERSION expresion_log_relacional
     (125) expresion_numerica -> . LLAVIZQ LISTA_VALORES_ARREGLO LLAVDER
     (131) expresion_numerica -> . ABS PARIZQ expresion_numerica PARDER
-    (132) expresion_log_relacional -> . expresion_log_relacional MAYQUE expresion_log_relacional
-    (133) expresion_log_relacional -> . expresion_log_relacional MENQUE expresion_log_relacional
-    (134) expresion_log_relacional -> . expresion_log_relacional IGUALQUE expresion_log_relacional
-    (135) expresion_log_relacional -> . expresion_log_relacional NIGUALQUE expresion_log_relacional
-    (136) expresion_log_relacional -> . expresion_log_relacional MAYORIG expresion_log_relacional
-    (137) expresion_log_relacional -> . expresion_log_relacional MENORIG expresion_log_relacional
-    (138) expresion_log_relacional -> . expresion_log_relacional ANDLOG expresion_log_relacional
-    (139) expresion_log_relacional -> . expresion_log_relacional ORLOG expresion_log_relacional
-    (140) expresion_log_relacional -> . expresion_log_relacional XORLOG expresion_log_relacional
-    (141) expresion_log_relacional -> . NOTLOG expresion_log_relacional
-    (142) expresion_log_relacional -> . expresion_numerica
     (71) LLAMADA -> . ID PARIZQ PARAM_LLAMADA PARDER
     (128) TIPOCONVERSION -> . PARIZQ INT PARDER
     (129) TIPOCONVERSION -> . PARIZQ FLOAT PARDER
     (130) TIPOCONVERSION -> . PARIZQ CHAR PARDER
 
+    NOTLOG          shift and go to state 53
     NOTBIT          shift and go to state 57
     MENOS           shift and go to state 55
     PARIZQ          shift and go to state 58
@@ -7913,10 +7914,9 @@ state 186
     ANDBIT          shift and go to state 56
     LLAVIZQ         shift and go to state 66
     ABS             shift and go to state 67
-    NOTLOG          shift and go to state 53
 
-    expresion_numerica             shift and go to state 216
-    expresion_log_relacional       shift and go to state 154
+    expresion_log_relacional       shift and go to state 216
+    expresion_numerica             shift and go to state 54
     LLAMADA                        shift and go to state 64
     TIPOCONVERSION                 shift and go to state 65
 
@@ -8373,7 +8373,7 @@ state 200
     (85) CONTINUEF -> . CONTINUE PTCOMA
     (86) RETURNF -> . RETURN expresion_log_relacional PTCOMA
     (87) RETURNF -> . RETURN PTCOMA
-    (78) WHILEF -> . WHILE expresion_numerica LLAVIZQ SENTENCIAS LLAVDER
+    (78) WHILEF -> . WHILE expresion_log_relacional LLAVIZQ SENTENCIAS LLAVDER
     (77) DOFUN -> . DO LLAVIZQ SENTENCIAS LLAVDER WHILE expresion_numerica PTCOMA
     (76) FORF -> . FOR PARIZQ definicion_instr expresion_log_relacional PTCOMA asignacion_instr PARDER BLOQUE
     (71) LLAMADA -> . ID PARIZQ PARAM_LLAMADA PARDER
@@ -8755,7 +8755,7 @@ state 210
     (85) CONTINUEF -> . CONTINUE PTCOMA
     (86) RETURNF -> . RETURN expresion_log_relacional PTCOMA
     (87) RETURNF -> . RETURN PTCOMA
-    (78) WHILEF -> . WHILE expresion_numerica LLAVIZQ SENTENCIAS LLAVDER
+    (78) WHILEF -> . WHILE expresion_log_relacional LLAVIZQ SENTENCIAS LLAVDER
     (77) DOFUN -> . DO LLAVIZQ SENTENCIAS LLAVDER WHILE expresion_numerica PTCOMA
     (76) FORF -> . FOR PARIZQ definicion_instr expresion_log_relacional PTCOMA asignacion_instr PARDER BLOQUE
     (71) LLAMADA -> . ID PARIZQ PARAM_LLAMADA PARDER
@@ -8977,30 +8977,49 @@ state 215
 
 state 216
 
-    (78) WHILEF -> WHILE expresion_numerica . LLAVIZQ SENTENCIAS LLAVDER
-    (142) expresion_log_relacional -> expresion_numerica .
+    (78) WHILEF -> WHILE expresion_log_relacional . LLAVIZQ SENTENCIAS LLAVDER
+    (132) expresion_log_relacional -> expresion_log_relacional . MAYQUE expresion_log_relacional
+    (133) expresion_log_relacional -> expresion_log_relacional . MENQUE expresion_log_relacional
+    (134) expresion_log_relacional -> expresion_log_relacional . IGUALQUE expresion_log_relacional
+    (135) expresion_log_relacional -> expresion_log_relacional . NIGUALQUE expresion_log_relacional
+    (136) expresion_log_relacional -> expresion_log_relacional . MAYORIG expresion_log_relacional
+    (137) expresion_log_relacional -> expresion_log_relacional . MENORIG expresion_log_relacional
+    (138) expresion_log_relacional -> expresion_log_relacional . ANDLOG expresion_log_relacional
+    (139) expresion_log_relacional -> expresion_log_relacional . ORLOG expresion_log_relacional
+    (140) expresion_log_relacional -> expresion_log_relacional . XORLOG expresion_log_relacional
+    (97) expresion_numerica -> expresion_log_relacional . MAS expresion_log_relacional
+    (98) expresion_numerica -> expresion_log_relacional . MENOS expresion_log_relacional
+    (99) expresion_numerica -> expresion_log_relacional . POR expresion_log_relacional
+    (100) expresion_numerica -> expresion_log_relacional . DIVIDIDO expresion_log_relacional
+    (101) expresion_numerica -> expresion_log_relacional . RES expresion_log_relacional
+    (102) expresion_numerica -> expresion_log_relacional . ANDBIT expresion_log_relacional
+    (103) expresion_numerica -> expresion_log_relacional . ORBIT expresion_log_relacional
+    (104) expresion_numerica -> expresion_log_relacional . XORBIT expresion_log_relacional
+    (105) expresion_numerica -> expresion_log_relacional . IZQBIT expresion_log_relacional
+    (106) expresion_numerica -> expresion_log_relacional . DERBIT expresion_log_relacional
+    (115) expresion_numerica -> expresion_log_relacional . INTERRO expresion_log_relacional DOSP expresion_log_relacional
 
     LLAVIZQ         shift and go to state 232
-    MAS             reduce using rule 142 (expresion_log_relacional -> expresion_numerica .)
-    MENOS           reduce using rule 142 (expresion_log_relacional -> expresion_numerica .)
-    POR             reduce using rule 142 (expresion_log_relacional -> expresion_numerica .)
-    DIVIDIDO        reduce using rule 142 (expresion_log_relacional -> expresion_numerica .)
-    RES             reduce using rule 142 (expresion_log_relacional -> expresion_numerica .)
-    ANDBIT          reduce using rule 142 (expresion_log_relacional -> expresion_numerica .)
-    ORBIT           reduce using rule 142 (expresion_log_relacional -> expresion_numerica .)
-    XORBIT          reduce using rule 142 (expresion_log_relacional -> expresion_numerica .)
-    IZQBIT          reduce using rule 142 (expresion_log_relacional -> expresion_numerica .)
-    DERBIT          reduce using rule 142 (expresion_log_relacional -> expresion_numerica .)
-    INTERRO         reduce using rule 142 (expresion_log_relacional -> expresion_numerica .)
-    MAYQUE          reduce using rule 142 (expresion_log_relacional -> expresion_numerica .)
-    MENQUE          reduce using rule 142 (expresion_log_relacional -> expresion_numerica .)
-    IGUALQUE        reduce using rule 142 (expresion_log_relacional -> expresion_numerica .)
-    NIGUALQUE       reduce using rule 142 (expresion_log_relacional -> expresion_numerica .)
-    MAYORIG         reduce using rule 142 (expresion_log_relacional -> expresion_numerica .)
-    MENORIG         reduce using rule 142 (expresion_log_relacional -> expresion_numerica .)
-    ANDLOG          reduce using rule 142 (expresion_log_relacional -> expresion_numerica .)
-    ORLOG           reduce using rule 142 (expresion_log_relacional -> expresion_numerica .)
-    XORLOG          reduce using rule 142 (expresion_log_relacional -> expresion_numerica .)
+    MAYQUE          shift and go to state 83
+    MENQUE          shift and go to state 84
+    IGUALQUE        shift and go to state 85
+    NIGUALQUE       shift and go to state 86
+    MAYORIG         shift and go to state 87
+    MENORIG         shift and go to state 88
+    ANDLOG          shift and go to state 89
+    ORLOG           shift and go to state 90
+    XORLOG          shift and go to state 91
+    MAS             shift and go to state 92
+    MENOS           shift and go to state 93
+    POR             shift and go to state 94
+    DIVIDIDO        shift and go to state 95
+    RES             shift and go to state 96
+    ANDBIT          shift and go to state 97
+    ORBIT           shift and go to state 98
+    XORBIT          shift and go to state 99
+    IZQBIT          shift and go to state 100
+    DERBIT          shift and go to state 101
+    INTERRO         shift and go to state 102
 
 
 state 217
@@ -9037,7 +9056,7 @@ state 217
     (85) CONTINUEF -> . CONTINUE PTCOMA
     (86) RETURNF -> . RETURN expresion_log_relacional PTCOMA
     (87) RETURNF -> . RETURN PTCOMA
-    (78) WHILEF -> . WHILE expresion_numerica LLAVIZQ SENTENCIAS LLAVDER
+    (78) WHILEF -> . WHILE expresion_log_relacional LLAVIZQ SENTENCIAS LLAVDER
     (77) DOFUN -> . DO LLAVIZQ SENTENCIAS LLAVDER WHILE expresion_numerica PTCOMA
     (76) FORF -> . FOR PARIZQ definicion_instr expresion_log_relacional PTCOMA asignacion_instr PARDER BLOQUE
     (71) LLAMADA -> . ID PARIZQ PARAM_LLAMADA PARDER
@@ -9147,7 +9166,7 @@ state 219
     (85) CONTINUEF -> . CONTINUE PTCOMA
     (86) RETURNF -> . RETURN expresion_log_relacional PTCOMA
     (87) RETURNF -> . RETURN PTCOMA
-    (78) WHILEF -> . WHILE expresion_numerica LLAVIZQ SENTENCIAS LLAVDER
+    (78) WHILEF -> . WHILE expresion_log_relacional LLAVIZQ SENTENCIAS LLAVDER
     (77) DOFUN -> . DO LLAVIZQ SENTENCIAS LLAVDER WHILE expresion_numerica PTCOMA
     (76) FORF -> . FOR PARIZQ definicion_instr expresion_log_relacional PTCOMA asignacion_instr PARDER BLOQUE
     (71) LLAMADA -> . ID PARIZQ PARAM_LLAMADA PARDER
@@ -9690,7 +9709,7 @@ state 231
 
 state 232
 
-    (78) WHILEF -> WHILE expresion_numerica LLAVIZQ . SENTENCIAS LLAVDER
+    (78) WHILEF -> WHILE expresion_log_relacional LLAVIZQ . SENTENCIAS LLAVDER
     (54) SENTENCIAS -> . SENTENCIAS SENTENCIA
     (55) SENTENCIAS -> . SENTENCIA
     (56) SENTENCIA -> . definicion_instr
@@ -9722,7 +9741,7 @@ state 232
     (85) CONTINUEF -> . CONTINUE PTCOMA
     (86) RETURNF -> . RETURN expresion_log_relacional PTCOMA
     (87) RETURNF -> . RETURN PTCOMA
-    (78) WHILEF -> . WHILE expresion_numerica LLAVIZQ SENTENCIAS LLAVDER
+    (78) WHILEF -> . WHILE expresion_log_relacional LLAVIZQ SENTENCIAS LLAVDER
     (77) DOFUN -> . DO LLAVIZQ SENTENCIAS LLAVDER WHILE expresion_numerica PTCOMA
     (76) FORF -> . FOR PARIZQ definicion_instr expresion_log_relacional PTCOMA asignacion_instr PARDER BLOQUE
     (71) LLAMADA -> . ID PARIZQ PARAM_LLAMADA PARDER
@@ -9809,7 +9828,7 @@ state 233
     (85) CONTINUEF -> . CONTINUE PTCOMA
     (86) RETURNF -> . RETURN expresion_log_relacional PTCOMA
     (87) RETURNF -> . RETURN PTCOMA
-    (78) WHILEF -> . WHILE expresion_numerica LLAVIZQ SENTENCIAS LLAVDER
+    (78) WHILEF -> . WHILE expresion_log_relacional LLAVIZQ SENTENCIAS LLAVDER
     (77) DOFUN -> . DO LLAVIZQ SENTENCIAS LLAVDER WHILE expresion_numerica PTCOMA
     (76) FORF -> . FOR PARIZQ definicion_instr expresion_log_relacional PTCOMA asignacion_instr PARDER BLOQUE
     (71) LLAMADA -> . ID PARIZQ PARAM_LLAMADA PARDER
@@ -10059,7 +10078,7 @@ state 240
 
 state 241
 
-    (78) WHILEF -> WHILE expresion_numerica LLAVIZQ SENTENCIAS . LLAVDER
+    (78) WHILEF -> WHILE expresion_log_relacional LLAVIZQ SENTENCIAS . LLAVDER
     (54) SENTENCIAS -> SENTENCIAS . SENTENCIA
     (56) SENTENCIA -> . definicion_instr
     (57) SENTENCIA -> . asignacion_instr
@@ -10090,7 +10109,7 @@ state 241
     (85) CONTINUEF -> . CONTINUE PTCOMA
     (86) RETURNF -> . RETURN expresion_log_relacional PTCOMA
     (87) RETURNF -> . RETURN PTCOMA
-    (78) WHILEF -> . WHILE expresion_numerica LLAVIZQ SENTENCIAS LLAVDER
+    (78) WHILEF -> . WHILE expresion_log_relacional LLAVIZQ SENTENCIAS LLAVDER
     (77) DOFUN -> . DO LLAVIZQ SENTENCIAS LLAVDER WHILE expresion_numerica PTCOMA
     (76) FORF -> . FOR PARIZQ definicion_instr expresion_log_relacional PTCOMA asignacion_instr PARDER BLOQUE
     (71) LLAMADA -> . ID PARIZQ PARAM_LLAMADA PARDER
@@ -10348,7 +10367,7 @@ state 248
     (85) CONTINUEF -> . CONTINUE PTCOMA
     (86) RETURNF -> . RETURN expresion_log_relacional PTCOMA
     (87) RETURNF -> . RETURN PTCOMA
-    (78) WHILEF -> . WHILE expresion_numerica LLAVIZQ SENTENCIAS LLAVDER
+    (78) WHILEF -> . WHILE expresion_log_relacional LLAVIZQ SENTENCIAS LLAVDER
     (77) DOFUN -> . DO LLAVIZQ SENTENCIAS LLAVDER WHILE expresion_numerica PTCOMA
     (76) FORF -> . FOR PARIZQ definicion_instr expresion_log_relacional PTCOMA asignacion_instr PARDER BLOQUE
     (71) LLAMADA -> . ID PARIZQ PARAM_LLAMADA PARDER
@@ -10404,32 +10423,32 @@ state 248
 
 state 249
 
-    (78) WHILEF -> WHILE expresion_numerica LLAVIZQ SENTENCIAS LLAVDER .
+    (78) WHILEF -> WHILE expresion_log_relacional LLAVIZQ SENTENCIAS LLAVDER .
 
-    ID              reduce using rule 78 (WHILEF -> WHILE expresion_numerica LLAVIZQ SENTENCIAS LLAVDER .)
-    PRINT           reduce using rule 78 (WHILEF -> WHILE expresion_numerica LLAVIZQ SENTENCIAS LLAVDER .)
-    GOTO            reduce using rule 78 (WHILEF -> WHILE expresion_numerica LLAVIZQ SENTENCIAS LLAVDER .)
-    SWITCH          reduce using rule 78 (WHILEF -> WHILE expresion_numerica LLAVIZQ SENTENCIAS LLAVDER .)
-    BREAK           reduce using rule 78 (WHILEF -> WHILE expresion_numerica LLAVIZQ SENTENCIAS LLAVDER .)
-    CONTINUE        reduce using rule 78 (WHILEF -> WHILE expresion_numerica LLAVIZQ SENTENCIAS LLAVDER .)
-    RETURN          reduce using rule 78 (WHILEF -> WHILE expresion_numerica LLAVIZQ SENTENCIAS LLAVDER .)
-    WHILE           reduce using rule 78 (WHILEF -> WHILE expresion_numerica LLAVIZQ SENTENCIAS LLAVDER .)
-    DO              reduce using rule 78 (WHILEF -> WHILE expresion_numerica LLAVIZQ SENTENCIAS LLAVDER .)
-    FOR             reduce using rule 78 (WHILEF -> WHILE expresion_numerica LLAVIZQ SENTENCIAS LLAVDER .)
-    MASMAS          reduce using rule 78 (WHILEF -> WHILE expresion_numerica LLAVIZQ SENTENCIAS LLAVDER .)
-    MENOSMENOS      reduce using rule 78 (WHILEF -> WHILE expresion_numerica LLAVIZQ SENTENCIAS LLAVDER .)
-    INT             reduce using rule 78 (WHILEF -> WHILE expresion_numerica LLAVIZQ SENTENCIAS LLAVDER .)
-    DOUBLE          reduce using rule 78 (WHILEF -> WHILE expresion_numerica LLAVIZQ SENTENCIAS LLAVDER .)
-    FLOAT           reduce using rule 78 (WHILEF -> WHILE expresion_numerica LLAVIZQ SENTENCIAS LLAVDER .)
-    CHAR            reduce using rule 78 (WHILEF -> WHILE expresion_numerica LLAVIZQ SENTENCIAS LLAVDER .)
-    VOID            reduce using rule 78 (WHILEF -> WHILE expresion_numerica LLAVIZQ SENTENCIAS LLAVDER .)
-    IF              reduce using rule 78 (WHILEF -> WHILE expresion_numerica LLAVIZQ SENTENCIAS LLAVDER .)
-    STRUCT          reduce using rule 78 (WHILEF -> WHILE expresion_numerica LLAVIZQ SENTENCIAS LLAVDER .)
-    $end            reduce using rule 78 (WHILEF -> WHILE expresion_numerica LLAVIZQ SENTENCIAS LLAVDER .)
-    LLAVDER         reduce using rule 78 (WHILEF -> WHILE expresion_numerica LLAVIZQ SENTENCIAS LLAVDER .)
-    ELSE            reduce using rule 78 (WHILEF -> WHILE expresion_numerica LLAVIZQ SENTENCIAS LLAVDER .)
-    CASE            reduce using rule 78 (WHILEF -> WHILE expresion_numerica LLAVIZQ SENTENCIAS LLAVDER .)
-    DEFAULT         reduce using rule 78 (WHILEF -> WHILE expresion_numerica LLAVIZQ SENTENCIAS LLAVDER .)
+    ID              reduce using rule 78 (WHILEF -> WHILE expresion_log_relacional LLAVIZQ SENTENCIAS LLAVDER .)
+    PRINT           reduce using rule 78 (WHILEF -> WHILE expresion_log_relacional LLAVIZQ SENTENCIAS LLAVDER .)
+    GOTO            reduce using rule 78 (WHILEF -> WHILE expresion_log_relacional LLAVIZQ SENTENCIAS LLAVDER .)
+    SWITCH          reduce using rule 78 (WHILEF -> WHILE expresion_log_relacional LLAVIZQ SENTENCIAS LLAVDER .)
+    BREAK           reduce using rule 78 (WHILEF -> WHILE expresion_log_relacional LLAVIZQ SENTENCIAS LLAVDER .)
+    CONTINUE        reduce using rule 78 (WHILEF -> WHILE expresion_log_relacional LLAVIZQ SENTENCIAS LLAVDER .)
+    RETURN          reduce using rule 78 (WHILEF -> WHILE expresion_log_relacional LLAVIZQ SENTENCIAS LLAVDER .)
+    WHILE           reduce using rule 78 (WHILEF -> WHILE expresion_log_relacional LLAVIZQ SENTENCIAS LLAVDER .)
+    DO              reduce using rule 78 (WHILEF -> WHILE expresion_log_relacional LLAVIZQ SENTENCIAS LLAVDER .)
+    FOR             reduce using rule 78 (WHILEF -> WHILE expresion_log_relacional LLAVIZQ SENTENCIAS LLAVDER .)
+    MASMAS          reduce using rule 78 (WHILEF -> WHILE expresion_log_relacional LLAVIZQ SENTENCIAS LLAVDER .)
+    MENOSMENOS      reduce using rule 78 (WHILEF -> WHILE expresion_log_relacional LLAVIZQ SENTENCIAS LLAVDER .)
+    INT             reduce using rule 78 (WHILEF -> WHILE expresion_log_relacional LLAVIZQ SENTENCIAS LLAVDER .)
+    DOUBLE          reduce using rule 78 (WHILEF -> WHILE expresion_log_relacional LLAVIZQ SENTENCIAS LLAVDER .)
+    FLOAT           reduce using rule 78 (WHILEF -> WHILE expresion_log_relacional LLAVIZQ SENTENCIAS LLAVDER .)
+    CHAR            reduce using rule 78 (WHILEF -> WHILE expresion_log_relacional LLAVIZQ SENTENCIAS LLAVDER .)
+    VOID            reduce using rule 78 (WHILEF -> WHILE expresion_log_relacional LLAVIZQ SENTENCIAS LLAVDER .)
+    IF              reduce using rule 78 (WHILEF -> WHILE expresion_log_relacional LLAVIZQ SENTENCIAS LLAVDER .)
+    STRUCT          reduce using rule 78 (WHILEF -> WHILE expresion_log_relacional LLAVIZQ SENTENCIAS LLAVDER .)
+    $end            reduce using rule 78 (WHILEF -> WHILE expresion_log_relacional LLAVIZQ SENTENCIAS LLAVDER .)
+    LLAVDER         reduce using rule 78 (WHILEF -> WHILE expresion_log_relacional LLAVIZQ SENTENCIAS LLAVDER .)
+    ELSE            reduce using rule 78 (WHILEF -> WHILE expresion_log_relacional LLAVIZQ SENTENCIAS LLAVDER .)
+    CASE            reduce using rule 78 (WHILEF -> WHILE expresion_log_relacional LLAVIZQ SENTENCIAS LLAVDER .)
+    DEFAULT         reduce using rule 78 (WHILEF -> WHILE expresion_log_relacional LLAVIZQ SENTENCIAS LLAVDER .)
 
 
 state 250
@@ -10539,7 +10558,7 @@ state 252
     (85) CONTINUEF -> . CONTINUE PTCOMA
     (86) RETURNF -> . RETURN expresion_log_relacional PTCOMA
     (87) RETURNF -> . RETURN PTCOMA
-    (78) WHILEF -> . WHILE expresion_numerica LLAVIZQ SENTENCIAS LLAVDER
+    (78) WHILEF -> . WHILE expresion_log_relacional LLAVIZQ SENTENCIAS LLAVDER
     (77) DOFUN -> . DO LLAVIZQ SENTENCIAS LLAVDER WHILE expresion_numerica PTCOMA
     (76) FORF -> . FOR PARIZQ definicion_instr expresion_log_relacional PTCOMA asignacion_instr PARDER BLOQUE
     (71) LLAMADA -> . ID PARIZQ PARAM_LLAMADA PARDER
@@ -10626,7 +10645,7 @@ state 253
     (85) CONTINUEF -> . CONTINUE PTCOMA
     (86) RETURNF -> . RETURN expresion_log_relacional PTCOMA
     (87) RETURNF -> . RETURN PTCOMA
-    (78) WHILEF -> . WHILE expresion_numerica LLAVIZQ SENTENCIAS LLAVDER
+    (78) WHILEF -> . WHILE expresion_log_relacional LLAVIZQ SENTENCIAS LLAVDER
     (77) DOFUN -> . DO LLAVIZQ SENTENCIAS LLAVDER WHILE expresion_numerica PTCOMA
     (76) FORF -> . FOR PARIZQ definicion_instr expresion_log_relacional PTCOMA asignacion_instr PARDER BLOQUE
     (71) LLAMADA -> . ID PARIZQ PARAM_LLAMADA PARDER
@@ -10779,7 +10798,7 @@ state 257
     (85) CONTINUEF -> . CONTINUE PTCOMA
     (86) RETURNF -> . RETURN expresion_log_relacional PTCOMA
     (87) RETURNF -> . RETURN PTCOMA
-    (78) WHILEF -> . WHILE expresion_numerica LLAVIZQ SENTENCIAS LLAVDER
+    (78) WHILEF -> . WHILE expresion_log_relacional LLAVIZQ SENTENCIAS LLAVDER
     (77) DOFUN -> . DO LLAVIZQ SENTENCIAS LLAVDER WHILE expresion_numerica PTCOMA
     (76) FORF -> . FOR PARIZQ definicion_instr expresion_log_relacional PTCOMA asignacion_instr PARDER BLOQUE
     (71) LLAMADA -> . ID PARIZQ PARAM_LLAMADA PARDER
@@ -10901,7 +10920,7 @@ state 259
     (85) CONTINUEF -> . CONTINUE PTCOMA
     (86) RETURNF -> . RETURN expresion_log_relacional PTCOMA
     (87) RETURNF -> . RETURN PTCOMA
-    (78) WHILEF -> . WHILE expresion_numerica LLAVIZQ SENTENCIAS LLAVDER
+    (78) WHILEF -> . WHILE expresion_log_relacional LLAVIZQ SENTENCIAS LLAVDER
     (77) DOFUN -> . DO LLAVIZQ SENTENCIAS LLAVDER WHILE expresion_numerica PTCOMA
     (76) FORF -> . FOR PARIZQ definicion_instr expresion_log_relacional PTCOMA asignacion_instr PARDER BLOQUE
     (71) LLAMADA -> . ID PARIZQ PARAM_LLAMADA PARDER
