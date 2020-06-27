@@ -1,18 +1,21 @@
 
 int main( ){
   int a=10;
-  int b=12;
+  int b="das";
   a=12;
   a+=a+1;
   a-=a+1;
   a*=a+1;
   a/=a.ide;
   a%=&a;
-  a<<=a++;
-  a>>=--a;
+  a<<=2;
+  a>>=5;
   a&=a+1;
   a^=a+1;
   a|=a+1;
-
+  a++;
+  --a;
+  --a;
+  ++a;
   printf(a);
 }

@@ -173,12 +173,12 @@ def t_ID(t):
 
 def t_CADENA(t):
     r'\'.*?\''
-    t.value = t.value[1:-1]# remuevo las comillas
+    t.value = t.value# remuevo las comillas
     return t 
 
 def t_CADE(t):
     r'\".*?\"'
-    t.value = t.value[1:-1] # remuevo las comillas
+    t.value = t.value # remuevo las comillas
     return t 
 
 
@@ -268,7 +268,8 @@ def p_instruccion(t) :
                         | asignacion_instr
                         | STRUCTDEF
                         | FUNCION
-                        | FUNCMAIN'''
+                        | FUNCMAIN
+                        | INCREMENTO PTCOMA'''
     t[0] = t[1]
     if isinstance(t[1],Asignacion): asc.append('instruccion - asignacion_instr')
     elif isinstance(t[1],Definicion): asc.append('instruccion - definicion_instr')
@@ -435,6 +436,7 @@ def p_Sentencia(t):
                     | DOFUN 
                     | FORF
                     | LLAMADA PTCOMA
+                    | INCREMENTO PTCOMA
                     '''
     t[0]=t[1]
 
@@ -620,19 +622,15 @@ def p_sizeof(t):
     'expresion_numerica : SIZEOF expresion_log_relacional '
     t[0]= ExpresionSizeof(t[2],t.lineno(1),get_clomuna(entry,t.slice[1]))
 
-def p_expresion_incremento(t):
-    'expresion_numerica : INCREMENTO'
-    t[0]=t[1]
-
 def p_incremento_pre(t):
-    '''INCREMENTO :   MASMAS  expresion_log_relacional
-                    | MENOSMENOS expresion_log_relacional'''
-    t[0]= ExpresionIncremento(t[2],t[1], t.lineno(1),get_clomuna(entry,t.slice[1]))
+    '''INCREMENTO :   MASMAS  ID
+                    | MENOSMENOS ID'''
+    t[0]= inc(t[2],t[1], t.lineno(1),get_clomuna(entry,t.slice[1]))
 
 def p_incremento_post(t):
-    '''INCREMENTO : expresion_log_relacional MASMAS
-                    | expresion_log_relacional MENOSMENOS'''
-    t[0] = ExpresionIncremento(t[1],t[2],t.lineno(1),get_clomuna(entry,t.slice[2]))
+    '''INCREMENTO : ID MASMAS
+                    | ID MENOSMENOS'''
+    t[0] = inc(t[1],t[2],t.lineno(1),get_clomuna(entry,t.slice[2]))
 
 def p_expresion_llamada(t):
     'expresion_numerica : LLAMADA'

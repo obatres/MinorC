@@ -566,7 +566,8 @@ class Ejecucion_MinorC ():
             self.CodigoGenerado += '\t'+registro+'='+registro+'|'+str(valor)+';'+'\n'
         elif instr.tipo =="^=":
             self.CodigoGenerado += '\t'+registro+'='+registro+'^'+str(valor)+';'+'\n'
-            
+        else:
+            print("Error, no se puede realizar la traduccion de esta asignacion")   
             
         return
     def procesar_mientras(self,instr, ts) :
@@ -1136,6 +1137,14 @@ class Ejecucion_MinorC ():
                 print('Error, la variable solicitada no existe o no tiene un registro asociado')
                 return
 
+        elif isinstance(expNum,ExpresionAccesoStruct):
+            padre = ts.obtener(expNum.idPadre)
+            hijo = expNum.idHijo
+            expNum.tipo = padre.tipo
+            temporal = self.generarTemp()
+            self.CodigoGenerado += '\t'+temporal+'='+padre.reg+'[\''+str(hijo)+'\']'+';'+'\n'
+            return temporal
+        
         else:
             print(expNum)
             err = 'Error, no existe un valor en el indice: ',expNum,' En la linea: ',expNum.linea,' En la columna: ',expNum.columna, 'Tipo: SEMANTICO'
@@ -1151,22 +1160,29 @@ class Ejecucion_MinorC ():
             err = 'Error el valor ',exp.exp.id,'no puede ser ejecutado por unset(), se esperaba un registro',' En la linea: ',exp.linea,' En la columna: ',exp.columna, 'Tipo: SEMANTICO'
             self.errores.append(err) 
 
-    def procesar_inicioPila(self,instr,ts):
-        pila = TS.Simbolo(instr.id,td.PILA,[],self.Etiqueta)
-        if ts.existeSimbolo(pila):
-            print('La pila ya existe')
-            err = 'Error el valor ',instr.id,'La pila ya existe',' En la linea: ',instr.linea,' En la columna: ',instr.columna, 'Tipo: SEMANTICO'
-            self.errores.append(err) 
-        else:
-            ts.agregar(pila)
+    def procesar_incremento(self, instr, ts):
+        try:
+            reg = ts.obtener(instr.exp) 
+        except:
+            print('la variable no esta definida')
+        try:
+            if reg.tipo == td.INT:
+                if instr.tipo == '++':
+                    self.CodigoGenerado += '\t'+reg.reg+'='+reg.reg+'+1;'+'\n'
+                elif instr.tipo == '--':
+                    self.CodigoGenerado += '\t'+reg.reg+'='+reg.reg+'-1;'+'\n'
+        except :
+            print('error de tipos')
+
+        return
 
     def procesar_main(self, instr, ts):
         self.CodigoGenerado += "main:"+"\n"
-
         for sent in instr.sentencias:
             if isinstance(sent,Imprimir): self.procesar_imprimir(sent,ts)
             elif isinstance(sent,Definicion): self.procesar_definicion(sent,ts)
             elif isinstance(sent,Asignacion): self.procesar_asignacion(sent,ts)
+            elif isinstance(sent, inc) : self.procesar_incremento(sent,ts)
             else:
                 print('error, sentencia no posible de realizar')
 
@@ -1257,6 +1273,7 @@ class Ejecucion_MinorC ():
             if isinstance(instr, Main) : self.procesar_main(instr,ts)
             elif isinstance(instr, Definicion) : self.procesar_definicion(instr, ts)
             elif isinstance(instr, Asignacion) : self.procesar_asignacion(instr, ts)
+            elif isinstance(instr, Incremento) : self.procesar_incremento(instr, ts)
             #elif isinstance(instr, Mientras) : self.procesar_mientras(instr, ts)
             #elif isinstance(instr, If) : 
             #elif isinstance(instr, IfElse) : self.procesar_if_else(instr, ts)

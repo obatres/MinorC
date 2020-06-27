@@ -161,16 +161,7 @@ class ExpresionSizeof(ExpresionNumerica):
         self.linea = linea
         self.columna = columna
 
-class ExpresionIncremento(ExpresionNumerica):
-    '''
-        Esta clase representa la funcion incremento o decremento
-    '''
 
-    def __init__(self, exp, tipo,  linea =0, columna=0) :
-        self.exp=exp   
-        self.tipo=tipo 
-        self.linea = linea
-        self.columna = columna
 
 class ExpresionConversion (ExpresionNumerica):
     '''

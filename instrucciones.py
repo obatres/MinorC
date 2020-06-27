@@ -265,3 +265,21 @@ class DefinicionSinValor():
         self.id = id 
         self.linea = linea
         self.columna = columna
+
+class Incremento(Instruccion):
+    '''
+        Esta clase representa la funcion incremento o decremento
+    '''
+
+    def __init__(self, exp, tipo,  linea =0, columna=0) :
+        self.exp=exp   
+        self.tipo=tipo 
+        self.linea = linea
+        self.columna = columna
+
+class inc ():
+    def __init__(self, exp, tipo,  linea =0, columna=0) :
+        self.exp=exp   
+        self.tipo=tipo 
+        self.linea = linea
+        self.columna = columna
