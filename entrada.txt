@@ -3,16 +3,10 @@ struct punto {
     int ancho;
 };
 
-struct movies_t {
-  char title;
-  int year;
-};
-
-struct movies_t movie;
-
-struct punto mipunto;
-
-
+int fun(){
+  struct punto mipunto;
+}
 int main( ){
+
   printf("ASasd");
 }

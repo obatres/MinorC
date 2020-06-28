@@ -373,7 +373,7 @@ def p_elemento_struct(t):
 def p_struct_declaracion(t):
     'STRUCTDECLA : STRUCT ID ID PTCOMA'
     t[0]= DeclaracionStruct(t[2],t[3],t.lineno(1),get_clomuna(entry,t.slice[2]))
-    
+
 def p_tipo_variable(t):
     '''TIPO_VAR :  INT
                 | DOUBLE
@@ -391,6 +391,8 @@ def p_asignacion_instr(t) :
     t[0] =Asignacion(t[1], t[2],t[3],t.lineno(1),get_clomuna(entry,t.slice[1]))
     asc.append('asignacion_instr   : TEMPORAL IGUAL expresion_log_relacional PTCOMA')
 
+def p_asignacion_struct(t):
+    'ASIGNA_STRUCT : ID PUNTO ID IGUAL expresion_log_relacional PTCOMA'
 
 def p_tipo_asigna(t):
     '''TIPO_AS :  IGUAL
@@ -456,6 +458,7 @@ def p_Sentencia(t):
                     | LLAMADA PTCOMA
                     | INCREMENTO PTCOMA
                     | STRUCTDECLA
+                    | ASIGNA_STRUCT
                     '''
     t[0]=t[1]
 

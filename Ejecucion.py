@@ -645,6 +645,7 @@ class Ejecucion_MinorC ():
                     return
             elif isinstance(sent,Goto): self.Llamada_goto(sent,ts)
             elif isinstance(sent,Label): self.procesa_Label(sent,ts)
+            elif isinstance(sent, DeclaracionStruct) : self.procesar_decla_struct(sent, ts)
             else:
                 print(sent)
                 print('error, sentencia no posible de realizar')
@@ -1345,21 +1346,25 @@ class Ejecucion_MinorC ():
     def procesar_decla_struct(self,instr,ts):
         try:
             struct = ts.obtener(instr.TipoStruct)
+
         except :
             print('error, el struct no esta definidio previamente')
 
         try:
             registro = self.generarTemp()
-            self.CodigoGenerado += '\t'+registro+'=array();'+'\n'
-            for e in struct.valor:
-                if e.tipo == td.INT:
-                    self.CodigoGenerado +='\t'+registro+'[\''+e.ide+'\']=0;'+'\n'
-                elif e.tipo == td.FLOAT:
-                    self.CodigoGenerado +='\t'+registro+'[\''+e.ide+'\']=0.0;'+'\n'
-                elif e.tipo == td.CADENA:
-                    self.CodigoGenerado +='\t'+registro+'[\''+e.ide+'\']=\"0\";'+'\n'
+            nuevo = TS.Simbolo(instr.ide,td.STRUCT,{},registro)
+
+            if ts.existeSimbolo(nuevo)==False:
+                self.CodigoGenerado += '\t'+registro+'=array();'+'\n'
+                for e in struct.valor:
+                    if e.tipo == td.INT:
+                        self.CodigoGenerado +='\t'+registro+'[\''+e.ide+'\']=0;'+'\n'
+                    elif e.tipo == td.FLOAT:
+                        self.CodigoGenerado +='\t'+registro+'[\''+e.ide+'\']=0.0;'+'\n'
+                    elif e.tipo == td.CADENA:
+                        self.CodigoGenerado +='\t'+registro+'[\''+e.ide+'\']=\"0\";'+'\n'
         except:
-            pass
+            print('error, nose puede traducir la declaracion de struct')
 
 
 
