@@ -658,6 +658,9 @@ def p_expresion_conversion(t):
     t[0] = ExpresionConversion(t[1],t[2],t.lineno(1),get_clomuna(entry,t.slice[2]))
     asc.append('expresion_numerica - TIPOCONVERSION expresion_numerica ')
 
+def p_expresion_acceso_arreglo(t):
+    'expresion_numerica : IDT'
+    t[0]=t[1]
 def p_expresion_valores_arreglo(t):
     'expresion_numerica : LLAVIZQ LISTA_VALORES_ARREGLO LLAVDER'
     t[0]=t[2]

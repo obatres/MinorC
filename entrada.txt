@@ -1,9 +1,7 @@
 char prueba (int ab,char bb, float cb){
     int a =10;
-    float b = 5;
-    if(b>a){
-      printf("hola");
-    }
+    float b = a[2][4];
+
 }
 
 int main( ){

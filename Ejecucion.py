@@ -1213,6 +1213,15 @@ class Ejecucion_MinorC ():
             self.CodigoGenerado += '\t'+temporal+'='+padre.reg+'[\''+str(hijo)+'\']'+';'+'\n'
             return temporal
         
+        elif isinstance(expNum, ExpresionListaIndices):
+            registro  = self.generarTemp()
+
+            r = ts.obtener(expNum.id).reg
+            lista =""
+            for i in expNum.listaindices:
+                lista +="["+str(self.resolver_expresion_aritmetica(i,ts))+"]"
+            self.CodigoGenerado += "\t"+registro+"="+r+lista+";"+"\n" 
+            return registro
         else:
             print(expNum)
             err = 'Error, no existe un valor en el indice: ',expNum,' En la linea: ',expNum.linea,' En la columna: ',expNum.columna, 'Tipo: SEMANTICO'
