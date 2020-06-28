@@ -296,3 +296,28 @@ class While(Instruccion):
         self.instrucciones = instrucciones
         self.linea = linea
         self.columna = columna
+
+class DefinicionFuncion(Instruccion):
+    '''
+        Esta clase representa la instrucción definicion de una funcion
+    '''
+
+    def __init__(self, id, parametros, sentencias,linea =0, columna=0) :
+        self.id = id
+        self.parametros = parametros
+        self.sentencias = sentencias
+        self.linea = linea
+        self.columna = columna   
+
+class ParametroDefinicionFuncion():
+    '''
+        Esta clase representa la un parametro
+        dentro de la lista de parametros aceptados
+        en la definicion de una funcion
+    '''
+
+    def __init__(self, tipo, exp,linea =0, columna=0) :
+        self.tipo = tipo
+        self.exp = exp
+        self.linea = linea
+        self.columna = columna   

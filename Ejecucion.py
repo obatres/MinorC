@@ -24,6 +24,7 @@ class Ejecucion_MinorC ():
     CodigoGenerado=''
     cont = 0
     contLabel=0
+    contPar =0
 #--------------------------------------METODOS/FUNCIONES DE EJECUCION EN INTERFAZ
     def ejecutar_asc(self, input):
         import gramaticaM as g
@@ -638,7 +639,6 @@ class Ejecucion_MinorC ():
                     return
                 else:
                     self.CodigoGenerado += sal+":"+"\n"
-
             elif isinstance(sent,IfElse): 
                 if self.procesar_ifElse(sent,ts) == 0:
                     print("error en traducir if else")
@@ -658,9 +658,6 @@ class Ejecucion_MinorC ():
         except:
             print('error, no se puede traducir el if else')
             return 0
-
-        
-
 
     def resolver_cadena(self,exp, ts) :
         if isinstance(exp, ExpresionConcatenar) :
@@ -1292,7 +1289,6 @@ class Ejecucion_MinorC ():
         except :
             print("error, no se puede traducir el label")
 
-
     def Llamada_goto(self,instr,ts):  
         try:
             self.CodigoGenerado += "\t"+"goto "+instr.id + ";" + "\n"
@@ -1300,6 +1296,33 @@ class Ejecucion_MinorC ():
         except :
             print("error en traduccion de goto")
             return
+
+    def procesar_funcion (self, instr,ts):
+        try:
+            self.CodigoGenerado += instr.id+":"+"\n"
+            if instr.parametros[0].exp!=0:
+                for par in instr.parametros:
+                    if par.tipo == td.INT :
+                        para = self.generaPar()
+                        nuevo = TS.Simbolo(par.exp,par.tipo,0,para,instr.id)
+                        self.CodigoGenerado += '\t'+para+"=0"+";"+"\n"
+                    elif par.tipo == td.CADENA:
+                        para = self.generaPar()
+                        nuevo = TS.Simbolo(par.exp,par.tipo," ",para,instr.id)
+                        self.CodigoGenerado += '\t'+para+"=\' \'"+";"+"\n"
+                    elif par.tipo == td.FLOAT:
+                        para = self.generaPar()
+                        nuevo = TS.Simbolo(par.exp,par.tipo,0.0,para,instr.id)
+                        self.CodigoGenerado += '\t'+para+"=0.0"+";"+"\n"
+                if ts.existeSimbolo(nuevo)==False:
+                    ts.agregar(nuevo)
+                else:
+                    ts.actualizar(nuevo)
+
+            self.procesar_sentencias(instr.sentencias,ts)
+        except :
+            print('Error al traducir la funcion')
+
 
     def ejecutar_expresiones_label(self,listainstrucciones,ts,listaglobal):
             for instr in listainstrucciones :
@@ -1340,7 +1363,7 @@ class Ejecucion_MinorC ():
             elif isinstance(instr, Definicion) : self.procesar_definicion(instr, ts)
             elif isinstance(instr, Asignacion) : self.procesar_asignacion(instr, ts)
             elif isinstance(instr, Incremento) : self.procesar_incremento(instr, ts)
-            #elif isinstance(instr, Mientras) : self.procesar_mientras(instr, ts)
+            elif isinstance(instr, DefinicionFuncion) : self.procesar_funcion(instr, ts)
             #elif isinstance(instr, If) : 
             #elif isinstance(instr, IfElse) : self.procesar_if_else(instr, ts)
             #elif isinstance(instr, Unset) : self.procesar_unset(instr,ts)
@@ -1402,6 +1425,11 @@ class Ejecucion_MinorC ():
     def generaLabel(self):
         eti = 'Label'+str(self.contLabel)
         self.contLabel+=1
+        return eti
+
+    def generaPar(self):
+        eti = '$a'+str(self.contPar)
+        self.contPar+=1
         return eti
 
 a = Ejecucion_MinorC()

@@ -1,13 +1,11 @@
-int main( ){
-  int a = 20;
-  printf(10);
-  while (5>=a) {
-    printf(50);
-    goto la;
-    if(12>4){
+char prueba (int ab,char bb, float cb){
+    int a =10;
+    float b = 5;
+    if(b>a){
       printf("hola");
     }
-    la:
-  }
-  
+}
+
+int main( ){
+  printf("ASasd");
 }

@@ -393,20 +393,26 @@ def p_tipo_asigna(t):
                 | NOTIGUAL  
                 | ORIGUAL   '''
     t[0]=t[1]   
+
 def p_Funcion(t):
     'FUNCION : TIPO_VAR ID PARIZQ PARAMETROS PARDER BLOQUE'
-
+    t[0]= DefinicionFuncion(t[2],t[4],t[6],t.lineno(1),get_clomuna(entry,t.slice[2]))
 def p_Funcion_parametros(t):
     'PARAMETROS : PARAMETROS COMA PARAMETRO'
+    t[1].append(t[3])
+    t[0]=t[1]
 
 def p_Funcion_parametros_1(t):
     'PARAMETROS : PARAMETRO'
+    t[0]=[t[1]]
 
 def p_Parametro(t):
     'PARAMETRO : TIPO_VAR ID'
+    t[0]=ParametroDefinicionFuncion(t[1],t[2],t.lineno(1),get_clomuna(entry,t.slice[2]))
 
 def p_Parametro_vacio(t):
     'PARAMETRO : '
+    t[0]= ParametroDefinicionFuncion(0,0)
 
 def p_bloque(t):
     '''BLOQUE : LLAVIZQ SENTENCIAS LLAVDER'''
