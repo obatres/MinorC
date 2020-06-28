@@ -311,7 +311,7 @@ class DefinicionFuncion(Instruccion):
 
 class ParametroDefinicionFuncion():
     '''
-        Esta clase representa la un parametro
+        Esta clase representa un parametro
         dentro de la lista de parametros aceptados
         en la definicion de una funcion
     '''
@@ -319,5 +319,38 @@ class ParametroDefinicionFuncion():
     def __init__(self, tipo, exp,linea =0, columna=0) :
         self.tipo = tipo
         self.exp = exp
+        self.linea = linea
+        self.columna = columna   
+
+class ElementoStruct():
+    '''
+        Esta clase representa un elemento
+        dentro de la lista de elemntos aceptados
+        en la definicion de un struct
+    '''
+
+    def __init__(self, tipo, ide,linea =0, columna=0) :
+        self.tipo = tipo
+        self.ide = ide
+        self.linea = linea
+        self.columna = columna   
+
+class DefStruct(Instruccion):
+    '''
+        Esta clase representa la definicion de un Struct
+    '''
+    def __init__(self, ide, elementos,linea =0, columna=0) :
+        self.ide = ide
+        self.elementos = elementos
+        self.linea = linea
+        self.columna = columna   
+
+class DeclaracionStruct(Instruccion):
+    '''
+        Esta clase representa la declaracion de un Struct
+    '''
+    def __init__(self, TipoStruct, ide,linea =0, columna=0) :
+        self.TipoStruct = TipoStruct
+        self.ide = ide
         self.linea = linea
         self.columna = columna   

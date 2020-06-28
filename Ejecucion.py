@@ -440,7 +440,7 @@ class Ejecucion_MinorC ():
                 elif ts.existeSimbolo(nuevo)==True:
                     print('Error, la variable '+str(temp.id)+' ya ha sido declarada anteriormente')
             elif tipo == td.CADENA:
-                nuevo = TS.Simbolo(temp.id,tipo," ",registro)
+                nuevo = TS.Simbolo(temp.id,tipo,"0",registro)
                 if ts.existeSimbolo(nuevo)==False:
                     self.CodigoGenerado += '\t' + registro + '= \' \';'+'\n'
                     ts.agregar(nuevo)
@@ -1332,6 +1332,36 @@ class Ejecucion_MinorC ():
         except :
             print('Error al traducir la funcion')
 
+    def procesar_def_struct(self, instr, ts):
+
+        try:
+            nuevo = TS.Simbolo(instr.ide,td.STRUCT,instr.elementos,'struct')
+            if ts.existeSimbolo(nuevo)==False:
+                ts.agregar(nuevo)
+        except :
+            print("Error, Struct ya definido")
+            pass
+
+    def procesar_decla_struct(self,instr,ts):
+        try:
+            struct = ts.obtener(instr.TipoStruct)
+        except :
+            print('error, el struct no esta definidio previamente')
+
+        try:
+            registro = self.generarTemp()
+            self.CodigoGenerado += '\t'+registro+'=array();'+'\n'
+            for e in struct.valor:
+                if e.tipo == td.INT:
+                    self.CodigoGenerado +='\t'+registro+'[\''+e.ide+'\']=0;'+'\n'
+                elif e.tipo == td.FLOAT:
+                    self.CodigoGenerado +='\t'+registro+'[\''+e.ide+'\']=0.0;'+'\n'
+                elif e.tipo == td.CADENA:
+                    self.CodigoGenerado +='\t'+registro+'[\''+e.ide+'\']=\"0\";'+'\n'
+        except:
+            pass
+
+
 
     def ejecutar_expresiones_label(self,listainstrucciones,ts,listaglobal):
             for instr in listainstrucciones :
@@ -1373,8 +1403,8 @@ class Ejecucion_MinorC ():
             elif isinstance(instr, Asignacion) : self.procesar_asignacion(instr, ts)
             elif isinstance(instr, Incremento) : self.procesar_incremento(instr, ts)
             elif isinstance(instr, DefinicionFuncion) : self.procesar_funcion(instr, ts)
-            #elif isinstance(instr, If) : 
-            #elif isinstance(instr, IfElse) : self.procesar_if_else(instr, ts)
+            elif isinstance(instr, DefStruct) : self.procesar_def_struct(instr,ts)
+            elif isinstance(instr, DeclaracionStruct) : self.procesar_decla_struct(instr, ts)
             #elif isinstance(instr, Unset) : self.procesar_unset(instr,ts)
             #elif isinstance(instr,AsignaPunteroPila): self.procesar_asignacion_punteropila(instr,ts)
             #elif isinstance(instr,AsignaValorPila): self.procesar_asignacion_pila(instr,ts)

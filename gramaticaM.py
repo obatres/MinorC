@@ -265,11 +265,14 @@ def p_instrucciones_instruccion(t) :
 
 def p_instruccion(t) :
     '''instruccion     : definicion_instr
+                        | imprimir_instr
                         | asignacion_instr
                         | STRUCTDEF
                         | FUNCION
                         | FUNCMAIN
-                        | INCREMENTO PTCOMA'''
+                        | INCREMENTO PTCOMA
+                        | STRUCTDECLA
+                        '''
     t[0] = t[1]
     if isinstance(t[1],Asignacion): asc.append('instruccion - asignacion_instr')
     elif isinstance(t[1],Definicion): asc.append('instruccion - definicion_instr')
@@ -352,16 +355,25 @@ def p_indice_lleno(t):
 
 def p_struct_definicion(t):
     'STRUCTDEF : STRUCT ID LLAVIZQ IDSTRUCT  LLAVDER PTCOMA'
+    t[0]=DefStruct(t[2],t[4],t.lineno(1),get_clomuna(entry,t.slice[2]))
 
 def p_lista_id_struct(t):
-    'IDSTRUCT : IDSTRUCT TIPO_VAR ID PTCOMA'
-    t[1].append(t[3])
+    'IDSTRUCT : IDSTRUCT ELESTRUCT'
+    t[1].append(t[2])
     t[0] = t[1]
 
 def p_id_struct_def(t):
-    'IDSTRUCT :  TIPO_VAR ID PTCOMA'
-    t[0]=[t[2]]
+    'IDSTRUCT :  ELESTRUCT'
+    t[0]=[t[1]]
 
+def p_elemento_struct(t):
+    'ELESTRUCT : TIPO_VAR ID PTCOMA'
+    t[0]=ElementoStruct(t[1],t[2],t.lineno(1),get_clomuna(entry,t.slice[2]))
+
+def p_struct_declaracion(t):
+    'STRUCTDECLA : STRUCT ID ID PTCOMA'
+    t[0]= DeclaracionStruct(t[2],t[3],t.lineno(1),get_clomuna(entry,t.slice[2]))
+    
 def p_tipo_variable(t):
     '''TIPO_VAR :  INT
                 | DOUBLE
@@ -443,6 +455,7 @@ def p_Sentencia(t):
                     | FORF
                     | LLAMADA PTCOMA
                     | INCREMENTO PTCOMA
+                    | STRUCTDECLA
                     '''
     t[0]=t[1]
 

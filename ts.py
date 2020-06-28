@@ -8,6 +8,7 @@ class TIPO_DATO(Enum) :
     PILA    = 5
     VOID    = 6
     DOUBLE  = 7
+    STRUCT  = 8
 
 
 class Simbolo() :

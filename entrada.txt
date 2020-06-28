@@ -1,8 +1,17 @@
-char prueba (int ab,char bb, float cb){
-    int a =10;
-    float b = a[2][4];
+struct punto {
+    int alto;
+    int ancho;
+};
 
-}
+struct movies_t {
+  char title;
+  int year;
+};
+
+struct movies_t movie;
+
+struct punto mipunto;
+
 
 int main( ){
   printf("ASasd");
