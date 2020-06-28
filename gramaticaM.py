@@ -465,7 +465,7 @@ def p_do_while_fun(t):
 def p_while_fun(t):
     'WHILEF : WHILE expresion_log_relacional LLAVIZQ SENTENCIAS LLAVDER'
     t[0]= While(t[2],t[4],t.lineno(1),get_clomuna(entry,t.slice[1]))
-    
+
 def p_switch_fun(t):
     'SWITCHFUN : SWITCH expresion_numerica LLAVIZQ LISTACASE LLAVDER'
 

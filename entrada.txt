@@ -7,5 +7,7 @@ int main( ){
     if(12>4){
       printf("hola");
     }
+    la:
   }
+  
 }

@@ -638,12 +638,13 @@ class Ejecucion_MinorC ():
                     return
                 else:
                     self.CodigoGenerado += sal+":"+"\n"
-                    return
+
             elif isinstance(sent,IfElse): 
                 if self.procesar_ifElse(sent,ts) == 0:
                     print("error en traducir if else")
                     return
             elif isinstance(sent,Goto): self.Llamada_goto(sent,ts)
+            elif isinstance(sent,Label): self.procesa_Label(sent,ts)
             else:
                 print(sent)
                 print('error, sentencia no posible de realizar')
@@ -1286,8 +1287,11 @@ class Ejecucion_MinorC ():
                     diccionario=diccionario.get(indice)
 
     def procesa_Label(self,instr,ts):
-        
-        self.Etiqueta=str(instr.id)
+        try:
+            self.CodigoGenerado+=str(instr.id)+":"+"\n"
+        except :
+            print("error, no se puede traducir el label")
+
 
     def Llamada_goto(self,instr,ts):  
         try:
