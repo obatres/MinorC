@@ -646,6 +646,7 @@ class Ejecucion_MinorC ():
             elif isinstance(sent,Goto): self.Llamada_goto(sent,ts)
             elif isinstance(sent,Label): self.procesa_Label(sent,ts)
             elif isinstance(sent, DeclaracionStruct) : self.procesar_decla_struct(sent, ts)
+            elif isinstance(sent, AsignacionStruct) : self.procesar_asignacion_struct(sent,ts)
             else:
                 print(sent)
                 print('error, sentencia no posible de realizar')
@@ -1355,6 +1356,7 @@ class Ejecucion_MinorC ():
             nuevo = TS.Simbolo(instr.ide,td.STRUCT,{},registro)
 
             if ts.existeSimbolo(nuevo)==False:
+                ts.agregar(nuevo)
                 self.CodigoGenerado += '\t'+registro+'=array();'+'\n'
                 for e in struct.valor:
                     if e.tipo == td.INT:
@@ -1366,7 +1368,10 @@ class Ejecucion_MinorC ():
         except:
             print('error, nose puede traducir la declaracion de struct')
 
-
+    def procesar_asignacion_struct(self,instr,ts):
+        struct = ts.obtener(instr.TipoStruct)
+        valor =self.resolver_expresion_aritmetica(instr.valor,ts)
+        self.CodigoGenerado += '\t'+struct.reg+'[\''+instr.ide+'\']='+str(valor)+";"+"\n"
 
     def ejecutar_expresiones_label(self,listainstrucciones,ts,listaglobal):
             for instr in listainstrucciones :
@@ -1410,7 +1415,7 @@ class Ejecucion_MinorC ():
             elif isinstance(instr, DefinicionFuncion) : self.procesar_funcion(instr, ts)
             elif isinstance(instr, DefStruct) : self.procesar_def_struct(instr,ts)
             elif isinstance(instr, DeclaracionStruct) : self.procesar_decla_struct(instr, ts)
-            #elif isinstance(instr, Unset) : self.procesar_unset(instr,ts)
+            elif isinstance(instr, AsignacionStruct) : self.procesar_asignacion_struct(instr,ts)
             #elif isinstance(instr,AsignaPunteroPila): self.procesar_asignacion_punteropila(instr,ts)
             #elif isinstance(instr,AsignaValorPila): self.procesar_asignacion_pila(instr,ts)
             #elif isinstance(instr, AsignacionExtra): self.procesar_asignacion_extra(instr,ts)

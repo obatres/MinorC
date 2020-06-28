@@ -4,7 +4,10 @@ struct punto {
 };
 
 int fun(){
+
   struct punto mipunto;
+  struct punto otropunto;
+  mipunto.alto=otropunto.alto;
 }
 int main( ){
 

@@ -354,3 +354,15 @@ class DeclaracionStruct(Instruccion):
         self.ide = ide
         self.linea = linea
         self.columna = columna   
+
+class AsignacionStruct(Instruccion):
+    '''
+        Esta clase representa la asignacion de valor 
+        a un elemnto de un Struct
+    '''
+    def __init__(self, TipoStruct, ide,valor,linea =0, columna=0) :
+        self.TipoStruct = TipoStruct
+        self.ide = ide
+        self.valor = valor
+        self.linea = linea
+        self.columna = columna  

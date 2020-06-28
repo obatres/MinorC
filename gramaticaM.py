@@ -393,7 +393,8 @@ def p_asignacion_instr(t) :
 
 def p_asignacion_struct(t):
     'ASIGNA_STRUCT : ID PUNTO ID IGUAL expresion_log_relacional PTCOMA'
-
+    t[0]=AsignacionStruct(t[1],t[3],t[5],t.lineno(1),get_clomuna(entry,t.slice[1]))
+    
 def p_tipo_asigna(t):
     '''TIPO_AS :  IGUAL
                 | MASIGUAL
