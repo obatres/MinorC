@@ -394,7 +394,7 @@ def p_asignacion_instr(t) :
 def p_asignacion_struct(t):
     'ASIGNA_STRUCT : ID PUNTO ID IGUAL expresion_log_relacional PTCOMA'
     t[0]=AsignacionStruct(t[1],t[3],t[5],t.lineno(1),get_clomuna(entry,t.slice[1]))
-    
+
 def p_tipo_asigna(t):
     '''TIPO_AS :  IGUAL
                 | MASIGUAL
@@ -480,7 +480,8 @@ def p_param_vacio(t):
     'PARAM : '
     t[0]= 0
 def p_for_fun(t):
-    'FORF : FOR PARIZQ definicion_instr expresion_log_relacional PTCOMA asignacion_instr PARDER BLOQUE '
+    'FORF : FOR PARIZQ definicion_instr expresion_log_relacional PTCOMA INCREMENTO PARDER BLOQUE '
+    t[0]=FuncionFor(t[3],t[4],t[6],t[8],t.lineno(1),get_clomuna(entry,t.slice[1]))
     
 def p_do_while_fun(t):
     'DOFUN : DO LLAVIZQ SENTENCIAS LLAVDER WHILE expresion_numerica PTCOMA '

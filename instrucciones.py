@@ -366,3 +366,15 @@ class AsignacionStruct(Instruccion):
         self.valor = valor
         self.linea = linea
         self.columna = columna  
+
+class FuncionFor(Instruccion):
+    '''
+        Esta clase representa la funcion for
+    '''
+    def __init__(self, definicion, condicion,incremento,sentencias,linea =0, columna=0) :
+        self.definicion = definicion
+        self.condicion = condicion
+        self.incremento = incremento
+        self.sentencias = sentencias
+        self.linea = linea
+        self.columna = columna  

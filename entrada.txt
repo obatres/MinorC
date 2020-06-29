@@ -1,15 +1,12 @@
-struct punto {
-    int alto;
-    int ancho;
-};
 
-int fun(){
-
-  struct punto mipunto;
-  struct punto otropunto;
-  mipunto.alto=otropunto.alto;
-}
 int main( ){
 
   printf("ASasd");
+  for (int i=0;i>10;i++){
+    printf("for");
+    if(i==0){
+      printf(i);
+    }
+  }
+  printf(i);
 }

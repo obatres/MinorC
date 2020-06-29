@@ -625,6 +625,25 @@ class Ejecucion_MinorC ():
         except:
             print("error al traducir el while")  
 
+    def procesar_for(self, instr,ts):
+        try:
+            etiVer = self.generaLabel()
+            etiFal = self.generaLabel()
+            etiRep = self.generaLabel()
+            ts_local = TS.TablaDeSimbolos(ts.simbolos)
+            self.procesar_definicion(instr.definicion,ts_local)
+            self.CodigoGenerado += etiRep+":"+"\n"
+            cond = self.resolver_expresion_logica(instr.condicion,ts_local)
+            self.CodigoGenerado+='\t'+"if ("+cond+") goto "+etiVer+";"+"\n"
+            self.CodigoGenerado+='\t'+"goto "+etiFal+";"+"\n"
+            self.CodigoGenerado += etiVer+":"+"\n"
+            self.procesar_sentencias(instr.sentencias,ts_local)
+            self.procesar_incremento(instr.incremento,ts_local)
+            self.CodigoGenerado+='\t'+"goto "+etiRep+";"+"\n"
+            self.CodigoGenerado += etiFal+":"+"\n"
+        except:
+            print("error, no se puede traducir el ciclo for")
+            return
     def procesar_sentencias(self,sentencias,ts):
         for sent in sentencias:
             if isinstance(sent,Imprimir): self.procesar_imprimir(sent,ts)
@@ -647,6 +666,7 @@ class Ejecucion_MinorC ():
             elif isinstance(sent,Label): self.procesa_Label(sent,ts)
             elif isinstance(sent, DeclaracionStruct) : self.procesar_decla_struct(sent, ts)
             elif isinstance(sent, AsignacionStruct) : self.procesar_asignacion_struct(sent,ts)
+            elif isinstance(sent, FuncionFor): self.procesar_for(sent,ts)
             else:
                 print(sent)
                 print('error, sentencia no posible de realizar')
@@ -1206,7 +1226,14 @@ class Ejecucion_MinorC ():
             except:
                 print('Error, la variable solicitada no existe o no tiene un registro asociado')
                 return
-
+        elif isinstance(expNum,ExpresionInicioSimple):
+            try:
+                registro = ts.obtener(expNum.id)
+                expNum.tipo = registro.tipo
+                return registro.reg
+            except:
+                print('Error, la variable solicitada no existe o no tiene un registro asociado')
+                return
         elif isinstance(expNum,ExpresionAccesoStruct):
             padre = ts.obtener(expNum.idPadre)
             hijo = expNum.idHijo

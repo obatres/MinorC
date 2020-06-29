@@ -106,7 +106,7 @@ Rule 79    PARAM_LLAMADA -> PARAM_LLAMADA COMA PARAM
 Rule 80    PARAM_LLAMADA -> PARAM
 Rule 81    PARAM -> expresion_log_relacional
 Rule 82    PARAM -> <empty>
-Rule 83    FORF -> FOR PARIZQ definicion_instr expresion_log_relacional PTCOMA asignacion_instr PARDER BLOQUE
+Rule 83    FORF -> FOR PARIZQ definicion_instr expresion_log_relacional PTCOMA INCREMENTO PARDER BLOQUE
 Rule 84    DOFUN -> DO LLAVIZQ SENTENCIAS LLAVDER WHILE expresion_numerica PTCOMA
 Rule 85    WHILEF -> WHILE expresion_log_relacional LLAVIZQ SENTENCIAS LLAVDER
 Rule 86    SWITCHFUN -> SWITCH expresion_numerica LLAVIZQ LISTACASE LLAVDER
@@ -287,7 +287,7 @@ IDDECLA              : 19 20
 IDSTRUCT             : 29 30
 IDT                  : 21 22 132
 IFFUN                : 66
-INCREMENTO           : 10 75
+INCREMENTO           : 10 75 83
 IND                  : 25 26
 LIND                 : 24 25
 LISTACASE            : 86 87
@@ -310,7 +310,7 @@ TIPOCONVERSION       : 131
 TIPO_AS              : 39
 TIPO_VAR             : 18 32 52 55
 WHILEF               : 71
-asignacion_instr     : 6 62 83
+asignacion_instr     : 6 62
 definicion_instr     : 4 61 83
 else_instr           : 97 98
 expresion_log_relacional : 15 16 17 22 28 39 40 81 83 85 89 93 104 104 105 105 106 106 107 107 108 108 109 109 110 110 111 111 112 112 113 113 114 115 116 122 122 122 123 131 134 135 140 140 141 141 142 142 143 143 144 144 145 145 146 146 147 147 148 148 149
@@ -917,6 +917,7 @@ state 31
     (126) INCREMENTO -> ID MASMAS .
 
     PTCOMA          reduce using rule 126 (INCREMENTO -> ID MASMAS .)
+    PARDER          reduce using rule 126 (INCREMENTO -> ID MASMAS .)
 
 
 state 32
@@ -924,6 +925,7 @@ state 32
     (127) INCREMENTO -> ID MENOSMENOS .
 
     PTCOMA          reduce using rule 127 (INCREMENTO -> ID MENOSMENOS .)
+    PARDER          reduce using rule 127 (INCREMENTO -> ID MENOSMENOS .)
 
 
 state 33
@@ -1156,6 +1158,7 @@ state 46
     (124) INCREMENTO -> MASMAS ID .
 
     PTCOMA          reduce using rule 124 (INCREMENTO -> MASMAS ID .)
+    PARDER          reduce using rule 124 (INCREMENTO -> MASMAS ID .)
 
 
 state 47
@@ -1163,6 +1166,7 @@ state 47
     (125) INCREMENTO -> MENOSMENOS ID .
 
     PTCOMA          reduce using rule 125 (INCREMENTO -> MENOSMENOS ID .)
+    PARDER          reduce using rule 125 (INCREMENTO -> MENOSMENOS ID .)
 
 
 state 48
@@ -5133,7 +5137,6 @@ state 123
     ELSE            reduce using rule 39 (asignacion_instr -> ID TIPO_AS expresion_log_relacional PTCOMA .)
     CASE            reduce using rule 39 (asignacion_instr -> ID TIPO_AS expresion_log_relacional PTCOMA .)
     DEFAULT         reduce using rule 39 (asignacion_instr -> ID TIPO_AS expresion_log_relacional PTCOMA .)
-    PARDER          reduce using rule 39 (asignacion_instr -> ID TIPO_AS expresion_log_relacional PTCOMA .)
 
 
 state 124
@@ -5246,7 +5249,7 @@ state 128
     (94) RETURNF -> . RETURN PTCOMA
     (85) WHILEF -> . WHILE expresion_log_relacional LLAVIZQ SENTENCIAS LLAVDER
     (84) DOFUN -> . DO LLAVIZQ SENTENCIAS LLAVDER WHILE expresion_numerica PTCOMA
-    (83) FORF -> . FOR PARIZQ definicion_instr expresion_log_relacional PTCOMA asignacion_instr PARDER BLOQUE
+    (83) FORF -> . FOR PARIZQ definicion_instr expresion_log_relacional PTCOMA INCREMENTO PARDER BLOQUE
     (78) LLAMADA -> . ID PARIZQ PARAM_LLAMADA PARDER
     (124) INCREMENTO -> . MASMAS ID
     (125) INCREMENTO -> . MENOSMENOS ID
@@ -5353,7 +5356,7 @@ state 130
     (94) RETURNF -> . RETURN PTCOMA
     (85) WHILEF -> . WHILE expresion_log_relacional LLAVIZQ SENTENCIAS LLAVDER
     (84) DOFUN -> . DO LLAVIZQ SENTENCIAS LLAVDER WHILE expresion_numerica PTCOMA
-    (83) FORF -> . FOR PARIZQ definicion_instr expresion_log_relacional PTCOMA asignacion_instr PARDER BLOQUE
+    (83) FORF -> . FOR PARIZQ definicion_instr expresion_log_relacional PTCOMA INCREMENTO PARDER BLOQUE
     (78) LLAMADA -> . ID PARIZQ PARAM_LLAMADA PARDER
     (124) INCREMENTO -> . MASMAS ID
     (125) INCREMENTO -> . MENOSMENOS ID
@@ -7832,7 +7835,7 @@ state 170
     (94) RETURNF -> . RETURN PTCOMA
     (85) WHILEF -> . WHILE expresion_log_relacional LLAVIZQ SENTENCIAS LLAVDER
     (84) DOFUN -> . DO LLAVIZQ SENTENCIAS LLAVDER WHILE expresion_numerica PTCOMA
-    (83) FORF -> . FOR PARIZQ definicion_instr expresion_log_relacional PTCOMA asignacion_instr PARDER BLOQUE
+    (83) FORF -> . FOR PARIZQ definicion_instr expresion_log_relacional PTCOMA INCREMENTO PARDER BLOQUE
     (78) LLAMADA -> . ID PARIZQ PARAM_LLAMADA PARDER
     (124) INCREMENTO -> . MASMAS ID
     (125) INCREMENTO -> . MENOSMENOS ID
@@ -7926,7 +7929,7 @@ state 171
     (94) RETURNF -> . RETURN PTCOMA
     (85) WHILEF -> . WHILE expresion_log_relacional LLAVIZQ SENTENCIAS LLAVDER
     (84) DOFUN -> . DO LLAVIZQ SENTENCIAS LLAVDER WHILE expresion_numerica PTCOMA
-    (83) FORF -> . FOR PARIZQ definicion_instr expresion_log_relacional PTCOMA asignacion_instr PARDER BLOQUE
+    (83) FORF -> . FOR PARIZQ definicion_instr expresion_log_relacional PTCOMA INCREMENTO PARDER BLOQUE
     (78) LLAMADA -> . ID PARIZQ PARAM_LLAMADA PARDER
     (124) INCREMENTO -> . MASMAS ID
     (125) INCREMENTO -> . MENOSMENOS ID
@@ -8854,7 +8857,7 @@ state 199
 
 state 200
 
-    (83) FORF -> FOR . PARIZQ definicion_instr expresion_log_relacional PTCOMA asignacion_instr PARDER BLOQUE
+    (83) FORF -> FOR . PARIZQ definicion_instr expresion_log_relacional PTCOMA INCREMENTO PARDER BLOQUE
 
     PARIZQ          shift and go to state 230
 
@@ -9318,7 +9321,7 @@ state 212
     (94) RETURNF -> . RETURN PTCOMA
     (85) WHILEF -> . WHILE expresion_log_relacional LLAVIZQ SENTENCIAS LLAVDER
     (84) DOFUN -> . DO LLAVIZQ SENTENCIAS LLAVDER WHILE expresion_numerica PTCOMA
-    (83) FORF -> . FOR PARIZQ definicion_instr expresion_log_relacional PTCOMA asignacion_instr PARDER BLOQUE
+    (83) FORF -> . FOR PARIZQ definicion_instr expresion_log_relacional PTCOMA INCREMENTO PARDER BLOQUE
     (78) LLAMADA -> . ID PARIZQ PARAM_LLAMADA PARDER
     (124) INCREMENTO -> . MASMAS ID
     (125) INCREMENTO -> . MENOSMENOS ID
@@ -9650,7 +9653,7 @@ state 222
     (94) RETURNF -> . RETURN PTCOMA
     (85) WHILEF -> . WHILE expresion_log_relacional LLAVIZQ SENTENCIAS LLAVDER
     (84) DOFUN -> . DO LLAVIZQ SENTENCIAS LLAVDER WHILE expresion_numerica PTCOMA
-    (83) FORF -> . FOR PARIZQ definicion_instr expresion_log_relacional PTCOMA asignacion_instr PARDER BLOQUE
+    (83) FORF -> . FOR PARIZQ definicion_instr expresion_log_relacional PTCOMA INCREMENTO PARDER BLOQUE
     (78) LLAMADA -> . ID PARIZQ PARAM_LLAMADA PARDER
     (124) INCREMENTO -> . MASMAS ID
     (125) INCREMENTO -> . MENOSMENOS ID
@@ -9958,7 +9961,7 @@ state 229
     (94) RETURNF -> . RETURN PTCOMA
     (85) WHILEF -> . WHILE expresion_log_relacional LLAVIZQ SENTENCIAS LLAVDER
     (84) DOFUN -> . DO LLAVIZQ SENTENCIAS LLAVDER WHILE expresion_numerica PTCOMA
-    (83) FORF -> . FOR PARIZQ definicion_instr expresion_log_relacional PTCOMA asignacion_instr PARDER BLOQUE
+    (83) FORF -> . FOR PARIZQ definicion_instr expresion_log_relacional PTCOMA INCREMENTO PARDER BLOQUE
     (78) LLAMADA -> . ID PARIZQ PARAM_LLAMADA PARDER
     (124) INCREMENTO -> . MASMAS ID
     (125) INCREMENTO -> . MENOSMENOS ID
@@ -10017,7 +10020,7 @@ state 229
 
 state 230
 
-    (83) FORF -> FOR PARIZQ . definicion_instr expresion_log_relacional PTCOMA asignacion_instr PARDER BLOQUE
+    (83) FORF -> FOR PARIZQ . definicion_instr expresion_log_relacional PTCOMA INCREMENTO PARDER BLOQUE
     (18) definicion_instr -> . TIPO_VAR LISTAID PTCOMA
     (34) TIPO_VAR -> . INT
     (35) TIPO_VAR -> . DOUBLE
@@ -10082,7 +10085,7 @@ state 232
     (94) RETURNF -> . RETURN PTCOMA
     (85) WHILEF -> . WHILE expresion_log_relacional LLAVIZQ SENTENCIAS LLAVDER
     (84) DOFUN -> . DO LLAVIZQ SENTENCIAS LLAVDER WHILE expresion_numerica PTCOMA
-    (83) FORF -> . FOR PARIZQ definicion_instr expresion_log_relacional PTCOMA asignacion_instr PARDER BLOQUE
+    (83) FORF -> . FOR PARIZQ definicion_instr expresion_log_relacional PTCOMA INCREMENTO PARDER BLOQUE
     (78) LLAMADA -> . ID PARIZQ PARAM_LLAMADA PARDER
     (124) INCREMENTO -> . MASMAS ID
     (125) INCREMENTO -> . MENOSMENOS ID
@@ -10613,7 +10616,7 @@ state 244
     (94) RETURNF -> . RETURN PTCOMA
     (85) WHILEF -> . WHILE expresion_log_relacional LLAVIZQ SENTENCIAS LLAVDER
     (84) DOFUN -> . DO LLAVIZQ SENTENCIAS LLAVDER WHILE expresion_numerica PTCOMA
-    (83) FORF -> . FOR PARIZQ definicion_instr expresion_log_relacional PTCOMA asignacion_instr PARDER BLOQUE
+    (83) FORF -> . FOR PARIZQ definicion_instr expresion_log_relacional PTCOMA INCREMENTO PARDER BLOQUE
     (78) LLAMADA -> . ID PARIZQ PARAM_LLAMADA PARDER
     (124) INCREMENTO -> . MASMAS ID
     (125) INCREMENTO -> . MENOSMENOS ID
@@ -10707,7 +10710,7 @@ state 245
     (94) RETURNF -> . RETURN PTCOMA
     (85) WHILEF -> . WHILE expresion_log_relacional LLAVIZQ SENTENCIAS LLAVDER
     (84) DOFUN -> . DO LLAVIZQ SENTENCIAS LLAVDER WHILE expresion_numerica PTCOMA
-    (83) FORF -> . FOR PARIZQ definicion_instr expresion_log_relacional PTCOMA asignacion_instr PARDER BLOQUE
+    (83) FORF -> . FOR PARIZQ definicion_instr expresion_log_relacional PTCOMA INCREMENTO PARDER BLOQUE
     (78) LLAMADA -> . ID PARIZQ PARAM_LLAMADA PARDER
     (124) INCREMENTO -> . MASMAS ID
     (125) INCREMENTO -> . MENOSMENOS ID
@@ -10766,7 +10769,7 @@ state 245
 
 state 246
 
-    (83) FORF -> FOR PARIZQ definicion_instr . expresion_log_relacional PTCOMA asignacion_instr PARDER BLOQUE
+    (83) FORF -> FOR PARIZQ definicion_instr . expresion_log_relacional PTCOMA INCREMENTO PARDER BLOQUE
     (140) expresion_log_relacional -> . expresion_log_relacional MAYQUE expresion_log_relacional
     (141) expresion_log_relacional -> . expresion_log_relacional MENQUE expresion_log_relacional
     (142) expresion_log_relacional -> . expresion_log_relacional IGUALQUE expresion_log_relacional
@@ -11064,7 +11067,7 @@ state 253
     (94) RETURNF -> . RETURN PTCOMA
     (85) WHILEF -> . WHILE expresion_log_relacional LLAVIZQ SENTENCIAS LLAVDER
     (84) DOFUN -> . DO LLAVIZQ SENTENCIAS LLAVDER WHILE expresion_numerica PTCOMA
-    (83) FORF -> . FOR PARIZQ definicion_instr expresion_log_relacional PTCOMA asignacion_instr PARDER BLOQUE
+    (83) FORF -> . FOR PARIZQ definicion_instr expresion_log_relacional PTCOMA INCREMENTO PARDER BLOQUE
     (78) LLAMADA -> . ID PARIZQ PARAM_LLAMADA PARDER
     (124) INCREMENTO -> . MASMAS ID
     (125) INCREMENTO -> . MENOSMENOS ID
@@ -11130,7 +11133,7 @@ state 254
 
 state 255
 
-    (83) FORF -> FOR PARIZQ definicion_instr expresion_log_relacional . PTCOMA asignacion_instr PARDER BLOQUE
+    (83) FORF -> FOR PARIZQ definicion_instr expresion_log_relacional . PTCOMA INCREMENTO PARDER BLOQUE
     (140) expresion_log_relacional -> expresion_log_relacional . MAYQUE expresion_log_relacional
     (141) expresion_log_relacional -> expresion_log_relacional . MENQUE expresion_log_relacional
     (142) expresion_log_relacional -> expresion_log_relacional . IGUALQUE expresion_log_relacional
@@ -11346,7 +11349,7 @@ state 260
     (94) RETURNF -> . RETURN PTCOMA
     (85) WHILEF -> . WHILE expresion_log_relacional LLAVIZQ SENTENCIAS LLAVDER
     (84) DOFUN -> . DO LLAVIZQ SENTENCIAS LLAVDER WHILE expresion_numerica PTCOMA
-    (83) FORF -> . FOR PARIZQ definicion_instr expresion_log_relacional PTCOMA asignacion_instr PARDER BLOQUE
+    (83) FORF -> . FOR PARIZQ definicion_instr expresion_log_relacional PTCOMA INCREMENTO PARDER BLOQUE
     (78) LLAMADA -> . ID PARIZQ PARAM_LLAMADA PARDER
     (124) INCREMENTO -> . MASMAS ID
     (125) INCREMENTO -> . MENOSMENOS ID
@@ -11503,12 +11506,17 @@ state 262
 
 state 263
 
-    (83) FORF -> FOR PARIZQ definicion_instr expresion_log_relacional PTCOMA . asignacion_instr PARDER BLOQUE
-    (39) asignacion_instr -> . ID TIPO_AS expresion_log_relacional PTCOMA
+    (83) FORF -> FOR PARIZQ definicion_instr expresion_log_relacional PTCOMA . INCREMENTO PARDER BLOQUE
+    (124) INCREMENTO -> . MASMAS ID
+    (125) INCREMENTO -> . MENOSMENOS ID
+    (126) INCREMENTO -> . ID MASMAS
+    (127) INCREMENTO -> . ID MENOSMENOS
 
+    MASMAS          shift and go to state 17
+    MENOSMENOS      shift and go to state 18
     ID              shift and go to state 269
 
-    asignacion_instr               shift and go to state 268
+    INCREMENTO                     shift and go to state 268
 
 state 264
 
@@ -11578,7 +11586,7 @@ state 265
     (94) RETURNF -> . RETURN PTCOMA
     (85) WHILEF -> . WHILE expresion_log_relacional LLAVIZQ SENTENCIAS LLAVDER
     (84) DOFUN -> . DO LLAVIZQ SENTENCIAS LLAVDER WHILE expresion_numerica PTCOMA
-    (83) FORF -> . FOR PARIZQ definicion_instr expresion_log_relacional PTCOMA asignacion_instr PARDER BLOQUE
+    (83) FORF -> . FOR PARIZQ definicion_instr expresion_log_relacional PTCOMA INCREMENTO PARDER BLOQUE
     (78) LLAMADA -> . ID PARIZQ PARAM_LLAMADA PARDER
     (124) INCREMENTO -> . MASMAS ID
     (125) INCREMENTO -> . MENOSMENOS ID
@@ -11672,7 +11680,7 @@ state 266
     (94) RETURNF -> . RETURN PTCOMA
     (85) WHILEF -> . WHILE expresion_log_relacional LLAVIZQ SENTENCIAS LLAVDER
     (84) DOFUN -> . DO LLAVIZQ SENTENCIAS LLAVDER WHILE expresion_numerica PTCOMA
-    (83) FORF -> . FOR PARIZQ definicion_instr expresion_log_relacional PTCOMA asignacion_instr PARDER BLOQUE
+    (83) FORF -> . FOR PARIZQ definicion_instr expresion_log_relacional PTCOMA INCREMENTO PARDER BLOQUE
     (78) LLAMADA -> . ID PARIZQ PARAM_LLAMADA PARDER
     (124) INCREMENTO -> . MASMAS ID
     (125) INCREMENTO -> . MENOSMENOS ID
@@ -11761,39 +11769,19 @@ state 267
 
 state 268
 
-    (83) FORF -> FOR PARIZQ definicion_instr expresion_log_relacional PTCOMA asignacion_instr . PARDER BLOQUE
+    (83) FORF -> FOR PARIZQ definicion_instr expresion_log_relacional PTCOMA INCREMENTO . PARDER BLOQUE
 
     PARDER          shift and go to state 272
 
 
 state 269
 
-    (39) asignacion_instr -> ID . TIPO_AS expresion_log_relacional PTCOMA
-    (41) TIPO_AS -> . IGUAL
-    (42) TIPO_AS -> . MASIGUAL
-    (43) TIPO_AS -> . MENOSIGUAL
-    (44) TIPO_AS -> . PORIGUAL
-    (45) TIPO_AS -> . DIVIGUAL
-    (46) TIPO_AS -> . RESIGUAL
-    (47) TIPO_AS -> . IZQIGUAL
-    (48) TIPO_AS -> . DERIGUAL
-    (49) TIPO_AS -> . ANDIGUAL
-    (50) TIPO_AS -> . NOTIGUAL
-    (51) TIPO_AS -> . ORIGUAL
+    (126) INCREMENTO -> ID . MASMAS
+    (127) INCREMENTO -> ID . MENOSMENOS
 
-    IGUAL           shift and go to state 33
-    MASIGUAL        shift and go to state 34
-    MENOSIGUAL      shift and go to state 35
-    PORIGUAL        shift and go to state 36
-    DIVIGUAL        shift and go to state 37
-    RESIGUAL        shift and go to state 38
-    IZQIGUAL        shift and go to state 39
-    DERIGUAL        shift and go to state 40
-    ANDIGUAL        shift and go to state 41
-    NOTIGUAL        shift and go to state 42
-    ORIGUAL         shift and go to state 43
+    MASMAS          shift and go to state 31
+    MENOSMENOS      shift and go to state 32
 
-    TIPO_AS                        shift and go to state 30
 
 state 270
 
@@ -11832,7 +11820,7 @@ state 270
     (94) RETURNF -> . RETURN PTCOMA
     (85) WHILEF -> . WHILE expresion_log_relacional LLAVIZQ SENTENCIAS LLAVDER
     (84) DOFUN -> . DO LLAVIZQ SENTENCIAS LLAVDER WHILE expresion_numerica PTCOMA
-    (83) FORF -> . FOR PARIZQ definicion_instr expresion_log_relacional PTCOMA asignacion_instr PARDER BLOQUE
+    (83) FORF -> . FOR PARIZQ definicion_instr expresion_log_relacional PTCOMA INCREMENTO PARDER BLOQUE
     (78) LLAMADA -> . ID PARIZQ PARAM_LLAMADA PARDER
     (124) INCREMENTO -> . MASMAS ID
     (125) INCREMENTO -> . MENOSMENOS ID
@@ -11923,7 +11911,7 @@ state 271
 
 state 272
 
-    (83) FORF -> FOR PARIZQ definicion_instr expresion_log_relacional PTCOMA asignacion_instr PARDER . BLOQUE
+    (83) FORF -> FOR PARIZQ definicion_instr expresion_log_relacional PTCOMA INCREMENTO PARDER . BLOQUE
     (57) BLOQUE -> . LLAVIZQ SENTENCIAS LLAVDER
     (58) BLOQUE -> . SENTENCIAS
     (59) SENTENCIAS -> . SENTENCIAS SENTENCIA
@@ -11961,7 +11949,7 @@ state 272
     (94) RETURNF -> . RETURN PTCOMA
     (85) WHILEF -> . WHILE expresion_log_relacional LLAVIZQ SENTENCIAS LLAVDER
     (84) DOFUN -> . DO LLAVIZQ SENTENCIAS LLAVDER WHILE expresion_numerica PTCOMA
-    (83) FORF -> . FOR PARIZQ definicion_instr expresion_log_relacional PTCOMA asignacion_instr PARDER BLOQUE
+    (83) FORF -> . FOR PARIZQ definicion_instr expresion_log_relacional PTCOMA INCREMENTO PARDER BLOQUE
     (78) LLAMADA -> . ID PARIZQ PARAM_LLAMADA PARDER
     (124) INCREMENTO -> . MASMAS ID
     (125) INCREMENTO -> . MENOSMENOS ID
@@ -11998,10 +11986,11 @@ state 272
     IF              shift and go to state 202
 
     definicion_instr               shift and go to state 173
-    asignacion_instr               shift and go to state 174
+    INCREMENTO                     shift and go to state 187
     BLOQUE                         shift and go to state 273
     SENTENCIAS                     shift and go to state 171
     SENTENCIA                      shift and go to state 172
+    asignacion_instr               shift and go to state 174
     imprimir_instr                 shift and go to state 175
     DEFINEL                        shift and go to state 176
     DEFINEGOTO                     shift and go to state 177
@@ -12014,7 +12003,6 @@ state 272
     DOFUN                          shift and go to state 184
     FORF                           shift and go to state 185
     LLAMADA                        shift and go to state 186
-    INCREMENTO                     shift and go to state 187
     STRUCTDECLA                    shift and go to state 188
     ASIGNA_STRUCT                  shift and go to state 189
     TIPO_VAR                       shift and go to state 190
@@ -12022,32 +12010,32 @@ state 272
 
 state 273
 
-    (83) FORF -> FOR PARIZQ definicion_instr expresion_log_relacional PTCOMA asignacion_instr PARDER BLOQUE .
+    (83) FORF -> FOR PARIZQ definicion_instr expresion_log_relacional PTCOMA INCREMENTO PARDER BLOQUE .
 
-    ID              reduce using rule 83 (FORF -> FOR PARIZQ definicion_instr expresion_log_relacional PTCOMA asignacion_instr PARDER BLOQUE .)
-    PRINT           reduce using rule 83 (FORF -> FOR PARIZQ definicion_instr expresion_log_relacional PTCOMA asignacion_instr PARDER BLOQUE .)
-    GOTO            reduce using rule 83 (FORF -> FOR PARIZQ definicion_instr expresion_log_relacional PTCOMA asignacion_instr PARDER BLOQUE .)
-    SWITCH          reduce using rule 83 (FORF -> FOR PARIZQ definicion_instr expresion_log_relacional PTCOMA asignacion_instr PARDER BLOQUE .)
-    BREAK           reduce using rule 83 (FORF -> FOR PARIZQ definicion_instr expresion_log_relacional PTCOMA asignacion_instr PARDER BLOQUE .)
-    CONTINUE        reduce using rule 83 (FORF -> FOR PARIZQ definicion_instr expresion_log_relacional PTCOMA asignacion_instr PARDER BLOQUE .)
-    RETURN          reduce using rule 83 (FORF -> FOR PARIZQ definicion_instr expresion_log_relacional PTCOMA asignacion_instr PARDER BLOQUE .)
-    WHILE           reduce using rule 83 (FORF -> FOR PARIZQ definicion_instr expresion_log_relacional PTCOMA asignacion_instr PARDER BLOQUE .)
-    DO              reduce using rule 83 (FORF -> FOR PARIZQ definicion_instr expresion_log_relacional PTCOMA asignacion_instr PARDER BLOQUE .)
-    FOR             reduce using rule 83 (FORF -> FOR PARIZQ definicion_instr expresion_log_relacional PTCOMA asignacion_instr PARDER BLOQUE .)
-    MASMAS          reduce using rule 83 (FORF -> FOR PARIZQ definicion_instr expresion_log_relacional PTCOMA asignacion_instr PARDER BLOQUE .)
-    MENOSMENOS      reduce using rule 83 (FORF -> FOR PARIZQ definicion_instr expresion_log_relacional PTCOMA asignacion_instr PARDER BLOQUE .)
-    STRUCT          reduce using rule 83 (FORF -> FOR PARIZQ definicion_instr expresion_log_relacional PTCOMA asignacion_instr PARDER BLOQUE .)
-    INT             reduce using rule 83 (FORF -> FOR PARIZQ definicion_instr expresion_log_relacional PTCOMA asignacion_instr PARDER BLOQUE .)
-    DOUBLE          reduce using rule 83 (FORF -> FOR PARIZQ definicion_instr expresion_log_relacional PTCOMA asignacion_instr PARDER BLOQUE .)
-    FLOAT           reduce using rule 83 (FORF -> FOR PARIZQ definicion_instr expresion_log_relacional PTCOMA asignacion_instr PARDER BLOQUE .)
-    CHAR            reduce using rule 83 (FORF -> FOR PARIZQ definicion_instr expresion_log_relacional PTCOMA asignacion_instr PARDER BLOQUE .)
-    VOID            reduce using rule 83 (FORF -> FOR PARIZQ definicion_instr expresion_log_relacional PTCOMA asignacion_instr PARDER BLOQUE .)
-    IF              reduce using rule 83 (FORF -> FOR PARIZQ definicion_instr expresion_log_relacional PTCOMA asignacion_instr PARDER BLOQUE .)
-    $end            reduce using rule 83 (FORF -> FOR PARIZQ definicion_instr expresion_log_relacional PTCOMA asignacion_instr PARDER BLOQUE .)
-    LLAVDER         reduce using rule 83 (FORF -> FOR PARIZQ definicion_instr expresion_log_relacional PTCOMA asignacion_instr PARDER BLOQUE .)
-    ELSE            reduce using rule 83 (FORF -> FOR PARIZQ definicion_instr expresion_log_relacional PTCOMA asignacion_instr PARDER BLOQUE .)
-    CASE            reduce using rule 83 (FORF -> FOR PARIZQ definicion_instr expresion_log_relacional PTCOMA asignacion_instr PARDER BLOQUE .)
-    DEFAULT         reduce using rule 83 (FORF -> FOR PARIZQ definicion_instr expresion_log_relacional PTCOMA asignacion_instr PARDER BLOQUE .)
+    ID              reduce using rule 83 (FORF -> FOR PARIZQ definicion_instr expresion_log_relacional PTCOMA INCREMENTO PARDER BLOQUE .)
+    PRINT           reduce using rule 83 (FORF -> FOR PARIZQ definicion_instr expresion_log_relacional PTCOMA INCREMENTO PARDER BLOQUE .)
+    GOTO            reduce using rule 83 (FORF -> FOR PARIZQ definicion_instr expresion_log_relacional PTCOMA INCREMENTO PARDER BLOQUE .)
+    SWITCH          reduce using rule 83 (FORF -> FOR PARIZQ definicion_instr expresion_log_relacional PTCOMA INCREMENTO PARDER BLOQUE .)
+    BREAK           reduce using rule 83 (FORF -> FOR PARIZQ definicion_instr expresion_log_relacional PTCOMA INCREMENTO PARDER BLOQUE .)
+    CONTINUE        reduce using rule 83 (FORF -> FOR PARIZQ definicion_instr expresion_log_relacional PTCOMA INCREMENTO PARDER BLOQUE .)
+    RETURN          reduce using rule 83 (FORF -> FOR PARIZQ definicion_instr expresion_log_relacional PTCOMA INCREMENTO PARDER BLOQUE .)
+    WHILE           reduce using rule 83 (FORF -> FOR PARIZQ definicion_instr expresion_log_relacional PTCOMA INCREMENTO PARDER BLOQUE .)
+    DO              reduce using rule 83 (FORF -> FOR PARIZQ definicion_instr expresion_log_relacional PTCOMA INCREMENTO PARDER BLOQUE .)
+    FOR             reduce using rule 83 (FORF -> FOR PARIZQ definicion_instr expresion_log_relacional PTCOMA INCREMENTO PARDER BLOQUE .)
+    MASMAS          reduce using rule 83 (FORF -> FOR PARIZQ definicion_instr expresion_log_relacional PTCOMA INCREMENTO PARDER BLOQUE .)
+    MENOSMENOS      reduce using rule 83 (FORF -> FOR PARIZQ definicion_instr expresion_log_relacional PTCOMA INCREMENTO PARDER BLOQUE .)
+    STRUCT          reduce using rule 83 (FORF -> FOR PARIZQ definicion_instr expresion_log_relacional PTCOMA INCREMENTO PARDER BLOQUE .)
+    INT             reduce using rule 83 (FORF -> FOR PARIZQ definicion_instr expresion_log_relacional PTCOMA INCREMENTO PARDER BLOQUE .)
+    DOUBLE          reduce using rule 83 (FORF -> FOR PARIZQ definicion_instr expresion_log_relacional PTCOMA INCREMENTO PARDER BLOQUE .)
+    FLOAT           reduce using rule 83 (FORF -> FOR PARIZQ definicion_instr expresion_log_relacional PTCOMA INCREMENTO PARDER BLOQUE .)
+    CHAR            reduce using rule 83 (FORF -> FOR PARIZQ definicion_instr expresion_log_relacional PTCOMA INCREMENTO PARDER BLOQUE .)
+    VOID            reduce using rule 83 (FORF -> FOR PARIZQ definicion_instr expresion_log_relacional PTCOMA INCREMENTO PARDER BLOQUE .)
+    IF              reduce using rule 83 (FORF -> FOR PARIZQ definicion_instr expresion_log_relacional PTCOMA INCREMENTO PARDER BLOQUE .)
+    $end            reduce using rule 83 (FORF -> FOR PARIZQ definicion_instr expresion_log_relacional PTCOMA INCREMENTO PARDER BLOQUE .)
+    LLAVDER         reduce using rule 83 (FORF -> FOR PARIZQ definicion_instr expresion_log_relacional PTCOMA INCREMENTO PARDER BLOQUE .)
+    ELSE            reduce using rule 83 (FORF -> FOR PARIZQ definicion_instr expresion_log_relacional PTCOMA INCREMENTO PARDER BLOQUE .)
+    CASE            reduce using rule 83 (FORF -> FOR PARIZQ definicion_instr expresion_log_relacional PTCOMA INCREMENTO PARDER BLOQUE .)
+    DEFAULT         reduce using rule 83 (FORF -> FOR PARIZQ definicion_instr expresion_log_relacional PTCOMA INCREMENTO PARDER BLOQUE .)
 
 WARNING: 
 WARNING: Conflicts:
