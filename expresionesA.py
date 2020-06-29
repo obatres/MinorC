@@ -107,60 +107,6 @@ class ExpresionBitDer(ExpresionNumerica):
         self.linea = linea
         self.columna = columna
 
-class ExpresionPuntero(ExpresionNumerica):
-    '''
-        Esta clase representa el puntero de una variable
-    '''
-
-    def __init__(self, id ,  linea =0, columna=0) :
-        self.id = id
-        self.linea = linea
-        self.columna = columna
- 
-class ExpresionAccesoStruct(ExpresionNumerica):
-    '''
-        Esta clase representa el acceso al contenido de un struct
-    '''
-
-    def __init__(self, idPadre, idHijo ,  linea =0, columna=0) :
-        self.idPadre = idPadre
-        self.idHijo = idHijo
-        self.linea = linea
-        self.columna = columna
-
-class ExpresionLlamada(ExpresionNumerica):
-    '''
-        Esta clase representa la llamada a una funcion-metodo
-    '''
-
-    def __init__(self, id, parametros ,  linea =0, columna=0) :
-        self.id = id
-        self.parametros = parametros
-        self.linea = linea
-        self.columna = columna
-
-class ExpresionTernario(ExpresionNumerica):
-    '''
-        Esta clase representa el operador ternario
-    '''
-
-    def __init__(self, cond, exp1, exp2,  linea =0, columna=0) :
-        self.cond=cond
-        self.exp1 = exp1
-        self.exp2 = exp2       
-        self.linea = linea
-        self.columna = columna
-
-class ExpresionSizeof(ExpresionNumerica):
-    '''
-        Esta clase representa la funcion Sizeof
-    '''
-
-    def __init__(self, exp,  linea =0, columna=0) :
-        self.exp=exp    
-        self.linea = linea
-        self.columna = columna
-
 class ExpresionPunteroTemp(ExpresionNumerica):
     '''
         Esta clase representa el puntero un temporal.
@@ -170,6 +116,7 @@ class ExpresionPunteroTemp(ExpresionNumerica):
         self.id = id
         self.linea = linea
         self.columna = columna
+ 
 
 class ExpresionConversion (ExpresionNumerica):
     '''
@@ -182,6 +129,7 @@ class ExpresionConversion (ExpresionNumerica):
         self.linea = linea
         self.columna = columna
 
+
 class ExpresionNumero(ExpresionNumerica) :
     '''
         Esta clase representa una expresión numérica entera o decimal.
@@ -193,6 +141,7 @@ class ExpresionNumero(ExpresionNumerica) :
         self.linea = linea
         self.columna = columna
 
+
 class ExpresionIdentificador(ExpresionNumerica) :
     '''
         Esta clase representa un identificador.
@@ -203,6 +152,7 @@ class ExpresionIdentificador(ExpresionNumerica) :
         self.linea = linea
         self.columna = columna
 
+
 class ExpresionPila(ExpresionNumerica):
     '''
         Esta clase representa un identificador de pila.
@@ -212,6 +162,7 @@ class ExpresionPila(ExpresionNumerica):
         self.id = id   
         self.linea = linea
         self.columna = columna
+
 
 class ExpresionPunteroPila(ExpresionNumerica):
     '''
@@ -234,6 +185,8 @@ class Expresion_Pop_pila(ExpresionNumerica):
         self.linea = linea
         self.columna = columna
 
+
+
 class InicioArray(ExpresionNumerica):
     '''
         Esta clase representa la inicializacion de un array.
@@ -251,6 +204,7 @@ class ExpresionValorAbsoluto(ExpresionNumerica):
         self.linea = linea
         self.columna = columna
 
+
 class ExpresionTemporal(ExpresionNumerica) :
     '''
         Esta clase representa un temporal.
@@ -260,6 +214,7 @@ class ExpresionTemporal(ExpresionNumerica) :
         self.id = id
         self.linea = linea
         self.columna = columna
+
 
 class ExpresionCadena :
     '''
@@ -280,6 +235,7 @@ class ExpresionConcatenar(ExpresionCadena) :
         self.exp2 = exp2
         self.linea = linea
         self.columna = columna
+
 
 class ExpresionDobleComilla(ExpresionCadena) :
     '''
@@ -377,36 +333,5 @@ class AccesoValorArray(ExpresionNumerica):
     def __init__(self, id, lista,  linea=0 , columna=0) :
         self.id = id
         self.lista = lista
-        self.linea = linea
-        self.columna = columna
-
-class ExpresionListaIndices():
-    '''
-        Esta clase representa la expresión que tiene el listado de indices con el que se inicializa una variable
-    '''
-
-    def __init__(self, id, listaindices,  linea=0 , columna=0) :
-        self.id = id
-        self.listaindices = listaindices
-        self.linea = linea
-        self.columna = columna
-
-class ExpresionInicioSimple():
-    '''
-        Esta clase representa la expresión que tiene el id de la inicializacion de una vairable
-    '''
-
-    def __init__(self, id,  linea=0 , columna=0) :
-        self.id = id
-        self.linea = linea
-        self.columna = columna
-
-class ExpresionId(ExpresionNumerica):
-    '''
-        Esta clase representa la expresión que tiene un id
-    '''
-
-    def __init__(self, id,  linea=0 , columna=0) :
-        self.id = id
         self.linea = linea
         self.columna = columna
