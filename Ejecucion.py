@@ -644,6 +644,7 @@ class Ejecucion_MinorC ():
         except:
             print("error, no se puede traducir el ciclo for")
             return
+            
     def procesar_sentencias(self,sentencias,ts):
         for sent in sentencias:
             if isinstance(sent,Imprimir): self.procesar_imprimir(sent,ts)
