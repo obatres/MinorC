@@ -1,12 +1,14 @@
+char prueba (int a,char b, float c){
+    printf(a);
+}
+
+void hola(){
+  prueba(10,"sda",2.0);
+  printf("asd");
+}
 
 int main( ){
-
+  hola();
   printf("ASasd");
-  for (int i=0;i>10;i++){
-    printf("for");
-    if(i==0){
-      printf(i);
-    }
-  }
-  printf(i);
+
 }

@@ -571,6 +571,7 @@ class Ejecucion_MinorC ():
             print("Error, no se puede realizar la traduccion de esta asignacion")   
  
         return
+   
     def procesar_mientras(self,instr, ts) :
         while resolver_expresion_logica(instr.expLogica, ts) :
             ts_local = TS.TablaDeSimbolos(ts.simbolos)
@@ -668,6 +669,7 @@ class Ejecucion_MinorC ():
             elif isinstance(sent, DeclaracionStruct) : self.procesar_decla_struct(sent, ts)
             elif isinstance(sent, AsignacionStruct) : self.procesar_asignacion_struct(sent,ts)
             elif isinstance(sent, FuncionFor): self.procesar_for(sent,ts)
+            elif isinstance(sent, ExpresionLlamada): self.procesar_llamada_funcion(sent,ts)
             else:
                 print(sent)
                 print('error, sentencia no posible de realizar')
@@ -1340,28 +1342,46 @@ class Ejecucion_MinorC ():
         try:
             self.CodigoGenerado += instr.id+":"+"\n"
             if instr.parametros[0].exp!=0:
+                salida = self.generaLabel()
+                parametros =[]
                 for par in instr.parametros:
                     if par.tipo == td.INT :
                         para = self.generaPar()
                         nuevo = TS.Simbolo(par.exp,par.tipo,0,para,instr.id)
-                        self.CodigoGenerado += '\t'+para+"=0"+";"+"\n"
+                        parametros.append(para)
                     elif par.tipo == td.CADENA:
                         para = self.generaPar()
                         nuevo = TS.Simbolo(par.exp,par.tipo," ",para,instr.id)
-                        self.CodigoGenerado += '\t'+para+"=\' \'"+";"+"\n"
+                        parametros.append(para)
                     elif par.tipo == td.FLOAT:
                         para = self.generaPar()
                         nuevo = TS.Simbolo(par.exp,par.tipo,0.0,para,instr.id)
-                        self.CodigoGenerado += '\t'+para+"=0.0"+";"+"\n"
-                if ts.existeSimbolo(nuevo)==False:
-                    ts.agregar(nuevo)
-                else:
-                    ts.actualizar(nuevo)
-
+                        parametros.append(para)
+                    if ts.existeSimbolo(nuevo)==False:
+                        ts.agregar(nuevo)
+                    else:
+                        ts.actualizar(nuevo)
+                fun = TS.Simbolo(instr.id,td.FUNCION,parametros,salida)
+                ts.agregar(fun)
+            else:
+                salida = self.generaLabel()
+                fun = TS.Simbolo(instr.id,td.FUNCION,{},salida)
+                ts.agregar(fun)
             self.procesar_sentencias(instr.sentencias,ts)
+            self.CodigoGenerado += '\t'+"goto "+salida+";"+"\n"
         except :
             print('Error al traducir la funcion')
 
+    def procesar_llamada_funcion(self, instr, ts):
+        parametrosGuardados = ts.obtener(instr.id)
+
+        if len(parametrosGuardados.valor)==len(instr.parametros):
+            for i in range(len(parametrosGuardados.valor)):
+                self.CodigoGenerado += "\t"+parametrosGuardados.valor[i]+"="+str(self.resolver_expresion_aritmetica(instr.parametros[i],ts))+"\n"
+
+        self.CodigoGenerado +="\t"+"goto "+instr.id+";"+"\n"    
+        self.CodigoGenerado +=parametrosGuardados.reg+":"+"\n"
+    
     def procesar_def_struct(self, instr, ts):
 
         try:
@@ -1428,13 +1448,13 @@ class Ejecucion_MinorC ():
 
     def procesar_instrucciones(self,instrucciones, ts) :
         ## lista de instrucciones recolectadas.
-        i =0
-        while i <=len(instrucciones):
-            if isinstance(instrucciones[i],Main):
-                break
-            else:
-                i+=1
-        instrucciones.insert(0,instrucciones.pop(i))
+        #i =0
+        #while i <=len(instrucciones):
+        #    if isinstance(instrucciones[i],Main):
+        #        break
+        #    else:
+        #        i+=1
+        #instrucciones.insert(0,instrucciones.pop(i))
         for instr in instrucciones :
             if isinstance(instr, Main) : self.procesar_main(instr,ts)
             elif isinstance(instr, Definicion) : self.procesar_definicion(instr, ts)
@@ -1509,9 +1529,9 @@ class Ejecucion_MinorC ():
         self.contPar+=1
         return eti
 
-#a = Ejecucion_MinorC()
+a = Ejecucion_MinorC()
 
-#f = open("./entrada.txt", "r")
-#input = f.read()
-#a.ejecutar_asc(input)
-#print(a.CodigoGenerado)
+f = open("./entrada.txt", "r")
+input = f.read()
+a.ejecutar_asc(input)
+print(a.CodigoGenerado)

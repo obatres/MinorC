@@ -9,6 +9,7 @@ class TIPO_DATO(Enum) :
     VOID    = 6
     DOUBLE  = 7
     STRUCT  = 8
+    FUNCION = 9
 
 
 class Simbolo() :
