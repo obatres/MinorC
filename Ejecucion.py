@@ -21,12 +21,17 @@ class Ejecucion_MinorC ():
     true = 1
     false = 0
     Etiqueta = ''
+    CodigoGenerado=''
+    cont = 0
+    contLabel=0
+    contPar =0
 #--------------------------------------METODOS/FUNCIONES DE EJECUCION EN INTERFAZ
     def ejecutar_asc(self, input):
         import gramaticaM as g
         #self.gram = g.verGramatica()
         self.instrucciones = g.parse(input) 
-        #self.procesar_instrucciones(self.instrucciones, self.ts_global)   
+        #print(self.instrucciones)
+        self.procesar_instrucciones(self.instrucciones, self.ts_global)   
         
     def errores_asc(self):
         import gramaticaM as g
@@ -317,12 +322,6 @@ class Ejecucion_MinorC ():
             cont = self.dibujar_expresion(instr.exp1,nodo1,cont) 
             self.dot.node(nodo1,'Corr Der')
             cont = self.dibujar_expresion(instr.exp2,nodo1,cont)     
-        elif isinstance(instr, ExpresionPunteroTemp):  
-            self.dot.node(nodo1,instr.id)
-        elif isinstance(instr,ExpresionConversion):
-            self.dot.node(nodo1,'Conversion')
-            self.dot.node(nodo1,str(instr.tipo))
-            cont = self.dibujar_expresion(instr.exp,nodo,cont)
         elif isinstance(instr, ExpresionPila):  
             self.dot.node(nodo1,instr.id)
         elif isinstance(instr, ExpresionPunteroPila):  
@@ -381,8 +380,6 @@ class Ejecucion_MinorC ():
             elif isinstance(instr,Imprimir) : cont = self.dibujar_print(instr,root,cont)
             elif isinstance(instr,If): cont = self.dibujar_if(instr,root,cont)
             elif isinstance(instr,Unset): cont = self.dibujar_unset(instr,root,cont)
-            elif isinstance(instr,IniciaPila): cont = self.dibujar_IniciaPila(instr,root,cont)
-            elif isinstance(instr,AsignaPunteroPila): cont = self.dibujar_AsignaPunteroPila(instr,root,cont)
             elif isinstance(instr,AsignaValorPila): cont = self.dibujar_AsignaValorPila(instr,root,cont)
             elif isinstance(instr,AsignacionExtra): cont = self.dibujar_AsignaRegistro(instr,root,cont)
             elif isinstance(instr,Main): cont = self.dibujar_main(instr,root,cont)
@@ -397,19 +394,13 @@ class Ejecucion_MinorC ():
 #--------------------------------------------------------------------PROCESAR INSTRUCCIONES
     def procesar_imprimir(self,instr, ts) :
 
-        try:
-                
-            if not ts.obtener(instr.exp.id).tipo == td.ARRAY or ts.obtener(instr.exp.id).tipo == td.PILA:
-                #salida = resolver_registro(instr.exp,ts)
-                salida = self.resolver_expresion_aritmetica(instr.exp,ts)
-                print('>', salida)
-                
-                self.resultado += '>'+str(salida)+'\n'
-                return  str(salida) + '\n'
-            else:
-                #print('Error, no se puede imprimir un arreglo')
-                err = 'Error de tipo, no se puede imprimir el valor',instr.exp.id ,'En la linea: ',instr.linea,'En la columna: ',instr.columna, 'Tipo: SEMANTICO'
-                self.errores.append(err)
+        try:          
+            #salida = resolver_registro(instr.exp,ts)
+            salida = self.resolver_expresion_aritmetica(instr.exp,ts)
+            #print('>', salida)
+            self.CodigoGenerado += '\t'+'print('+str(salida)+');'+"\n"    
+            #self.resultado += '>'+str(salida)+'\n'
+            return  str(salida) + '\n'
         except:
             print('error de impresion, valor o variabe no encontrados: ',instr.exp.id ) 
             print(instr.linea,instr.columna)
@@ -422,23 +413,164 @@ class Ejecucion_MinorC ():
         return ts.obtener(exp.id).valor
 
     def procesar_definicion(self,instr, ts) :
-        simbolo = TS.Simbolo(instr.id, TS.TIPO_DATO.NUMERO, 0)      # inicializamos con 0 como valor por defecto
-        ts.agregar(simbolo)
+        tipoReg = instr.tipo
+        
+        for d in instr.listaid:
+            if isinstance (d,DefinicionSinValor): self.procesar_definicion_sinValor(d,ts,tipoReg)
+            elif isinstance(d,DefinicionConvalor): self.procesar_definicion_conValor(d,ts,tipoReg)
+            
+        return 
 
+    def procesar_definicion_sinValor(self, instr, ts, tipo):
+        temp = instr.id
+        if isinstance (temp,ExpresionInicioSimple):
+            registro =self.generarTemp()
+            if tipo ==td.INT:
+                nuevo = TS.Simbolo(temp.id,tipo,0,registro)
+                if ts.existeSimbolo(nuevo)==False:
+                    self.CodigoGenerado += '\t' + registro + '= 0;'+'\n'
+                    ts.agregar(nuevo)
+                elif ts.existeSimbolo(nuevo)==True:
+                    print('Error, la variable '+str(temp.id)+' ya ha sido declarada anteriormente')
+            elif tipo == td.FLOAT:
+                nuevo = TS.Simbolo(temp.id,tipo,0.0,registro)
+                if ts.existeSimbolo(nuevo)==False:
+                    self.CodigoGenerado += '\t' + registro + '= 0.0;'+'\n'
+                    ts.agregar(nuevo)
+                elif ts.existeSimbolo(nuevo)==True:
+                    print('Error, la variable '+str(temp.id)+' ya ha sido declarada anteriormente')
+            elif tipo == td.CADENA:
+                nuevo = TS.Simbolo(temp.id,tipo,"0",registro)
+                if ts.existeSimbolo(nuevo)==False:
+                    self.CodigoGenerado += '\t' + registro + '= \' \';'+'\n'
+                    ts.agregar(nuevo)
+                elif ts.existeSimbolo(nuevo)==True:
+                    print('Error, la variable '+str(temp.id)+' ya ha sido declarada anteriormente')
+            else:
+                print('Error, tipo '+str(tipo)+' no aplicable en la definicion')
+        
+        elif isinstance (temp,ExpresionListaIndices):
+            
+            if temp.listaindices[0]!=0:
+                registro = self.generarTemp()
+                nuevo = TS.Simbolo(temp.id,td.ARRAY,{},registro)
+                
+                if ts.existeSimbolo(nuevo)==False:
+                    self.CodigoGenerado += '\t'+registro+'='+'array()'+';'+'\n'
+                    ts.agregar(nuevo)   
+                    if len(temp.listaindices)==1:
+                        for i in temp.listaindices:
+                            indice = self.resolver_expresion_aritmetica(i,ts)
+                            if isinstance(indice,int):
+                                for i in range(indice):
+                                    self.CodigoGenerado += '\t'+registro+'['+str(i)+']=0;'+'\n'
+                    elif len(temp.listaindices)==2:
+                        indice1 = self.resolver_expresion_aritmetica(temp.listaindices[0],ts)
+                        indice2 = self.resolver_expresion_aritmetica(temp.listaindices[1],ts)
+                        for i in range(indice1):
+                            for j in range(indice2):
+                                self.CodigoGenerado+= '\t'+registro+'['+str(i)+']'+'['+str(j)+']=0;'+'\n'
+                    elif len(temp.listaindices)==3:
+                        indice1 = self.resolver_expresion_aritmetica(temp.listaindices[0],ts)
+                        indice2 = self.resolver_expresion_aritmetica(temp.listaindices[1],ts)
+                        indice3 = self.resolver_expresion_aritmetica(temp.listaindices[2],ts)
+                        for i in range(indice1):
+                            for j in range(indice2):
+                                for x in range(indice3):
+                                    self.CodigoGenerado+= '\t'+registro+'['+str(i)+']'+'['+str(j)+']'+'['+str(j)+']=0;'+'\n'
+                elif ts.existeSimbolo(nuevo)==True:
+                    print("Error, esta variable ya se declaro previamente o no tiene un registro asociado")
+            else:
+                print('Error, esta variable: '+temp.id+' debe contener un valor para ser inicializada')
+            return
+        else:
+            print(type(instr.id))
+        return
+    
+    def procesar_definicion_conValor(self,instr,ts,tipo):
+        temp = instr.id
+        if isinstance(temp,ExpresionInicioSimple):
+            registro = self.generarTemp()
+            valor  = self.resolver_expresion_aritmetica(instr.exp,ts)
+            nuevo = TS.Simbolo(temp.id,tipo,valor,registro)
+            if ts.existeSimbolo(nuevo)==False:
+                self.CodigoGenerado += '\t' + registro + '='+str(valor)+';'+'\n'
+                ts.agregar(nuevo)
+            elif ts.existeSimbolo(nuevo)==True:
+                print('Error, la variable '+str(temp.id)+' ya ha sido declarada anteriormente')
+            return
+        elif isinstance(temp,ExpresionListaIndices):            
+            if temp.listaindices[0]==0:
+                valor = self.resolver_expresion_aritmetica(instr.exp,ts)
+                registro = self.generarTemp()
+                nuevo = TS.Simbolo(temp.id,tipo,valor,registro)
+                if ts.existeSimbolo(nuevo) == False:
+                    self.CodigoGenerado += '\t'+registro+ '='+str(valor)+';'+'\n'
+                    ts.agregar(nuevo)
+                elif ts.existeSimbolo(nuevo)==True:
+                    print('Error, la variable '+str(temp.id)+' ya ha sido declarada anteriormente')
+                return
+            elif temp.listaindices[0]!=0:
+                registro = self.generarTemp()
+                nuevo = TS.Simbolo(temp.id,td.ARRAY,{},registro)
+                valores = []
+                self.CodigoGenerado += '\t'+registro+'='+'array()'+';'+'\n'
+                for i in instr.exp:
+                    i = self.resolver_expresion_aritmetica(i,ts)
+                    valores.append(i)
+                if ts.existeSimbolo(nuevo)==False:
+                    if len(temp.listaindices)==1:
+                        indice = self.resolver_expresion_aritmetica(temp.listaindices[0],ts)
+                        if(len(valores)==indice):
+                            ts.agregar(nuevo) 
+                            if isinstance(indice,int):
+                                for i in range(indice):
+                                    self.CodigoGenerado += '\t'+registro+'['+str(i)+']='+str(valores[i])+';'+'\n'
+                        else:
+                            print('Error, la cantidad de valores a asignar no es la misma con el tamaño del arreglo')
+                return
+            else:
+
+                print('mas indices')
+            return
+        else:
+            print(type(instr.id))
+        return
+   
     def procesar_asignacion(self,instr, ts) :
         try:
-            val = self.resolver_expresion_aritmetica(instr.expNumerica, ts)
-            simbolo = TS.Simbolo(instr.id, instr.expNumerica.tipo, val,self.Etiqueta)
-            if ts.existeSimbolo(simbolo) :
-                ts.actualizar(simbolo)
-            else:
-                ts.agregar(simbolo)
+            registro = ts.obtener(instr.id).reg
+            valor  = self.resolver_expresion_aritmetica(instr.expNumerica,ts)
         except :
-            print('No se puede realizar la asignacionde',instr.id, instr.linea, instr.columna)
-            err = 'Error No se puede realizar la asignacionde ',instr.id ,' En la linea: ',instr.linea,' En la columna: ',instr.columna, 'Tipo: SEMANTICO'
-            self.errores.append(err)
-            pass
+            print('error, no se pudo obtener el valor a asignar')
 
+        try:
+            if instr.tipo == "=":
+                self.CodigoGenerado += '\t'+registro+'='+str(valor)+';'+'\n'
+            elif instr.tipo =="+=":
+                self.CodigoGenerado += '\t'+registro+'='+registro+'+'+str(valor)+';'+'\n'
+            elif instr.tipo =="-=":
+                self.CodigoGenerado += '\t'+registro+'='+registro+'-'+str(valor)+';'+'\n'
+            elif instr.tipo =="*=":
+                self.CodigoGenerado += '\t'+registro+'='+registro+'*'+str(valor)+';'+'\n' 
+            elif instr.tipo =="/=":
+                self.CodigoGenerado += '\t'+registro+'='+registro+'/'+str(valor)+';'+'\n'
+            elif instr.tipo =="%=":
+                self.CodigoGenerado += '\t'+registro+'='+registro+'%'+str(valor)+';'+'\n'
+            elif instr.tipo =="<<=":
+                self.CodigoGenerado += '\t'+registro+'='+registro+'<<'+str(valor)+';'+'\n'
+            elif instr.tipo ==">>=":
+                self.CodigoGenerado += '\t'+registro+'='+registro+'>>'+str(valor)+';'+'\n'
+            elif instr.tipo =="&=":
+                self.CodigoGenerado += '\t'+registro+'='+registro+'&'+str(valor)+';'+'\n'
+            elif instr.tipo =="|=":
+                self.CodigoGenerado += '\t'+registro+'='+registro+'|'+str(valor)+';'+'\n'
+            elif instr.tipo =="^=":
+                self.CodigoGenerado += '\t'+registro+'='+registro+'^'+str(valor)+';'+'\n'
+        except :
+            print("Error, no se puede realizar la traduccion de esta asignacion")   
+ 
+        return
     def procesar_mientras(self,instr, ts) :
         while resolver_expresion_logica(instr.expLogica, ts) :
             ts_local = TS.TablaDeSimbolos(ts.simbolos)
@@ -457,14 +589,98 @@ class Ejecucion_MinorC ():
         else:
             return 0
 
-    def procesar_if_else(self,instr, ts) :
-        val = resolver_expresion_logica(instr.expLogica, ts)
-        if val :
+    def procesar_ifSimple (self, instr, ts):
+        try:
+            condicion = self.resolver_expresion_aritmetica(instr.cond,ts)
+            etiVer = self.generaLabel()
+            etiFal = self.generaLabel()
+            etiSal = self.generaLabel()
+            self.CodigoGenerado += '\t'+'if ('+str(condicion)+') goto '+etiVer+';'+'\n'
+            self.CodigoGenerado += '\t'+'goto '+etiFal+ ';'+'\n'
+
+            self.CodigoGenerado +=etiVer+":"+"\n"
+            self.procesar_sentencias(instr.bloqueSentenciasIf,ts)
+            self.CodigoGenerado +='\t'+"goto "+etiSal+";"+"\n"
+            self.CodigoGenerado +=etiFal+":"+"\n"
+
+            return etiSal
+        except :
+            return 0
+
+    def procesar_While (self, instr, ts):
+        try:
+            etiVer = self.generaLabel()
+            etiFal = self.generaLabel()
+            etiSal = self.generaLabel()
+
+            self.CodigoGenerado +=etiSal+":"+"\n"
+            condicion = self.resolver_expresion_aritmetica(instr.condicion,ts)
+            self.CodigoGenerado += '\t'+'if ('+str(condicion)+') goto '+etiVer+';'+'\n'
+            self.CodigoGenerado += '\t'+'goto '+etiFal+ ';'+'\n'
+
+            self.CodigoGenerado +=etiVer+":"+"\n"
+            self.procesar_sentencias(instr.instrucciones,ts)
+            self.CodigoGenerado +='\t'+"goto "+etiSal+";"+"\n"
+            self.CodigoGenerado +=etiFal+":"+"\n"
+        except:
+            print("error al traducir el while")  
+
+    def procesar_for(self, instr,ts):
+        try:
+            etiVer = self.generaLabel()
+            etiFal = self.generaLabel()
+            etiRep = self.generaLabel()
             ts_local = TS.TablaDeSimbolos(ts.simbolos)
-            procesar_instrucciones(instr.instrIfVerdadero, ts_local)
-        else :
-            ts_local = TS.TablaDeSimbolos(ts.simbolos)
-            procesar_instrucciones(instr.instrIfFalso, ts_local)
+            self.procesar_definicion(instr.definicion,ts_local)
+            self.CodigoGenerado += etiRep+":"+"\n"
+            cond = self.resolver_expresion_logica(instr.condicion,ts_local)
+            self.CodigoGenerado+='\t'+"if ("+cond+") goto "+etiVer+";"+"\n"
+            self.CodigoGenerado+='\t'+"goto "+etiFal+";"+"\n"
+            self.CodigoGenerado += etiVer+":"+"\n"
+            self.procesar_sentencias(instr.sentencias,ts_local)
+            self.procesar_incremento(instr.incremento,ts_local)
+            self.CodigoGenerado+='\t'+"goto "+etiRep+";"+"\n"
+            self.CodigoGenerado += etiFal+":"+"\n"
+        except:
+            print("error, no se puede traducir el ciclo for")
+            return
+            
+    def procesar_sentencias(self,sentencias,ts):
+        for sent in sentencias:
+            if isinstance(sent,Imprimir): self.procesar_imprimir(sent,ts)
+            elif isinstance(sent,Definicion): self.procesar_definicion(sent,ts)
+            elif isinstance(sent,Asignacion): self.procesar_asignacion(sent,ts)
+            elif isinstance(sent,inc) : self.procesar_incremento(sent,ts)
+            elif isinstance(sent,While): self.procesar_While(sent,ts)
+            elif isinstance(sent,IfSimple): 
+                sal =self.procesar_ifSimple(sent,ts)
+                if sal==0:
+                    print("error en traducir if")
+                    return
+                else:
+                    self.CodigoGenerado += sal+":"+"\n"
+            elif isinstance(sent,IfElse): 
+                if self.procesar_ifElse(sent,ts) == 0:
+                    print("error en traducir if else")
+                    return
+            elif isinstance(sent,Goto): self.Llamada_goto(sent,ts)
+            elif isinstance(sent,Label): self.procesa_Label(sent,ts)
+            elif isinstance(sent, DeclaracionStruct) : self.procesar_decla_struct(sent, ts)
+            elif isinstance(sent, AsignacionStruct) : self.procesar_asignacion_struct(sent,ts)
+            elif isinstance(sent, FuncionFor): self.procesar_for(sent,ts)
+            else:
+                print(sent)
+                print('error, sentencia no posible de realizar')
+    
+    def procesar_ifElse(self,instr, ts) :
+        try:
+            salida =self.procesar_ifSimple(instr.ifinst,ts) 
+            self.procesar_sentencias(instr.elseinst,ts)
+            self.CodigoGenerado += salida +":"+"\n"
+            return 1
+        except:
+            print('error, no se puede traducir el if else')
+            return 0
 
     def resolver_cadena(self,exp, ts) :
         if isinstance(exp, ExpresionConcatenar) :
@@ -488,23 +704,29 @@ class Ejecucion_MinorC ():
             if expLog.exp2.tipo == TS.TIPO_DATO.INT or expLog.exp2.tipo == TS.TIPO_DATO.FLOAT:
                 expLog.tipo = TS.TIPO_DATO.INT
                 if expLog.operador == OPERACION_LOGICA.MAYOR_QUE : 
-                    if exp1 > exp2: return self.true
-                    else:           return self.false 
+                    temp = self.generarTemp()
+                    self.CodigoGenerado += '\t'+temp+'='+str(exp1)+' > '+str(exp2)+';'+'\n'
+                    return temp
                 if expLog.operador == OPERACION_LOGICA.MENOR_QUE :
-                    if exp1 < exp2: return self.true
-                    else:           return self.false 
+                    temp = self.generarTemp()
+                    self.CodigoGenerado += '\t'+temp+'='+str(exp1)+' < '+str(exp2)+';'+'\n'
+                    return temp
                 if expLog.operador == OPERACION_LOGICA.IGUAL : 
-                    if exp1 == exp2: return self.true
-                    else:            return self.false 
+                    temp = self.generarTemp()
+                    self.CodigoGenerado += '\t'+temp+'='+str(exp1)+' == '+str(exp2)+';'+'\n'
+                    return temp
                 if expLog.operador == OPERACION_LOGICA.DIFERENTE : 
-                    if exp1 != exp2: return self.true
-                    else:            return self.false 
+                    temp = self.generarTemp()
+                    self.CodigoGenerado += '\t'+temp+'='+str(exp1)+' != '+str(exp2)+';'+'\n'
+                    return temp
                 if expLog.operador == OPERACION_LOGICA.MAYORQUE : 
-                    if exp1 >= exp2: return self.true
-                    else:            return self.false 
+                    temp = self.generarTemp()
+                    self.CodigoGenerado += '\t'+temp+'='+str(exp1)+' >= '+str(exp2)+';'+'\n'
+                    return temp
                 if expLog.operador == OPERACION_LOGICA.MENORQUE : 
-                    if exp1 <= exp2: return self.true
-                    else:            return self.false 
+                    temp = self.generarTemp()
+                    self.CodigoGenerado += '\t'+temp+'='+str(exp1)+' <= '+str(exp2)+';'+'\n'
+                    return temp
             else:
                 print('Error de tipos ',exp1,'y ',exp2,' no pueden ser operados en una operacion relacional, se espera que ambos tengan el mismo tipo')
                 err = 'Error de tipos ',exp1,'y ',exp2,' no pueden ser operados en una operacion relacional, se espera que ambos tengan el mismo tipo' ,' En la linea: ',expLog.linea,' En la columna: ',expLog.columna, 'Tipo: SEMANTICO'
@@ -513,23 +735,29 @@ class Ejecucion_MinorC ():
             if expLog.exp2.tipo == TS.TIPO_DATO.CADENA:
                 expLog.tipo = TS.TIPO_DATO.INT
                 if expLog.operador == OPERACION_LOGICA.MAYOR_QUE : 
-                    if exp1 > exp2: return self.true
-                    else:           return self.false 
+                    temp = self.generarTemp()
+                    self.CodigoGenerado += '\t'+temp+'='+str(exp1)+' > '+str(exp2)+';'+'\n'
+                    return temp
                 if expLog.operador == OPERACION_LOGICA.MENOR_QUE :
-                    if exp1 < exp2: return self.true
-                    else:           return self.false 
+                    temp = self.generarTemp()
+                    self.CodigoGenerado += '\t'+temp+'='+str(exp1)+' < '+str(exp2)+';'+'\n'
+                    return temp
                 if expLog.operador == OPERACION_LOGICA.IGUAL : 
-                    if exp1 == exp2: return self.true
-                    else:            return self.false   
+                    temp = self.generarTemp()
+                    self.CodigoGenerado += '\t'+temp+'='+str(exp1)+' == '+str(exp2)+';'+'\n'
+                    return temp 
                 if expLog.operador == OPERACION_LOGICA.DIFERENTE : 
-                    if exp1 != exp2: return self.true
-                    else:            return self.false        
+                    temp = self.generarTemp()
+                    self.CodigoGenerado += '\t'+temp+'='+str(exp1)+' != '+str(exp2)+';'+'\n'
+                    return temp  
                 if expLog.operador == OPERACION_LOGICA.MAYORQUE : 
-                    if exp1 >= exp2: return self.true
-                    else:            return self.false  
+                    temp = self.generarTemp()
+                    self.CodigoGenerado += '\t'+temp+'='+str(exp1)+' >= '+str(exp2)+';'+'\n'
+                    return temp  
                 if expLog.operador == OPERACION_LOGICA.MENORQUE : 
-                    if exp1 <= exp2: return self.true
-                    else:            return self.false                                                                      
+                    temp = self.generarTemp()
+                    self.CodigoGenerado += '\t'+temp+'='+str(exp1)+' <= '+str(exp2)+';'+'\n'
+                    return temp                                                                    
             else:
                 print('error de tipos ',exp1,'y ',exp2,' no pueden ser operados en una operacion relacional, \n se espera que ambos tengan el mismo tipo')
                 err = 'Error de tipos ',exp1,'y ',exp2,' no pueden ser operados en una operacion relacional, se espera que ambos tengan el mismo tipo' ,' En la linea: ',expLog.linea,' En la columna: ',expLog.columna, 'Tipo: SEMANTICO'
@@ -547,49 +775,58 @@ class Ejecucion_MinorC ():
 
 
                     if expNum.operador == OPERACION_ARITMETICA.MAS : 
-                        expNum.val =exp1+exp2
                         expNum.tipo = TS.TIPO_DATO.INT
-                        return expNum.val
+                        temporal = self.generarTemp()
+                        self.CodigoGenerado += '\t'+temporal+'='+str(exp1)+'+'+str(exp2)+";"+"\n"
+                        return temporal
                     if expNum.operador == OPERACION_ARITMETICA.MENOS : 
-                        expNum.val =exp1-exp2
                         expNum.tipo = TS.TIPO_DATO.INT
-                        return expNum.val
+                        temporal = self.generarTemp()
+                        self.CodigoGenerado += '\t'+temporal+'='+str(exp1)+'-'+str(exp2)+";"+"\n"
+                        return temporal
                     if expNum.operador == OPERACION_ARITMETICA.POR : 
-                        expNum.val =exp1*exp2
                         expNum.tipo = TS.TIPO_DATO.INT
-                        return expNum.val
+                        temporal = self.generarTemp()
+                        self.CodigoGenerado += '\t'+temporal+'='+str(exp1)+'*'+str(exp2)+";"+"\n"
+                        return temporal
                     if expNum.operador == OPERACION_ARITMETICA.DIVIDIDO : 
-                        expNum.val =exp1/exp2
                         expNum.tipo = TS.TIPO_DATO.INT
-                        return expNum.val
+                        temporal = self.generarTemp()
+                        self.CodigoGenerado += '\t'+temporal+'='+str(exp1)+'/'+str(exp2)+";"+"\n"
+                        return temporal
                     if expNum.operador == OPERACION_ARITMETICA.RESIDUO : 
-                        expNum.val =exp1%exp2
                         expNum.tipo = TS.TIPO_DATO.INT
-                        return expNum.val
+                        temporal = self.generarTemp()
+                        self.CodigoGenerado += '\t'+temporal+'='+str(exp1)+'%'+str(exp2)+";"+"\n"
+                        return temporal
                         
                 elif (expNum.exp2.tipo==td.FLOAT):
 
-
-                    if expNum.operador == OPERACION_ARITMETICA.MAS : 
-                        expNum.val =exp1+exp2
+                    if expNum.operador == OPERACION_ARITMETICA.MAS :                      
                         expNum.tipo = TS.TIPO_DATO.FLOAT
-                        return expNum.val
+                        temporal = self.generarTemp()
+                        self.CodigoGenerado += '\t'+temporal+'='+str(exp1)+'+'+str(exp2)+";"+"\n"
+                        return temporal
                     if expNum.operador == OPERACION_ARITMETICA.MENOS : 
-                        expNum.val =exp1-exp2
                         expNum.tipo = TS.TIPO_DATO.FLOAT
-                        return expNum.val
+                        temporal = self.generarTemp()
+                        self.CodigoGenerado += '\t'+temporal+'='+str(exp1)+'-'+str(exp2)+";"+"\n"
+                        return temporal
                     if expNum.operador == OPERACION_ARITMETICA.POR : 
-                        expNum.val =exp1*exp2
                         expNum.tipo = TS.TIPO_DATO.FLOAT
-                        return expNum.val
+                        temporal = self.generarTemp()
+                        self.CodigoGenerado += '\t'+temporal+'='+str(exp1)+'*'+str(exp2)+";"+"\n"
+                        return temporal
                     if expNum.operador == OPERACION_ARITMETICA.DIVIDIDO : 
-                        expNum.val =exp1/exp2
                         expNum.tipo = TS.TIPO_DATO.FLOAT
-                        return expNum.val
+                        temporal = self.generarTemp()
+                        self.CodigoGenerado += '\t'+temporal+'='+str(exp1)+'/'+str(exp2)+";"+"\n"
+                        return temporal
                     if expNum.operador == OPERACION_ARITMETICA.RESIDUO : 
-                        expNum.val =exp1%exp2
                         expNum.tipo = TS.TIPO_DATO.FLOAT
-                        return expNum.val
+                        temporal = self.generarTemp()
+                        self.CodigoGenerado += '\t'+temporal+'='+str(exp1)+'%'+str(exp2)+";"+"\n"
+                        return temporal
                     else:
                         print('Error de operacion: el operador '+str(expNum.exp1.val)+' y el operador'+str(expNum.exp2.val)+' no reconocen este tipo de operacion')
                         err = 'Error de operacion: el operador '+str(expNum.exp1.val)+' y el operador'+str(expNum.exp2.val)+' no reconocen este tipo de operacion' ,' En la linea: ',expNum.linea,' En la columna: ',expNum.columna, 'Tipo: SEMANTICO'
@@ -603,25 +840,30 @@ class Ejecucion_MinorC ():
         
                 if(expNum.exp2.tipo==td.INT or expNum.exp2.tipo==td.FLOAT):
                     if expNum.operador == OPERACION_ARITMETICA.MAS : 
-                        expNum.val =exp1+exp2
                         expNum.tipo = TS.TIPO_DATO.FLOAT
-                        return expNum.val
+                        temporal = self.generarTemp()
+                        self.CodigoGenerado += '\t'+temporal+'='+str(exp1)+'+'+str(exp2)+";"+"\n"
+                        return temporal
                     if expNum.operador == OPERACION_ARITMETICA.MENOS : 
-                        expNum.val =exp1-exp2
                         expNum.tipo = TS.TIPO_DATO.FLOAT
-                        return expNum.val
+                        temporal = self.generarTemp()
+                        self.CodigoGenerado += '\t'+temporal+'='+str(exp1)+'-'+str(exp2)+";"+"\n"
+                        return temporal
                     if expNum.operador == OPERACION_ARITMETICA.POR : 
-                        expNum.val =exp1*exp2
                         expNum.tipo = TS.TIPO_DATO.FLOAT
-                        return expNum.val
+                        temporal = self.generarTemp()
+                        self.CodigoGenerado += '\t'+temporal+'='+str(exp1)+'*'+str(exp2)+";"+"\n"
+                        return temporal
                     if expNum.operador == OPERACION_ARITMETICA.DIVIDIDO : 
-                        expNum.val =exp1/exp2
                         expNum.tipo = TS.TIPO_DATO.FLOAT
-                        return expNum.val
+                        temporal = self.generarTemp()
+                        self.CodigoGenerado += '\t'+temporal+'='+str(exp1)+'/'+str(exp2)+";"+"\n"
+                        return temporal
                     if expNum.operador == OPERACION_ARITMETICA.RESIDUO : 
-                        expNum.val =exp1%exp2
                         expNum.tipo = TS.TIPO_DATO.FLOAT
-                        return expNum.val
+                        temporal = self.generarTemp()
+                        self.CodigoGenerado += '\t'+temporal+'='+str(exp1)+'%'+str(exp2)+";"+"\n"
+                        return temporal
                     else:
                         print('Error de operacion: el operador '+str(expNum.exp1.val)+' y el operador'+str(expNum.exp2.val)+' no reconocen este tipo de operacion')
                         err = 'Error de operacion: el operador '+str(expNum.exp1.val)+' y el operador'+str(expNum.exp2.val)+' no reconocen este tipo de operacion' ,' En la linea: ',expNum.linea,' En la columna: ',expNum.columna, 'Tipo: SEMANTICO'
@@ -634,9 +876,10 @@ class Ejecucion_MinorC ():
             elif (expNum.exp1.tipo==td.CADENA):
                 if(expNum.exp2.tipo==td.CADENA):
                     if expNum.operador == OPERACION_ARITMETICA.MAS : 
-                        expNum.val =exp1+exp2
                         expNum.tipo = TS.TIPO_DATO.CADENA
-                        return expNum.val
+                        temporal = self.generarTemp()
+                        self.CodigoGenerado += '\t'+temporal+'='+str(exp1)+'+'+str(exp2)+";"+"\n"
+                        return temporal
                     else:
                         print('Error de operacion: el operador '+str(expNum.exp1.val)+' y el operador'+str(expNum.exp2.val)+' no reconocen este tipo de operacion')
                         err = 'Error de operacion: el operador '+str(expNum.exp1.val)+' y el operador'+str(expNum.exp2.val)+' no reconocen este tipo de operacion ' ,' En la linea: ',expNum.linea,' En la columna: ',expNum.columna, 'Tipo: SEMANTICO'
@@ -648,27 +891,30 @@ class Ejecucion_MinorC ():
         
         elif isinstance(expNum, ExpresionNegativo) :
             exp = self.resolver_expresion_aritmetica(expNum.exp, ts)
-            expNum.val=exp*-1
             expNum.tipo = expNum.exp.tipo
-            return expNum.val
+            temporal = self.generarTemp()
+            self.CodigoGenerado += '\t'+temporal+'='+"-"+str(exp)+";"+"\n"
+            return temporal
 
         elif isinstance(expNum, ExpresionNumero) :
             expNum.tipo = expNum.tipo
             return expNum.val
 
         elif isinstance(expNum, ExpresionIdentificador) :
+            
             return ts.obtener(expNum.id).valor
 
-        elif isinstance(expNum, ExpresionTemporal):
-            expNum.val = ts.obtener(expNum.id).valor
-            expNum.tipo = ts.obtener(expNum.id).tipo
-            return expNum.val
-
-        elif isinstance (expNum, ExpresionPunteroTemp):
-            temp = str(expNum.id).lstrip('&')
-            expNum.val = ts.obtenerPuntero(temp)
-            expNum.tipo = TS.TIPO_DATO.INT
-            return expNum.val
+        elif isinstance (expNum, ExpresionPuntero):
+            temp = str(expNum.id).lstrip('&')           
+            try:
+                reg = ts.obtener(temp).reg
+                r = self.generarTemp()
+                self.CodigoGenerado += '\t'+r+'='+'&'+reg+';'+'\n'
+                expNum.tipo = td.INT
+                return r
+            except :
+                print('error, no existe el registro asociado al puntero')
+                return expNum.val
 
         elif isinstance (expNum,ExpresionValorAbsoluto):
             temp=self.resolver_expresion_aritmetica(expNum.exp,ts)
@@ -749,105 +995,45 @@ class Ejecucion_MinorC ():
             
         elif isinstance (expNum, ExpresionLogicaNot):
             temp = self.resolver_expresion_aritmetica(expNum.exp,ts)
-            if temp==self.false: expNum.val=self.true
-            elif temp==self.true: expNum.val=self.false
-            else: 
-                expNum.val=1964
-                print('Valor',temp,' no asociado a una condicion logica')
-                err = 'Error: Valor',temp,' no asociado a una condicion logica',' En la linea: ',expNum.linea,' En la columna: ',expNum.columna, 'Tipo: SEMANTICO'
-                self.errores.append(err)
             expNum.tipo=TS.TIPO_DATO.INT
-            return expNum.val
+            temporal = self.generarTemp()
+            self.CodigoGenerado += '\t'+temp+'= !'+str(temp)+'\n'
+            return temporal
     
         elif isinstance (expNum, ExpresionLogicaXOR):
             exp1 = self.resolver_expresion_aritmetica(expNum.exp1,ts)
             exp2 = self.resolver_expresion_aritmetica(expNum.exp2,ts)
             if expNum.exp1.tipo==TS.TIPO_DATO.INT and expNum.exp1.tipo==TS.TIPO_DATO.INT :
                 expNum.tipo = TS.TIPO_DATO.INT
-                if exp1==self.true:
-                    if exp2==self.true:
-                        return self.false
-                    elif exp2==self.false:
-                        return self.true
-                    else:
-                        print("error de valor ",exp2," no puede ser comparado en un XOR") 
-                        err = 'Error de valor ',exp2,'no puede ser comparado en un XOR',' En la linea: ',expNum.linea,' En la columna: ',expNum.columna, 'Tipo: SEMANTICO'
-                        self.errores.append(err)        
-                elif exp1==self.false:
-                    if exp2==self.true:
-                        return self.true
-                    elif exp2==self.false:
-                        return self.false
-                    else:
-                        print("error de valor ",exp2,", no puede ser comparado en un XOR")
-                        err = 'Error de valor ',exp2,'no puede ser comparado en un XOR',' En la linea: ',expNum.linea,' En la columna: ',expNum.columna, 'Tipo: SEMANTICO'
-                        self.errores.append(err)    
-                else:
-                    print("error de valor ",exp1," no puede ser comparado en un XOR")    
-                    err = 'Error de valor ',exp1,'no puede ser comparado en un XOR',' En la linea: ',expNum.linea,' En la columna: ',expNum.columna, 'Tipo: SEMANTICO'
-                    self.errores.append(err)    
+                temp = self.generarTemp()
+                self.CodigoGenerado += '\t'+temp+'='+str(exp1)+' xor '+str(exp2)+';'+'\n'
+                return temp
             else:
                 print('error de tipos ',exp2,'y ',exp2,' no pueden operarse en un XOR, ambos deben ser INT')
                 err = 'Error de tipos ',exp2,'y ',exp2,' no pueden operarse en un XOR, ambos deben ser INT',' En la linea: ',expNum.linea,' En la columna: ',expNum.columna, 'Tipo: SEMANTICO'
                 self.errores.append(err)  
+        
         elif isinstance (expNum, ExpresionLogicaOR):
             exp1 = self.resolver_expresion_aritmetica(expNum.exp1,ts)
             exp2 = self.resolver_expresion_aritmetica(expNum.exp2,ts)
             if expNum.exp1.tipo==TS.TIPO_DATO.INT and expNum.exp1.tipo==TS.TIPO_DATO.INT :
                 expNum.tipo = TS.TIPO_DATO.INT
-                if exp1==self.true:
-                    if exp2==self.true:
-                        return self.true
-                    elif exp2==self.false:
-                        return self.true
-                    else:
-                        print("error de valor ",exp2," no puede ser comparado en un OR") 
-                        err = 'Error de valor ',exp2,' no puede ser comparado en un OR',' En la linea: ',expNum.linea,' En la columna: ',expNum.columna, 'Tipo: SEMANTICO'
-                        self.errores.append(err)         
-                elif exp1==self.false:
-                    if exp2==self.true:
-                        return self.true
-                    elif exp2==self.false:
-                        return self.false
-                    else:
-                        print("error de valor ",exp2,", no puede ser comparado en un OR") 
-                        err = 'Error de valor ',exp2,' no puede ser comparado en un OR',' En la linea: ',expNum.linea,' En la columna: ',expNum.columna, 'Tipo: SEMANTICO'
-                        self.errores.append(err)  
-                else:
-                    print("error de valor ",exp1," no puede ser comparado en un OR")    
-                    err = 'Error de valor ',exp1,' no puede ser comparado en un OR',' En la linea: ',expNum.linea,' En la columna: ',expNum.columna, 'Tipo: SEMANTICO'
-                    self.errores.append(err)  
+                temp = self.generarTemp()
+                self.CodigoGenerado += '\t'+temp+'='+str(exp1)+' || '+str(exp2)+';'+'\n'
+                return temp
             else:
                 print('error de tipos ',exp2,'y ',exp2,' no pueden operarse en un OR, ambos deben ser INT')
                 err = 'Error de tipos ',exp1,'y ',exp2,' no pueden operarse en un OR, ambos deben ser INT',' En la linea: ',expNum.linea,' En la columna: ',expNum.columna, 'Tipo: SEMANTICO'
                 self.errores.append(err) 
+        
         elif isinstance (expNum, ExpresionLogicaAND):   
             exp1 = self.resolver_expresion_aritmetica(expNum.exp1,ts)
             exp2 = self.resolver_expresion_aritmetica(expNum.exp2,ts)
             if expNum.exp1.tipo==TS.TIPO_DATO.INT and expNum.exp1.tipo==TS.TIPO_DATO.INT :
                 expNum.tipo = TS.TIPO_DATO.INT
-                if exp1==self.true:
-                    if exp2==self.true:
-                        return self.true
-                    elif exp2==self.false:
-                        return self.false
-                    else:
-                        print("error de valor ",exp2," no puede ser comparado en un AND")   
-                        err = 'Error de valor ',exp2,' no puede ser comparado en un AND',' En la linea: ',expNum.linea,' En la columna: ',expNum.columna, 'Tipo: SEMANTICO'
-                        self.errores.append(err)   
-                elif exp1==self.false:
-                    if exp2==self.true:
-                        return self.false
-                    elif exp2==self.false:
-                        return self.true
-                    else:
-                        print("error de valor ",exp2,", no puede ser comparado en un AND") 
-                        err = 'Error de valor ',exp2,' no puede ser comparado en un AND',' En la linea: ',expNum.linea,' En la columna: ',expNum.columna, 'Tipo: SEMANTICO'
-                        self.errores.append(err)  
-                else:
-                    print("error de valor ",exp1,", no puede ser comparado en un AND") 
-                    err = 'Error de valor ',exp1,' no puede ser comparado en un AND',' En la linea: ',expNum.linea,' En la columna: ',expNum.columna, 'Tipo: SEMANTICO'
-                    self.errores.append(err)       
+                temp = self.generarTemp()
+                self.CodigoGenerado += '\t'+temp+'='+str(exp1)+' && '+str(exp2)+';'+'\n'
+                return temp     
             else:
                 print('error de tipos ',exp1,' y "=',exp2,' no pueden operarse en un AND, ambos deben ser INT')
                 err = 'Error de tipos ',exp1,' y "=',exp2,' no pueden operarse en un AND, ambos deben ser INT',' En la linea: ',expNum.linea,' En la columna: ',expNum.columna, 'Tipo: SEMANTICO'
@@ -856,10 +1042,10 @@ class Ejecucion_MinorC ():
         elif isinstance (expNum, ExpresionBitNot):
             temp = self.resolver_expresion_aritmetica(expNum.exp,ts)
             if expNum.exp.tipo == TS.TIPO_DATO.INT or expNum.exp.tipo == TS.TIPO_DATO.FLOAT:       
-                t = int(Decimal(temp))
-                expNum.val=~t
                 expNum.tipo = TS.TIPO_DATO.INT
-                return expNum.val
+                temporal = self.generarTemp()
+                self.CodigoGenerado += '\t'+temporal+'= ~'+str(temp)+';'+'\n'
+                return temporal   
             else:
                 print('El valor ',temp,'no pude ser operado en binario por un NOT, se esperaba un tipo INT o FLOAT')
                 err = 'Error el valor ',temp,'no pude ser operado en binario por un NOT, se esperaba un tipo INT o FLOAT',' En la linea: ',expNum.linea,' En la columna: ',expNum.columna, 'Tipo: SEMANTICO'
@@ -868,12 +1054,12 @@ class Ejecucion_MinorC ():
         elif isinstance (expNum, ExpresionBitAnd):
             exp1 = self.resolver_expresion_aritmetica(expNum.exp1,ts)
             exp2 = self.resolver_expresion_aritmetica(expNum.exp2,ts)
-            if expNum.exp1.tipo == TS.TIPO_DATO.INT or expNum.exp1.tipo == TS.TIPO_DATO.FLOAT: 
-                t1 = int(Decimal(exp1))     
+            if expNum.exp1.tipo == TS.TIPO_DATO.INT or expNum.exp1.tipo == TS.TIPO_DATO.FLOAT:     
                 if expNum.exp2.tipo == TS.TIPO_DATO.INT or expNum.exp2.tipo == TS.TIPO_DATO.FLOAT: 
-                    t2 = int(Decimal(exp2))
                     expNum.tipo = TS.TIPO_DATO.INT
-                    return t1 & t2
+                    temp = self.generarTemp()
+                    self.CodigoGenerado += '\t'+temp+'='+str(exp1)+' & '+str(exp2)+';'+'\n'
+                    return temp
                 else:
                     print ('error de tipos ',exp1,' y ',exp2,'no se pueden operar en un AND bit a bit se espera que ambos sean INT o FLOAT')
                     err = 'Error de tipos ',exp1,' y ',exp2,'no se pueden operar en un AND bit a bit se espera que ambos sean INT o FLOAT',' En la linea: ',expNum.linea,' En la columna: ',expNum.columna, 'Tipo: SEMANTICO'
@@ -882,15 +1068,15 @@ class Ejecucion_MinorC ():
                 print ('error de tipos ',exp1,' y ',exp2,'no se pueden operar en un AND bit a bit se espera que ambos sean INT o FLOAT')
                 err = 'Error de tipos ',exp1,' y ',exp2,'no se pueden operar en un AND bit a bit se espera que ambos sean INT o FLOAT',' En la linea: ',expNum.linea,' En la columna: ',expNum.columna, 'Tipo: SEMANTICO'
                 self.errores.append(err) 
+        
         elif isinstance (expNum, ExpresionBitOr):
             exp1 = self.resolver_expresion_aritmetica(expNum.exp1,ts)
             exp2 = self.resolver_expresion_aritmetica(expNum.exp2,ts)
-            if expNum.exp1.tipo == TS.TIPO_DATO.INT or expNum.exp1.tipo == TS.TIPO_DATO.FLOAT: 
-                t1 = int(Decimal(exp1))     
+            if expNum.exp1.tipo == TS.TIPO_DATO.INT or expNum.exp1.tipo == TS.TIPO_DATO.FLOAT:    
                 if expNum.exp2.tipo == TS.TIPO_DATO.INT or expNum.exp2.tipo == TS.TIPO_DATO.FLOAT: 
-                    t2 = int(Decimal(exp2))
-                    expNum.tipo = TS.TIPO_DATO.INT
-                    return t1 | t2
+                    temp = self.generarTemp()
+                    self.CodigoGenerado += '\t'+temp+'='+str(exp1)+' | '+str(exp2)+';'+'\n'
+                    return temp
                 else:
                     print ('error de tipos ',exp1,' y ',exp2,'no se pueden operar en un OR bit a bit se espera que ambos sean INT o FLOAT')
                     err = 'Error de tipos ',exp1,' y ',exp2,'no se pueden operar en un OR bit a bit se espera que ambos sean INT o FLOAT',' En la linea: ',expNum.linea,' En la columna: ',expNum.columna, 'Tipo: SEMANTICO'
@@ -899,15 +1085,16 @@ class Ejecucion_MinorC ():
                 print ('error de tipos ',exp1,' y ',exp2,'no se pueden operar en un OR bit a bit se espera que ambos sean INT o FLOAT')
                 err = 'Error de tipos ',exp1,' y ',exp2,'no se pueden operar en un OR bit a bit se espera que ambos sean INT o FLOAT',' En la linea: ',expNum.linea,' En la columna: ',expNum.columna, 'Tipo: SEMANTICO'
                 self.errores.append(err) 
+        
         elif isinstance (expNum, ExpresionBitXor):
             exp1 = self.resolver_expresion_aritmetica(expNum.exp1,ts)
             exp2 = self.resolver_expresion_aritmetica(expNum.exp2,ts)
-            if expNum.exp1.tipo == TS.TIPO_DATO.INT or expNum.exp1.tipo == TS.TIPO_DATO.FLOAT: 
-                t1 = int(Decimal(exp1))     
+            if expNum.exp1.tipo == TS.TIPO_DATO.INT or expNum.exp1.tipo == TS.TIPO_DATO.FLOAT:  
                 if expNum.exp2.tipo == TS.TIPO_DATO.INT or expNum.exp2.tipo == TS.TIPO_DATO.FLOAT: 
-                    t2 = int(Decimal(exp2))
                     expNum.tipo = TS.TIPO_DATO.INT
-                    return t1 ^ t2
+                    temp = self.generarTemp()
+                    self.CodigoGenerado += '\t'+temp+'='+str(exp1)+' ^ '+str(exp2)+';'+'\n'
+                    return temp
                 else:
                     print ('error de tipos ',exp1,' y ',exp2,'no se pueden operar en un XOR bit a bit se espera que ambos sean INT o FLOAT')
                     err = 'Error de tipos ',exp1,' y ',exp2,'no se pueden operar en un XOR bit a bit se espera que ambos sean INT o FLOAT',' En la linea: ',expNum.linea,' En la columna: ',expNum.columna, 'Tipo: SEMANTICO'
@@ -916,15 +1103,16 @@ class Ejecucion_MinorC ():
                 print ('error de tipos ',exp1,' y ',exp2,'no se pueden operar en un XOR bit a bit se espera que ambos sean INT o FLOAT')
                 err = 'Error de tipos ',exp1,' y ',exp2,'no se pueden operar en un XOR bit a bit se espera que ambos sean INT o FLOAT',' En la linea: ',expNum.linea,' En la columna: ',expNum.columna, 'Tipo: SEMANTICO'
                 self.errores.append(err) 
+        
         elif isinstance (expNum, ExpresionBitIzq):
             exp1 = self.resolver_expresion_aritmetica(expNum.exp1,ts)
             exp2 = self.resolver_expresion_aritmetica(expNum.exp2,ts)
-            if expNum.exp1.tipo == TS.TIPO_DATO.INT or expNum.exp1.tipo == TS.TIPO_DATO.FLOAT: 
-                t1 = int(Decimal(exp1))     
+            if expNum.exp1.tipo == TS.TIPO_DATO.INT or expNum.exp1.tipo == TS.TIPO_DATO.FLOAT:    
                 if expNum.exp2.tipo == TS.TIPO_DATO.INT or expNum.exp2.tipo == TS.TIPO_DATO.FLOAT: 
-                    t2 = int(Decimal(exp2))
                     expNum.tipo = TS.TIPO_DATO.INT
-                    return t1 << t2
+                    temp = self.generarTemp()
+                    self.CodigoGenerado += '\t'+temp+'='+str(exp1)+' << '+str(exp2)+';'+'\n'
+                    return temp
                 else:
                     print ('error de tipos ',exp1,' y ',exp2,'no se pueden operar en un CORR IZQ bit a bit se espera que ambos sean INT o FLOAT')
                     err = 'Error de tipos ',exp1,' y ',exp2,'no se pueden operar en un CORR IZQ bit a bit se espera que ambos sean INT o FLOAT',' En la linea: ',expNum.linea,' En la columna: ',expNum.columna, 'Tipo: SEMANTICO'
@@ -933,15 +1121,16 @@ class Ejecucion_MinorC ():
                 print ('error de tipos ',exp1,' y ',exp2,'no se pueden operar en un CORR IZQ bit a bit se espera que ambos sean INT o FLOAT')
                 err = 'Error de tipos ',exp1,' y ',exp2,'no se pueden operar en un CORR IZQ bit a bit se espera que ambos sean INT o FLOAT',' En la linea: ',expNum.linea,' En la columna: ',expNum.columna, 'Tipo: SEMANTICO'
                 self.errores.append(err) 
+        
         elif isinstance (expNum, ExpresionBitDer):
             exp1 = self.resolver_expresion_aritmetica(expNum.exp1,ts)
             exp2 = self.resolver_expresion_aritmetica(expNum.exp2,ts)
-            if expNum.exp1.tipo == TS.TIPO_DATO.INT or expNum.exp1.tipo == TS.TIPO_DATO.FLOAT: 
-                t1 = int(Decimal(exp1))     
+            if expNum.exp1.tipo == TS.TIPO_DATO.INT or expNum.exp1.tipo == TS.TIPO_DATO.FLOAT:   
                 if expNum.exp2.tipo == TS.TIPO_DATO.INT or expNum.exp2.tipo == TS.TIPO_DATO.FLOAT: 
-                    t2 = int(Decimal(exp2))
                     expNum.tipo = TS.TIPO_DATO.INT
-                    return t1 >> t2
+                    temp = self.generarTemp()
+                    self.CodigoGenerado += '\t'+temp+'='+str(exp1)+' >> '+str(exp2)+';'+'\n'
+                    return temp
                 else:
                     print ('error de tipos ',exp1,' y ',exp2,'no se pueden operar en un CORR DER bit a bit se espera que ambos sean INT o FLOAT')
                     err = 'Error de tipos ',exp1,' y ',exp2,'no se pueden operar en un CORR DER bit a bit se espera que ambos sean INT o FLOAT',' En la linea: ',expNum.linea,' En la columna: ',expNum.columna, 'Tipo: SEMANTICO'
@@ -950,6 +1139,7 @@ class Ejecucion_MinorC ():
                 print ('error de tipos ',exp1,' y ',exp2,'no se pueden operar en un CORR DER bit a bit se espera que ambos sean INT o FLOAT')
                 err = 'Error de tipos ',exp1,' y ',exp2,'no se pueden operar en un CORR DER bit a bit se espera que ambos sean INT o FLOAT',' En la linea: ',expNum.linea,' En la columna: ',expNum.columna, 'Tipo: SEMANTICO'
                 self.errores.append(err) 
+        
         elif isinstance (expNum,ExpresionLogica):
             return self.resolver_expresion_logica(expNum,ts)
         
@@ -1029,9 +1219,42 @@ class Ejecucion_MinorC ():
                 expNum.tipo = td.CADENA
             return expNum.val
         
+        elif isinstance(expNum,ExpresionId):
+            try:
+                registro = ts.obtener(expNum.id)
+                expNum.tipo = registro.tipo
+                return registro.reg
+            except:
+                print('Error, la variable solicitada no existe o no tiene un registro asociado')
+                return
+        elif isinstance(expNum,ExpresionInicioSimple):
+            try:
+                registro = ts.obtener(expNum.id)
+                expNum.tipo = registro.tipo
+                return registro.reg
+            except:
+                print('Error, la variable solicitada no existe o no tiene un registro asociado')
+                return
+        elif isinstance(expNum,ExpresionAccesoStruct):
+            padre = ts.obtener(expNum.idPadre)
+            hijo = expNum.idHijo
+            expNum.tipo = padre.tipo
+            temporal = self.generarTemp()
+            self.CodigoGenerado += '\t'+temporal+'='+padre.reg+'[\''+str(hijo)+'\']'+';'+'\n'
+            return temporal
+        
+        elif isinstance(expNum, ExpresionListaIndices):
+            registro  = self.generarTemp()
+
+            r = ts.obtener(expNum.id).reg
+            lista =""
+            for i in expNum.listaindices:
+                lista +="["+str(self.resolver_expresion_aritmetica(i,ts))+"]"
+            self.CodigoGenerado += "\t"+registro+"="+r+lista+";"+"\n" 
+            return registro
         else:
             print(expNum)
-            err = 'Error, no existe un valor en el indice: ',ind,' En la linea: ',expNum.linea,' En la columna: ',expNum.columna, 'Tipo: SEMANTICO'
+            err = 'Error, no existe un valor en el indice: ',expNum,' En la linea: ',expNum.linea,' En la columna: ',expNum.columna, 'Tipo: SEMANTICO'
             self.errores.append(err) 
 
     def procesar_unset(self,exp, ts):
@@ -1044,40 +1267,28 @@ class Ejecucion_MinorC ():
             err = 'Error el valor ',exp.exp.id,'no puede ser ejecutado por unset(), se esperaba un registro',' En la linea: ',exp.linea,' En la columna: ',exp.columna, 'Tipo: SEMANTICO'
             self.errores.append(err) 
 
-    def procesar_inicioPila(self,instr,ts):
-        pila = TS.Simbolo(instr.id,td.PILA,[],self.Etiqueta)
-        if ts.existeSimbolo(pila):
-            print('La pila ya existe')
-            err = 'Error el valor ',instr.id,'La pila ya existe',' En la linea: ',instr.linea,' En la columna: ',instr.columna, 'Tipo: SEMANTICO'
-            self.errores.append(err) 
-        else:
-            ts.agregar(pila)
-
-    def procesar_asignacion_punteropila(self,instr,ts):
-        valor=self.resolver_expresion_aritmetica(instr.exp,ts)
-        punteropila = TS.Simbolo(instr.id,td.INT,valor,self.Etiqueta)
-        if ts.existeSimbolo(punteropila):
-            ts.actualizar(punteropila)
-        else:
-            ts.agregar(punteropila)
-
-    def procesar_asignacion_pila (self,instr,ts):
+    def procesar_incremento(self, instr, ts):
         try:
-            pila = ts.obtener(instr.id).valor
-            pos = ts.obtener(instr.puntero).valor
-            valor = self.resolver_expresion_aritmetica(instr.exp,ts)
-            pila.insert(pos,valor)
-
-            nuevapila = TS.Simbolo(instr.id,td.PILA,pila,self.Etiqueta)
-
-            if ts.existeSimbolo(nuevapila):
-                ts.actualizar(nuevapila)
-            else:
-                print('error pila',instr.id,'no existe')
-                err = 'Error pila',instr.id,'no existe',' En la linea: ',instr.linea,' En la columna: ',instr.columna, 'Tipo: SEMANTICO'
-                self.errores.append(err) 
+            reg = ts.obtener(instr.exp) 
+        except:
+            print('la variable no esta definida')
+        try:
+            if reg.tipo == td.INT:
+                if instr.tipo == '++':
+                    self.CodigoGenerado += '\t'+reg.reg+'='+reg.reg+'+1;'+'\n'
+                elif instr.tipo == '--':
+                    self.CodigoGenerado += '\t'+reg.reg+'='+reg.reg+'-1;'+'\n'
         except :
-            print('error en asignacion de valor a la pila')
+            print('error de tipos')
+
+        return
+
+    def procesar_main(self, instr, ts):
+        self.CodigoGenerado += "main:"+"\n"
+        try:
+            self.procesar_sentencias(instr.sentencias,ts)
+        except :
+            print('error, no se pueden ejecutar las sentencias dentro de main')
 
     def procesar_asignacion_extra (self,instr,ts):
         try:
@@ -1112,21 +1323,83 @@ class Ejecucion_MinorC ():
                     diccionario=diccionario.get(indice)
 
     def procesa_Label(self,instr,ts):
-        
-        self.Etiqueta=str(instr.id)
+        try:
+            self.CodigoGenerado+=str(instr.id)+":"+"\n"
+        except :
+            print("error, no se puede traducir el label")
 
-    def Llamada_goto(self,instr,ts,listasiguientes):  
-        siguientes = []
-        i = 0
-        for ins in listasiguientes:
-            if isinstance(ins,Label):
-                self.Etiqueta = str(instr.id)
-                if ins.id == instr.id:
-                    siguientes = listasiguientes[i+1:]
-                    self.ejecutar_expresiones_label(siguientes,ts,listasiguientes)
-                    return
-            i = i+1
-        return
+    def Llamada_goto(self,instr,ts):  
+        try:
+            self.CodigoGenerado += "\t"+"goto "+instr.id + ";" + "\n"
+            return
+        except :
+            print("error en traduccion de goto")
+            return
+
+    def procesar_funcion (self, instr,ts):
+        try:
+            self.CodigoGenerado += instr.id+":"+"\n"
+            if instr.parametros[0].exp!=0:
+                for par in instr.parametros:
+                    if par.tipo == td.INT :
+                        para = self.generaPar()
+                        nuevo = TS.Simbolo(par.exp,par.tipo,0,para,instr.id)
+                        self.CodigoGenerado += '\t'+para+"=0"+";"+"\n"
+                    elif par.tipo == td.CADENA:
+                        para = self.generaPar()
+                        nuevo = TS.Simbolo(par.exp,par.tipo," ",para,instr.id)
+                        self.CodigoGenerado += '\t'+para+"=\' \'"+";"+"\n"
+                    elif par.tipo == td.FLOAT:
+                        para = self.generaPar()
+                        nuevo = TS.Simbolo(par.exp,par.tipo,0.0,para,instr.id)
+                        self.CodigoGenerado += '\t'+para+"=0.0"+";"+"\n"
+                if ts.existeSimbolo(nuevo)==False:
+                    ts.agregar(nuevo)
+                else:
+                    ts.actualizar(nuevo)
+
+            self.procesar_sentencias(instr.sentencias,ts)
+        except :
+            print('Error al traducir la funcion')
+
+    def procesar_def_struct(self, instr, ts):
+
+        try:
+            nuevo = TS.Simbolo(instr.ide,td.STRUCT,instr.elementos,'struct')
+            if ts.existeSimbolo(nuevo)==False:
+                ts.agregar(nuevo)
+        except :
+            print("Error, Struct ya definido")
+            pass
+
+    def procesar_decla_struct(self,instr,ts):
+        try:
+            struct = ts.obtener(instr.TipoStruct)
+
+        except :
+            print('error, el struct no esta definidio previamente')
+
+        try:
+            registro = self.generarTemp()
+            nuevo = TS.Simbolo(instr.ide,td.STRUCT,{},registro)
+
+            if ts.existeSimbolo(nuevo)==False:
+                ts.agregar(nuevo)
+                self.CodigoGenerado += '\t'+registro+'=array();'+'\n'
+                for e in struct.valor:
+                    if e.tipo == td.INT:
+                        self.CodigoGenerado +='\t'+registro+'[\''+e.ide+'\']=0;'+'\n'
+                    elif e.tipo == td.FLOAT:
+                        self.CodigoGenerado +='\t'+registro+'[\''+e.ide+'\']=0.0;'+'\n'
+                    elif e.tipo == td.CADENA:
+                        self.CodigoGenerado +='\t'+registro+'[\''+e.ide+'\']=\"0\";'+'\n'
+        except:
+            print('error, nose puede traducir la declaracion de struct')
+
+    def procesar_asignacion_struct(self,instr,ts):
+        struct = ts.obtener(instr.TipoStruct)
+        valor =self.resolver_expresion_aritmetica(instr.valor,ts)
+        self.CodigoGenerado += '\t'+struct.reg+'[\''+instr.ide+'\']='+str(valor)+";"+"\n"
 
     def ejecutar_expresiones_label(self,listainstrucciones,ts,listaglobal):
             for instr in listainstrucciones :
@@ -1138,7 +1411,6 @@ class Ejecucion_MinorC ():
                 elif isinstance(instr, IfElse) : 
                     if self.procesar_if_else(instr, ts) == 1 : return
                 elif isinstance(instr, Unset) : self.procesar_unset(instr,ts)
-                elif isinstance(instr,IniciaPila): self.procesar_inicioPila(instr,ts)
                 elif isinstance(instr,AsignaPunteroPila): self.procesar_asignacion_punteropila(instr,ts)
                 elif isinstance(instr,AsignaValorPila): self.procesar_asignacion_pila(instr,ts)
                 elif isinstance(instr, AsignacionExtra): self.procesar_asignacion_extra(instr,ts)
@@ -1154,40 +1426,38 @@ class Ejecucion_MinorC ():
                     err = 'Error: instrucción no válida', instr,' En la linea: ',instr.linea,' En la columna: ',instr.columna, 'Tipo: SEMANTICO'
                     self.errores.append(err) 
 
-
     def procesar_instrucciones(self,instrucciones, ts) :
-        ## lista de instrucciones recolectadas
-        if isinstance(instrucciones[0],Main):
-            for instr in instrucciones :
-                if isinstance(instr, Imprimir) : self.procesar_imprimir(instr, ts)
-                elif isinstance(instr, Definicion) : self.procesar_definicion(instr, ts)
-                elif isinstance(instr, Asignacion) : self.procesar_asignacion(instr, ts)
-                elif isinstance(instr, Mientras) : self.procesar_mientras(instr, ts)
-                elif isinstance(instr, If) : 
-                    if self.procesar_if(instr, ts)==1: 
-                        return
-                elif isinstance(instr, IfElse) : self.procesar_if_else(instr, ts)
-                elif isinstance(instr, Unset) : self.procesar_unset(instr,ts)
-                elif isinstance(instr,IniciaPila): self.procesar_inicioPila(instr,ts)
-                elif isinstance(instr,AsignaPunteroPila): self.procesar_asignacion_punteropila(instr,ts)
-                elif isinstance(instr,AsignaValorPila): self.procesar_asignacion_pila(instr,ts)
-                elif isinstance(instr, AsignacionExtra): self.procesar_asignacion_extra(instr,ts)
-                elif isinstance(instr, Main): self.Etiqueta = 'Main'
-                elif isinstance(instr,Asigna_arreglo): self.procesar_asignacion_arreglo(instr,ts)
-                elif isinstance(instr,Label): self.procesa_Label(instr,ts)
-                elif isinstance(instr,Exit): return
-                elif isinstance(instr,Goto): 
-                    self.Llamada_goto(instr,ts, instrucciones)
-                    return
+        ## lista de instrucciones recolectadas.
+        i =0
+        while i <=len(instrucciones):
+            if isinstance(instrucciones[i],Main):
+                break
+            else:
+                i+=1
+        instrucciones.insert(0,instrucciones.pop(i))
+        for instr in instrucciones :
+            if isinstance(instr, Main) : self.procesar_main(instr,ts)
+            elif isinstance(instr, Definicion) : self.procesar_definicion(instr, ts)
+            elif isinstance(instr, Asignacion) : self.procesar_asignacion(instr, ts)
+            elif isinstance(instr, Incremento) : self.procesar_incremento(instr, ts)
+            elif isinstance(instr, DefinicionFuncion) : self.procesar_funcion(instr, ts)
+            elif isinstance(instr, DefStruct) : self.procesar_def_struct(instr,ts)
+            elif isinstance(instr, DeclaracionStruct) : self.procesar_decla_struct(instr, ts)
+            elif isinstance(instr, AsignacionStruct) : self.procesar_asignacion_struct(instr,ts)
+            #elif isinstance(instr,AsignaPunteroPila): self.procesar_asignacion_punteropila(instr,ts)
+            #elif isinstance(instr,AsignaValorPila): self.procesar_asignacion_pila(instr,ts)
+            #elif isinstance(instr, AsignacionExtra): self.procesar_asignacion_extra(instr,ts)
+            #elif isinstance(instr, Main): self.Etiqueta = 'Main'
+            #elif isinstance(instr,Asigna_arreglo): self.procesar_asignacion_arreglo(instr,ts)
+            #elif isinstance(instr,Label): self.procesa_Label(instr,ts)
+            #elif isinstance(instr,Exit): return
+            #elif isinstance(instr,Goto): 
+                #self.Llamada_goto(instr,ts, instrucciones)
+                #return
                 
-                else : 
-                    err = 'Error: instrucción no válida', instr,' En la linea: ',instr.linea,' En la columna: ',instr.columna, 'Tipo: SEMANTICO'
-                    self.errores.append(err) 
-
-        else:
-            print('Error la etiqueta main no esta al inicio del programa o no existe')
-            err = 'Error la etiqueta main no esta al inicio del programa o no existe',' En la linea: ',instr.linea,' En la columna: ',instr.columna, 'Tipo: SEMANTICO'
-            self.errores.append(err) 
+            else : 
+                err = 'Error: instrucción no válida', instr,' En la linea: ',instr,' En la columna: ',instr, 'Tipo: SEMANTICO'
+                self.errores.append(err) 
 
     def procesar_instrucciones_debugger(self,instrucciones, ts, i) :
         ## lista de instrucciones recolectadas
@@ -1202,7 +1472,6 @@ class Ejecucion_MinorC ():
                         return
                 elif isinstance(instrucciones[i], IfElse) : self.procesar_if_else(instrucciones[i], ts)
                 elif isinstance(instrucciones[i], Unset) : self.procesar_unset(instrucciones[i],ts)
-                elif isinstance(instrucciones[i],IniciaPila): self.procesar_inicioPila(instrucciones[i],ts)
                 elif isinstance(instrucciones[i],AsignaPunteroPila): self.procesar_asignacion_punteropila(instrucciones[i],ts)
                 elif isinstance(instrucciones[i],AsignaValorPila): self.procesar_asignacion_pila(instrucciones[i],ts)
                 elif isinstance(instrucciones[i], AsignacionExtra): self.procesar_asignacion_extra(instrucciones[i],ts)
@@ -1225,9 +1494,24 @@ class Ejecucion_MinorC ():
             err = 'Error la etiqueta main no esta al inicio del programa o no existe',' En la linea: ',instrucciones[i].linea,' En la columna: ',instrucciones[i].columna, 'Tipo: SEMANTICO'
             self.errores.append(err) 
 
+    def generarTemp(self):
+        temp = '$t'+str(self.cont)
+        self.cont+=1
+        return temp
+
+    def generaLabel(self):
+        eti = 'Label'+str(self.contLabel)
+        self.contLabel+=1
+        return eti
+
+    def generaPar(self):
+        eti = '$a'+str(self.contPar)
+        self.contPar+=1
+        return eti
 
 a = Ejecucion_MinorC()
 
 f = open("./entrada.txt", "r")
 input = f.read()
 a.ejecutar_asc(input)
+print(a.CodigoGenerado)

@@ -29,8 +29,11 @@ class Definicion(Instruccion) :
         Recibe como parámetro el nombre del identificador a definir
     '''
 
-    def __init__(self, id) :
-        self.id = id
+    def __init__(self,tipo, listaid,linea=0 , columna=0) :
+        self.tipo = tipo
+        self.listaid = listaid
+        self.linea = linea
+        self.columna = columna
 
 class Asignacion(Instruccion) :
     '''
@@ -38,8 +41,9 @@ class Asignacion(Instruccion) :
         Recibe como parámetro el identificador a asignar y el valor que será asignado.
     '''
 
-    def __init__(self, id, expNumerica,  linea=0 , columna=0) :
+    def __init__(self, id,tipo, expNumerica,  linea=0 , columna=0) :
         self.id = id
+        self.tipo = tipo
         self.expNumerica = expNumerica
         self.linea = linea
         self.columna = columna
@@ -57,6 +61,38 @@ class If(Instruccion) :
         self.linea = linea
         self.columna = columna
 
+class IfSimple(Instruccion):
+    '''
+        Esta clase representa la instruccion if Simple
+    '''
+
+    def __init__(self, cond, bloqueSentenciasIf, linea, columna):
+        self.cond = cond
+        self.bloqueSentenciasIf = bloqueSentenciasIf
+        self.linea = linea
+        self.columna=columna
+        
+class IfAnidado(Instruccion):
+    '''
+        Esta clase representa la instruccion if anidado
+    '''
+    def __init__(self, IfIni, listaif, linea, columna):
+        self.IfIni = IfIni
+        self.listaif = listaif
+        self.linea = linea
+        self.columna=columna
+
+class IfAnidadoElse(Instruccion):
+    '''
+        Esta clase representa la instruccion if anidado y un else
+    '''
+    def __init__(self, IfIni, listaif, instelse, linea, columna):
+        self.IfIni = IfIni
+        self.listaif = listaif
+        self.instelse = instelse
+        self.linea = linea
+        self.columna=columna
+
 class IfElse(Instruccion) : 
     '''
         Esta clase representa la instrucción if-else.
@@ -65,10 +101,21 @@ class IfElse(Instruccion) :
         a ejecutar si la expresión lógica es falsa.
     '''
 
-    def __init__(self, expLogica, instrIfVerdadero = [], instrIfFalso = []) :
-        self.expLogica = expLogica
-        self.instrIfVerdadero = instrIfVerdadero
-        self.instrIfFalso = instrIfFalso
+    def __init__(self, ifinst, elseinst, linea, columna) :
+        self.ifinst = ifinst
+        self.elseinst = elseinst
+        self.linea = linea
+        self.columna=columna
+
+class Else(Instruccion):
+    '''
+        Esta clase representa el bloque de sentencias de una instruccion else
+    '''
+
+    def __init__(self, bloqueSentenciasElse, linea =0, columna=0):
+        self.bloqueSentenciasElse = bloqueSentenciasElse
+        self.linea=linea
+        self.columna=columna
 
 class Unset(Instruccion):
     '''
@@ -81,21 +128,29 @@ class Unset(Instruccion):
         self.linea = linea
         self.columna = columna
 
-class ErrorSin(Instruccion):
+class Return(Instruccion):
     '''
-        Esta clase representa la instrucción error sintactico.
-        La instrucción unset únicamente tiene como parámetro un registro
+        Esta clase representa la instrucción return
     '''
-    '''
-    def __init__(self,  exp) :
-        self.exp = exp  '''    
 
-class IniciaPila (Instruccion):
+    def __init__(self,  exp=0,  linea =0, columna=0) :
+        self.exp = exp    
+        self.linea = linea
+        self.columna = columna
+
+class Continue(Instruccion):
     '''
-        Inicia una pila
+        Esta clase representa la instrucción return
     '''
-    def __init__(self,  id,  linea =0, columna=0) :
-        self.id = id  
+    def __init__(self,  linea =0, columna=0) :   
+        self.linea = linea
+        self.columna = columna
+
+class Break(Instruccion):
+    '''
+        Esta clase representa la instrucción break
+    '''
+    def __init__(self,  linea =0, columna=0) :   
         self.linea = linea
         self.columna = columna
 
@@ -135,7 +190,8 @@ class Main (Instruccion):
         Nodo de tipo main
    
     '''
-    def __init__(self,  linea=0 , columna=0) :
+    def __init__(self, sentencias, linea=0 , columna=0) :
+        self.sentencias=sentencias
         self.linea = linea
         self.columna = columna
 
@@ -188,3 +244,137 @@ class Read():
     def __init__(self,  linea=0 , columna=0) :
         self.linea = linea
         self.columna = columna
+
+class DefinicionConvalor():
+    '''
+        Nodo de tipo definicion de un id simple o un arreglo, con valor inicial
+   
+    '''
+    def __init__(self,id,exp,  linea=0 , columna=0) :
+        self.id = id 
+        self.exp = exp
+        self.linea = linea
+        self.columna = columna
+
+class DefinicionSinValor():
+    '''
+        Nodo de tipo definicion de un id simple o un arreglo, sin valor inicial
+   
+    '''
+    def __init__(self,id,  linea=0 , columna=0) :
+        self.id = id 
+        self.linea = linea
+        self.columna = columna
+
+class Incremento(Instruccion):
+    '''
+        Esta clase representa la funcion incremento o decremento
+    '''
+
+    def __init__(self, exp, tipo,  linea =0, columna=0) :
+        self.exp=exp   
+        self.tipo=tipo 
+        self.linea = linea
+        self.columna = columna
+
+class inc ():
+    def __init__(self, exp, tipo,  linea =0, columna=0) :
+        self.exp=exp   
+        self.tipo=tipo 
+        self.linea = linea
+        self.columna = columna
+
+class While(Instruccion):
+    '''
+        Esta clase representa la instrucción mientras.
+        La instrucción mientras recibe como parámetro una expresión lógica y la lista
+        de instrucciones a ejecutar si la expresión lógica es verdadera.
+    '''
+
+    def __init__(self, condicion, instrucciones,linea =0, columna=0) :
+        self.condicion = condicion
+        self.instrucciones = instrucciones
+        self.linea = linea
+        self.columna = columna
+
+class DefinicionFuncion(Instruccion):
+    '''
+        Esta clase representa la instrucción definicion de una funcion
+    '''
+
+    def __init__(self, id, parametros, sentencias,linea =0, columna=0) :
+        self.id = id
+        self.parametros = parametros
+        self.sentencias = sentencias
+        self.linea = linea
+        self.columna = columna   
+
+class ParametroDefinicionFuncion():
+    '''
+        Esta clase representa un parametro
+        dentro de la lista de parametros aceptados
+        en la definicion de una funcion
+    '''
+
+    def __init__(self, tipo, exp,linea =0, columna=0) :
+        self.tipo = tipo
+        self.exp = exp
+        self.linea = linea
+        self.columna = columna   
+
+class ElementoStruct():
+    '''
+        Esta clase representa un elemento
+        dentro de la lista de elemntos aceptados
+        en la definicion de un struct
+    '''
+
+    def __init__(self, tipo, ide,linea =0, columna=0) :
+        self.tipo = tipo
+        self.ide = ide
+        self.linea = linea
+        self.columna = columna   
+
+class DefStruct(Instruccion):
+    '''
+        Esta clase representa la definicion de un Struct
+    '''
+    def __init__(self, ide, elementos,linea =0, columna=0) :
+        self.ide = ide
+        self.elementos = elementos
+        self.linea = linea
+        self.columna = columna   
+
+class DeclaracionStruct(Instruccion):
+    '''
+        Esta clase representa la declaracion de un Struct
+    '''
+    def __init__(self, TipoStruct, ide,linea =0, columna=0) :
+        self.TipoStruct = TipoStruct
+        self.ide = ide
+        self.linea = linea
+        self.columna = columna   
+
+class AsignacionStruct(Instruccion):
+    '''
+        Esta clase representa la asignacion de valor 
+        a un elemnto de un Struct
+    '''
+    def __init__(self, TipoStruct, ide,valor,linea =0, columna=0) :
+        self.TipoStruct = TipoStruct
+        self.ide = ide
+        self.valor = valor
+        self.linea = linea
+        self.columna = columna  
+
+class FuncionFor(Instruccion):
+    '''
+        Esta clase representa la funcion for
+    '''
+    def __init__(self, definicion, condicion,incremento,sentencias,linea =0, columna=0) :
+        self.definicion = definicion
+        self.condicion = condicion
+        self.incremento = incremento
+        self.sentencias = sentencias
+        self.linea = linea
+        self.columna = columna  

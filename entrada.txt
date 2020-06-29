@@ -1,84 +1,12 @@
-int a,a=654,s,d;
-float s,ds,sa_0=021;
-char sad,sda,sa2;
-double as,sd,fds54;
-char a[]= "asd",b[]="Asdsad";
-int b[1][3][4];
-
-a+=a+1;
-a-=a+1;
-a*=a+1;
-a/=a.ide;
-a%=&a;
-a<<=a++;
-a>>=--a;
-a&=a+1;
-a^=a+1;
-a|=a+1;
-struct punto {
-    int alto;
-    int ancho;
-};
-
-struct movies_t {
-  char title;
-  int year;
-};
 
 int main( ){
-  a&=a>b?4:2;
-  a^=sizeof(a);
-  a|=a+1;
-  printf(a);
-eti:
 
-goto eti;
-
-if (a>b){
-  printf(s);
-}else if(a>b){
-  printf(a);
-}else{
-  printf(b);
-}
-}
-
-char prueba (int a){
-
-  while (5>=a) {
-    printf(as);
-
-    if(b>k){
-      printf("hola");
-      continue;
+  printf("ASasd");
+  for (int i=0;i>10;i++){
+    printf("for");
+    if(i==0){
+      printf(i);
     }
   }
-  
-  switch(b){
-    case cons:
-      printf("asdsd");
-      break;
-    case con2:
-      printf(5);
-      break;
-    default:
-      printf(def);
-      break;
-  }
-
-  int i = 0;
-  do {
-    i+=1;
-    i=llamada();
-    continue;
-  }
-  while (i < 5);
-
-  for (int i = 0; i <= 10; i++) {
-    if(i>2){
-      printf("sad");
-      funcion(a,5+5,2>3);
-    }
-  }
-
+  printf(i);
 }

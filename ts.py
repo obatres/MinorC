@@ -6,16 +6,21 @@ class TIPO_DATO(Enum) :
     CADENA  = 3
     ARRAY   = 4
     PILA    = 5
+    VOID    = 6
+    DOUBLE  = 7
+    STRUCT  = 8
 
 
 class Simbolo() :
     'Esta clase representa un simbolo dentro de nuestra tabla de simbolos'
 
-    def __init__(self, id, tipo, valor, amb) :
+    def __init__(self, id, tipo, valor,reg , amb='global') :
         self.id = id
         self.tipo = tipo
         self.valor = valor
+        self.reg = reg
         self.amb =  amb
+
 
 
 class TablaDeSimbolos() :
@@ -32,7 +37,6 @@ class TablaDeSimbolos() :
             print('Error: variable ', id, ' no definida.')
 
         return self.simbolos[id]
-
 
     def obtenerPuntero(self,id):
         cont =0
