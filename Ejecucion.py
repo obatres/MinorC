@@ -25,6 +25,8 @@ class Ejecucion_MinorC ():
     cont = 0
     contLabel=0
     contPar =0
+    salidaParcial=''
+    salidaTotal =''
 #--------------------------------------METODOS/FUNCIONES DE EJECUCION EN INTERFAZ
     def ejecutar_asc(self, input):
         import gramaticaM as g
@@ -32,6 +34,10 @@ class Ejecucion_MinorC ():
         self.instrucciones = g.parse(input) 
         #print(self.instrucciones)
         self.procesar_instrucciones(self.instrucciones, self.ts_global)   
+        self.salidaParcial =self.CodigoGenerado.split("main:",1)
+        self.salidaTotal+="main:"
+        self.salidaTotal +=self.salidaParcial[1:][0]
+        self.salidaTotal +=self.salidaParcial[:-1][0]
         
     def errores_asc(self):
         import gramaticaM as g
@@ -1289,6 +1295,7 @@ class Ejecucion_MinorC ():
         self.CodigoGenerado += "main:"+"\n"
         try:
             self.procesar_sentencias(instr.sentencias,ts)
+            self.CodigoGenerado+='\t'+"exit();"+"\n"
         except :
             print('error, no se pueden ejecutar las sentencias dentro de main')
 
@@ -1448,13 +1455,7 @@ class Ejecucion_MinorC ():
 
     def procesar_instrucciones(self,instrucciones, ts) :
         ## lista de instrucciones recolectadas.
-        #i =0
-        #while i <=len(instrucciones):
-        #    if isinstance(instrucciones[i],Main):
-        #        break
-        #    else:
-        #        i+=1
-        #instrucciones.insert(0,instrucciones.pop(i))
+
         for instr in instrucciones :
             if isinstance(instr, Main) : self.procesar_main(instr,ts)
             elif isinstance(instr, Definicion) : self.procesar_definicion(instr, ts)
@@ -1534,4 +1535,4 @@ a = Ejecucion_MinorC()
 f = open("./entrada.txt", "r")
 input = f.read()
 a.ejecutar_asc(input)
-print(a.CodigoGenerado)
+print(a.salidaTotal)

@@ -1,25 +1,7 @@
-from PyQt5.QtGui import *
-from PyQt5.QtGui import QColor, QSyntaxHighlighter, QTextFormat, QColor, QTextCharFormat, QFont
-from PyQt5.QtWidgets import *
-from PyQt5.QtCore import *
-from PyQt5.QtPrintSupport import *
 
 
-lista = [2,3,4,6,5,7]
-print(lista)
+lista = "prueba:	print($a0);	goto Label0; main: goto hola; Label1: print(\"ASDs\");"
 
-
-
-i=0
-while i<=len(lista):
-    if(lista[i]==5):
-        break
-    else:
-        i+=1
-
-print('este es el indice de 5: ',i)
-lista.insert(0,lista.pop(3))
-
-
-
-print(lista)
+nuevo =lista.split("main:",1)
+print("main:",nuevo[1:][0])
+print(nuevo[:-1][0])
