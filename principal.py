@@ -1,8 +1,8 @@
 
 import ts as TS
 import sys
-from expresiones import *
-from instrucciones import *
+from expresionesA import *
+from instruccionesA import *
 from graphviz import Digraph
 from ts import TIPO_DATO as td
 from _pydecimal import Decimal
@@ -19,24 +19,23 @@ def procesar_imprimir(instr, ts) :
 
     try:
             
-        if not ts.obtener(instr.exp.id).tipo == td.ARRAY or ts.obtener(instr.exp.id).tipo == td.PILA:
+
             #salida = resolver_registro(instr.exp,ts)
             salida = resolver_expresion_aritmetica(instr.exp,ts)
             print('>', salida)
             global resultado
-            
-            resultado += '>'+str(salida)+'\n'
+            if salida=="\\n":
+                resultado+='\n'
+            else:
+                resultado += str(salida)
             return  str(salida) + '\n'
-        else:
-            #print('Error, no se puede imprimir un arreglo')
-            err = 'Error de tipo, no se puede imprimir el valor',instr.exp.id ,'En la linea: ',instr.linea,'En la columna: ',instr.columna, 'Tipo: SEMANTICO'
-            errores.append(err)
+
     except:
         print('error de impresion, valor o variabe no encontrados: ',instr.exp.id ) 
         print(instr.linea,instr.columna)
         err = 'Error de impresion, valor o variabe no encontrados: ',instr.exp.id ,'En la linea: ',instr.linea,'En la columna: ',instr.columna, 'Tipo: SEMANTICO'
         errores.append(err)
-        pass
+        return
 
 def resolver_registro(exp,ts):
     
@@ -68,12 +67,20 @@ def procesar_mientras(instr, ts) :
 
 def procesar_if(instr, ts) :
     try:
-        condicion = resolver_expresion_logica(instr.exp,ts)
+        condicion = resolver_expresion_aritmetica(instr.exp,ts)
     except :
         err = 'Error No se puede resolver la expresion a comparar en el if ',instr.exp ,' En la linea: ',instr.linea,' En la columna: ',instr.columna, 'Tipo: SEMANTICO'
         errores.append(err)
-
-    if condicion == 1: Llamada_goto(instr.goto,ts,instrucciones)
+    try:
+        if condicion == true: 
+            Llamada_goto(instr.goto,ts,instrucciones)
+            return 1
+        else:
+            return 0
+    except :
+        
+        err = 'Error en la ejecucion del if ',instr.exp ,' En la linea: ',instr.linea,' En la columna: ',instr.columna, 'Tipo: SEMANTICO'
+        errores.append(err)
 
 def procesar_if_else(instr, ts) :
     val = resolver_expresion_logica(instr.expLogica, ts)
@@ -409,6 +416,7 @@ def resolver_expresion_aritmetica(expNum, ts) :
             err = 'Error de tipos ',exp2,'y ',exp2,' no pueden operarse en un XOR, ambos deben ser INT',' En la linea: ',expNum.linea,' En la columna: ',expNum.columna, 'Tipo: SEMANTICO'
             errores.append(err)  
     elif isinstance (expNum, ExpresionLogicaOR):
+        print('ES OR LOGICO')
         exp1 = resolver_expresion_aritmetica(expNum.exp1,ts)
         exp2 = resolver_expresion_aritmetica(expNum.exp2,ts)
         if expNum.exp1.tipo==TS.TIPO_DATO.INT and expNum.exp1.tipo==TS.TIPO_DATO.INT :
@@ -440,6 +448,7 @@ def resolver_expresion_aritmetica(expNum, ts) :
             err = 'Error de tipos ',exp1,'y ',exp2,' no pueden operarse en un OR, ambos deben ser INT',' En la linea: ',expNum.linea,' En la columna: ',expNum.columna, 'Tipo: SEMANTICO'
             errores.append(err) 
     elif isinstance (expNum, ExpresionLogicaAND):   
+        print('ES AND LOGICO=')
         exp1 = resolver_expresion_aritmetica(expNum.exp1,ts)
         exp2 = resolver_expresion_aritmetica(expNum.exp2,ts)
         if expNum.exp1.tipo==TS.TIPO_DATO.INT and expNum.exp1.tipo==TS.TIPO_DATO.INT :
@@ -457,7 +466,7 @@ def resolver_expresion_aritmetica(expNum, ts) :
                 if exp2==true:
                     return false
                 elif exp2==false:
-                    return true
+                    return false
                 else:
                     print("error de valor ",exp2,", no puede ser comparado en un AND") 
                     err = 'Error de valor ',exp2,' no puede ser comparado en un AND',' En la linea: ',expNum.linea,' En la columna: ',expNum.columna, 'Tipo: SEMANTICO'
@@ -500,6 +509,7 @@ def resolver_expresion_aritmetica(expNum, ts) :
             print ('error de tipos ',exp1,' y ',exp2,'no se pueden operar en un AND bit a bit se espera que ambos sean INT o FLOAT')
             err = 'Error de tipos ',exp1,' y ',exp2,'no se pueden operar en un AND bit a bit se espera que ambos sean INT o FLOAT',' En la linea: ',expNum.linea,' En la columna: ',expNum.columna, 'Tipo: SEMANTICO'
             errores.append(err) 
+    
     elif isinstance (expNum, ExpresionBitOr):
         exp1 = resolver_expresion_aritmetica(expNum.exp1,ts)
         exp2 = resolver_expresion_aritmetica(expNum.exp2,ts)
@@ -517,6 +527,7 @@ def resolver_expresion_aritmetica(expNum, ts) :
             print ('error de tipos ',exp1,' y ',exp2,'no se pueden operar en un OR bit a bit se espera que ambos sean INT o FLOAT')
             err = 'Error de tipos ',exp1,' y ',exp2,'no se pueden operar en un OR bit a bit se espera que ambos sean INT o FLOAT',' En la linea: ',expNum.linea,' En la columna: ',expNum.columna, 'Tipo: SEMANTICO'
             errores.append(err) 
+    
     elif isinstance (expNum, ExpresionBitXor):
         exp1 = resolver_expresion_aritmetica(expNum.exp1,ts)
         exp2 = resolver_expresion_aritmetica(expNum.exp2,ts)
@@ -716,18 +727,22 @@ def procesar_asignacion_arreglo (instr,ts):
     lista = instr.lista
     niveles = len(lista)
     valor_a_asignar = resolver_expresion_aritmetica(instr.exp,ts)
-
-    for i in range(len(lista)):
-        indice = resolver_expresion_aritmetica(lista[i],ts)
-        if i== niveles-1:
-            diccionario[indice]=valor_a_asignar
-        else:
-            diccionario_aux = diccionario.get(indice)
-            if diccionario_aux == None:
-                diccionario[indice]={}
-                diccionario=diccionario.get(indice)
+    try:
+        for i in range(len(lista)):
+            indice = resolver_expresion_aritmetica(lista[i],ts)
+            if i== niveles-1:
+                diccionario[indice]=valor_a_asignar
             else:
-                diccionario=diccionario.get(indice)
+                diccionario_aux = diccionario.get(indice)
+                if diccionario_aux == None:
+                    diccionario[indice]={}
+                    diccionario=diccionario.get(indice)
+                else:
+                    diccionario=diccionario.get(indice)
+        return
+    except :
+        err = 'Error: Fallo de asignacion de arreglo', instr.id,' En la linea: ',instr.linea,' En la columna: ',instr.columna, 'Tipo: SEMANTICO'
+        errores.append(err) 
 
 def procesa_Label(instr,ts):
     global Etiqueta
@@ -753,7 +768,9 @@ def ejecutar_expresiones_label(listainstrucciones,ts,listaglobal):
             elif isinstance(instr, Definicion) : procesar_definicion(instr, ts)
             elif isinstance(instr, Asignacion) : procesar_asignacion(instr, ts)
             elif isinstance(instr, Mientras) : procesar_mientras(instr, ts)
-            elif isinstance(instr, If) : procesar_if(instr, ts)
+            elif isinstance(instr, If) : 
+                if (procesar_if(instr, ts)) ==1 :
+                    return
             elif isinstance(instr, IfElse) : procesar_if_else(instr, ts)
             elif isinstance(instr, Unset) : procesar_unset(instr,ts)
             elif isinstance(instr,IniciaPila): procesar_inicioPila(instr,ts)
@@ -771,7 +788,7 @@ def ejecutar_expresiones_label(listainstrucciones,ts,listaglobal):
                 print('Error: instrucción no válida', instr)
                 err = 'Error: instrucción no válida', instr,' En la linea: ',instr.linea,' En la columna: ',instr.columna, 'Tipo: SEMANTICO'
                 errores.append(err) 
-
+                return
 
 def procesar_instrucciones(instrucciones, ts) :
     ## lista de instrucciones recolectadas
@@ -781,7 +798,9 @@ def procesar_instrucciones(instrucciones, ts) :
             elif isinstance(instr, Definicion) : procesar_definicion(instr, ts)
             elif isinstance(instr, Asignacion) : procesar_asignacion(instr, ts)
             elif isinstance(instr, Mientras) : procesar_mientras(instr, ts)
-            elif isinstance(instr, If) : procesar_if(instr, ts)
+            elif isinstance(instr, If) : 
+                if procesar_if(instr, ts)==1:
+                    return
             elif isinstance(instr, IfElse) : procesar_if_else(instr, ts)
             elif isinstance(instr, Unset) : procesar_unset(instr,ts)
             elif isinstance(instr,IniciaPila): procesar_inicioPila(instr,ts)
@@ -1202,7 +1221,7 @@ dot = Digraph('AST',filename='AST')
 resultado = ''
 #ANALIZADOR ASCENDENTE
 def ejecutar_asc(input):
-    import gramatica as g
+    import gramaticaA as g
     global gram
     global instrucciones
     gram = g.verGramatica()
@@ -1210,26 +1229,11 @@ def ejecutar_asc(input):
     procesar_instrucciones(instrucciones, ts_global)   
 
 def errores_asc():
-    import gramatica as g
+    import gramaticaA as g
     global errores
     errores = g.retornalista()
     return errores 
 
-#ANALIZADOR DESCENDENTE
-def ejecutar_desc(input):
-    import gramaticadesc as gdes
-    global gram
-    global instrucciones
-    instrucciones = gdes.parse(input)
-    gram = gdes.verGramatica()
-    procesar_instrucciones(instrucciones, ts_global)   
-    return instrucciones
-
-def errores_desc():
-    import gramaticadesc as gdes
-    global errores
-    errores = gdes.retornalista()
-    return errores
 
 def GenerarAST():
     try:
@@ -1245,7 +1249,7 @@ def RecibirSalida():
     return nuevo
    
 def ejecutar_debug(input,i):
-    import gramatica as l
+    import gramaticaA as l
     global gram
     global instrucciones
     try:

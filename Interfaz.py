@@ -3,7 +3,7 @@ from PyQt5.QtGui import QColor, QSyntaxHighlighter, QTextFormat, QColor, QTextCh
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 from PyQt5.QtPrintSupport import *
-import Ejecucion as EJ
+from Ejecucion import Ejecucion_MinorC as EC
 import copy
 import os
 import sys
@@ -226,6 +226,7 @@ class MainWindow(QMainWindow):
         self.i = 0
         layout = QVBoxLayout()
         self.editor = PlainTextEdit()
+        self.editorAUGUS = PlainTextEdit()
         self.consola = QPlainTextEdit()
 
         self.consola.setReadOnly(True)
@@ -238,6 +239,8 @@ class MainWindow(QMainWindow):
         font = QFont('Times', 10)
         self.editor.setFont(font)
         
+        self.editorAUGUS.selectionChanged.connect(self.update_format)
+        self.editorAUGUS.setFont(font)
         # We need to repeat the size to init the current format.
         #self.editor.setFontPointSize(12)
 
@@ -251,6 +254,7 @@ class MainWindow(QMainWindow):
         #self.consola.setTextBackgroundColor("grey")
 
         layout.addWidget(self.editor)
+        layout.addWidget(self.editorAUGUS)
         layout.addWidget(self.consola)
 
         container = QWidget()
@@ -353,18 +357,18 @@ class MainWindow(QMainWindow):
         Ejecutar_menu = self.menuBar().addMenu("&Ejecutar")
         
 
-        EjecutarPLY = QAction(QIcon(os.path.join('images', 'application-run.png')), "Ascendente", self)  
-        EjecutarPLY.setStatusTip("Ejecutar Asc")
-        EjecutarPLY.triggered.connect(self.EjecutarAsc)  
+        EjecutarPLY = QAction(QIcon(os.path.join('images', 'application-run.png')), "Minor C", self)  
+        EjecutarPLY.setStatusTip("Ejecutar Minor C")
+        EjecutarPLY.triggered.connect(self.EjecutarMinorC)  
         
         Ejecutar_menu.addAction(EjecutarPLY)
         Ejec_toolbar.addAction(EjecutarPLY)
 
         #self.toolbar.addAction(EjecutarPLY)
 
-        EjecutarDesc = QAction(QIcon(os.path.join('images', 'Run.png')), "Descendente", self)  
-        EjecutarDesc.setStatusTip("Ejecutar Desc")
-        EjecutarDesc.triggered.connect(self.EjecutarDesc)  
+        EjecutarDesc = QAction(QIcon(os.path.join('images', 'Run.png')), "AUGUS", self)  
+        EjecutarDesc.setStatusTip("Ejecutar AUGUS")
+        EjecutarDesc.triggered.connect(self.EjecutarAsc)  
         Ejecutar_menu.addAction(EjecutarDesc)
         Ejec_toolbar.addAction(EjecutarDesc)
 
@@ -569,7 +573,7 @@ class MainWindow(QMainWindow):
 
     def edit_toggle_wrap(self):
         self.editor.setLineWrapMode( 1 if self.editor.lineWrapMode() == 0 else 0 )
-    
+#----------------------------------------------------------METODOS DE EJECUCION  
     def getInteger(self):
         text, ok = QInputDialog().getText(self, "QInputDialog().getText()",
                                      "User name:", QLineEdit.Normal,
@@ -583,20 +587,30 @@ class MainWindow(QMainWindow):
     def getTexto(self):
         return self.editor.toPlainText()
 
+    def EjecutarMinorC(self):
+        import principal as f
+        mc = EC()
+        mc.ejecutar_asc(self.editor.toPlainText())
+        s= mc.RecibirSalida
+        self.editorAUGUS.setPlainText(mc.CodigoGenerado)
+        
+        self.consola.clear()
+        f.ejecutar_asc(self.editorAUGUS.toPlainText())
+        s = f.RecibirSalida()
+        self.consola.setPlainText(s)
     def EjecutarAsc(self):
-        #import principal as f
-        j = EJ.Ejecucion_MinorC()
+        import principal as f
         self.consola.clear()
         
-        j.ejecutar_asc(self.editor.toPlainText())
-        j.errores_asc()
+        f.ejecutar_asc(self.editorAUGUS.toPlainText())
+        #j.errores_asc()
         try:
-            
-            j.ReporteErrores()
-            j.ReporteTS()
-            j.ReporteGramatical()
-            j.GenerarAST()
-            s = j.RecibirSalida()
+            print("")
+            #j.ReporteErrores()
+            #j.ReporteTS()
+            #j.ReporteGramatical()
+            #j.GenerarAST()
+            s = f.RecibirSalida()
             self.consola.setPlainText(s)
         except:
             btn = QMessageBox.information(self, 'FIN',
@@ -650,7 +664,7 @@ class MainWindow(QMainWindow):
 if __name__ == '__main__':
     
     app = QApplication(sys.argv)
-    app.setApplicationName("AUGUS IDE")
+    app.setApplicationName("MINORC IDE")
 
     window = MainWindow()
 

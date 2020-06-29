@@ -39,7 +39,7 @@ class Ejecucion_MinorC ():
         return self.errores 
 
     def RecibirSalida(self):
-        nuevo = copy.copy(self.resultado)
+        nuevo = copy.copy(self.CodigoGenerado)
         return nuevo
 
     def ejecutar_debug(self,input,i):
@@ -1509,9 +1509,9 @@ class Ejecucion_MinorC ():
         self.contPar+=1
         return eti
 
-a = Ejecucion_MinorC()
+#a = Ejecucion_MinorC()
 
-f = open("./entrada.txt", "r")
-input = f.read()
-a.ejecutar_asc(input)
-print(a.CodigoGenerado)
+#f = open("./entrada.txt", "r")
+#input = f.read()
+#a.ejecutar_asc(input)
+#print(a.CodigoGenerado)
