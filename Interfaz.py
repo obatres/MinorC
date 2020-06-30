@@ -592,7 +592,7 @@ class MainWindow(QMainWindow):
         mc = EC()
         mc.ejecutar_asc(self.editor.toPlainText())
         s= mc.RecibirSalida
-        self.editorAUGUS.setPlainText(mc.CodigoGenerado)
+        self.editorAUGUS.setPlainText(mc.salidaTotal)
         
         self.consola.clear()
         f.ejecutar_asc(self.editorAUGUS.toPlainText())

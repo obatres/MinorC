@@ -410,3 +410,12 @@ class ExpresionId(ExpresionNumerica):
         self.id = id
         self.linea = linea
         self.columna = columna
+
+class ExpresionScan(ExpresionNumerica):
+    '''
+        Esta clase representa la expresión que tiene un id
+    '''
+
+    def __init__(self,  linea=0 , columna=0) :
+        self.linea = linea
+        self.columna = columna

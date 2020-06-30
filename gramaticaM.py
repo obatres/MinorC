@@ -296,9 +296,9 @@ def p_Goto(t):
     asc.append('DEFINEGOTO - GOTO ID PTCOMA')
 
 def p_instruccion_imprimir(t) :
-    'imprimir_instr     : PRINT PARIZQ expresion_log_relacional PARDER PTCOMA'
+    'imprimir_instr     : PRINT PARIZQ LISTA_PRINT PARDER PTCOMA'
     t[0] =Imprimir(t[3],t.lineno(1),get_clomuna(entry,t.slice[1]))
-    asc.append('imprimir_instr  - PRINT PARIZQ expresion_log_relacional PARDER PTCOMA')
+    asc.append('imprimir_instr  - PRINT PARIZQ LISTA_PRINT PARDER PTCOMA')
 
 def p_lista_expresiones_print(t):
     'LISTA_PRINT : LISTA_PRINT COMA expresion_log_relacional'
@@ -387,8 +387,8 @@ def p_tipo_variable(t):
     elif t[1] == 'void' : t[0]=TS.TIPO_DATO.VOID
     
 def p_asignacion_instr(t) :
-    'asignacion_instr   : ID TIPO_AS expresion_log_relacional PTCOMA'
-    t[0] =Asignacion(t[1], t[2],t[3],t.lineno(1),get_clomuna(entry,t.slice[1]))
+    'asignacion_instr   : IDT TIPO_AS expresion_log_relacional PTCOMA'
+    t[0] =Asignacion(t[1], t[2],t[3],t.lineno(1),get_clomuna(entry,t.slice[4]))
     asc.append('asignacion_instr   : TEMPORAL IGUAL expresion_log_relacional PTCOMA')
 
 def p_asignacion_struct(t):
@@ -480,7 +480,7 @@ def p_param_vacio(t):
     'PARAM : '
     t[0]= 0
 def p_for_fun(t):
-    'FORF : FOR PARIZQ definicion_instr expresion_log_relacional PTCOMA INCREMENTO PARDER BLOQUE '
+    'FORF : FOR PARIZQ SENTENCIA expresion_log_relacional PTCOMA INCREMENTO PARDER BLOQUE '
     t[0]=FuncionFor(t[3],t[4],t[6],t[8],t.lineno(1),get_clomuna(entry,t.slice[1]))
     
 def p_do_while_fun(t):
@@ -687,6 +687,10 @@ def p_expresion_Valores_arreglo_lista(t):
     'LISTA_VALORES_ARREGLO : LISTA_VALORES_ARREGLO COMA expresion_log_relacional'
     t[1].append(t[3])
     t[0]=t[1]
+
+def p_expresion_Scanf(t):
+    'expresion_numerica : SCAN PARIZQ PARDER'
+    t[0] = ExpresionScan(t.lineno(1),get_clomuna(entry,t.slice[1]))
 
 def p_expresion_Valor_arreglo(t):
     'LISTA_VALORES_ARREGLO : expresion_log_relacional'

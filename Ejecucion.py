@@ -400,13 +400,23 @@ class Ejecucion_MinorC ():
 #--------------------------------------------------------------------PROCESAR INSTRUCCIONES
     def procesar_imprimir(self,instr, ts) :
 
-        try:          
-            #salida = resolver_registro(instr.exp,ts)
-            salida = self.resolver_expresion_aritmetica(instr.exp,ts)
-            #print('>', salida)
-            self.CodigoGenerado += '\t'+'print('+str(salida)+');'+"\n"    
-            #self.resultado += '>'+str(salida)+'\n'
-            return  str(salida) + '\n'
+        try: 
+
+            for i in instr.exp:
+                res = self.resolver_expresion_aritmetica(i,ts)
+                patronTemporal = re.compile('\$(t[0-9]+)')
+                patronParametro = re.compile('\$[a]([0-9]+)')
+                patronRetorno = re.compile('\$[r][a]')
+                if not (patronTemporal.match(res) or patronParametro.match(res) or patronRetorno.match(res) ):
+                    sal =res.split("%",1)
+                    sal =sal[0][1:-1]
+                    self.CodigoGenerado += '\t'+'print(\''+str(sal)+'\');'+"\n" 
+                else:
+                    self.CodigoGenerado += '\t'+'print('+str(res)+');'+"\n"    
+            #print(instr.exp)         
+            #salida = self.resolver_expresion_aritmetica(instr.exp,ts)
+            #self.CodigoGenerado += '\t'+'print('+str(salida)+');'+"\n"    
+            return 
         except:
             print('error de impresion, valor o variabe no encontrados: ',instr.exp.id ) 
             print(instr.linea,instr.columna)
@@ -437,21 +447,24 @@ class Ejecucion_MinorC ():
                     self.CodigoGenerado += '\t' + registro + '= 0;'+'\n'
                     ts.agregar(nuevo)
                 elif ts.existeSimbolo(nuevo)==True:
-                    print('Error, la variable '+str(temp.id)+' ya ha sido declarada anteriormente')
+                    self.CodigoGenerado += '\t' + registro + '= 0;'+'\n'
+                    ts.actualizar(nuevo)
             elif tipo == td.FLOAT:
                 nuevo = TS.Simbolo(temp.id,tipo,0.0,registro)
                 if ts.existeSimbolo(nuevo)==False:
                     self.CodigoGenerado += '\t' + registro + '= 0.0;'+'\n'
                     ts.agregar(nuevo)
                 elif ts.existeSimbolo(nuevo)==True:
-                    print('Error, la variable '+str(temp.id)+' ya ha sido declarada anteriormente')
+                    self.CodigoGenerado += '\t' + registro + '= 0.0;'+'\n'
+                    ts.actualizar(nuevo)
             elif tipo == td.CADENA:
                 nuevo = TS.Simbolo(temp.id,tipo,"0",registro)
                 if ts.existeSimbolo(nuevo)==False:
                     self.CodigoGenerado += '\t' + registro + '= \' \';'+'\n'
                     ts.agregar(nuevo)
                 elif ts.existeSimbolo(nuevo)==True:
-                    print('Error, la variable '+str(temp.id)+' ya ha sido declarada anteriormente')
+                    self.CodigoGenerado += '\t' + registro + '= \' \';'+'\n'
+                    ts.actualizar(nuevo)
             else:
                 print('Error, tipo '+str(tipo)+' no aplicable en la definicion')
         
@@ -503,7 +516,8 @@ class Ejecucion_MinorC ():
                 self.CodigoGenerado += '\t' + registro + '='+str(valor)+';'+'\n'
                 ts.agregar(nuevo)
             elif ts.existeSimbolo(nuevo)==True:
-                print('Error, la variable '+str(temp.id)+' ya ha sido declarada anteriormente')
+                self.CodigoGenerado += '\t' + registro + '='+str(valor)+';'+'\n'
+                ts.actualizar(nuevo)
             return
         elif isinstance(temp,ExpresionListaIndices):            
             if temp.listaindices[0]==0:
@@ -514,7 +528,8 @@ class Ejecucion_MinorC ():
                     self.CodigoGenerado += '\t'+registro+ '='+str(valor)+';'+'\n'
                     ts.agregar(nuevo)
                 elif ts.existeSimbolo(nuevo)==True:
-                    print('Error, la variable '+str(temp.id)+' ya ha sido declarada anteriormente')
+                    self.CodigoGenerado += '\t'+registro+ '='+str(valor)+';'+'\n'
+                    ts.actualizar(nuevo)
                 return
             elif temp.listaindices[0]!=0:
                 registro = self.generarTemp()
@@ -544,38 +559,66 @@ class Ejecucion_MinorC ():
         return
    
     def procesar_asignacion(self,instr, ts) :
-        try:
-            registro = ts.obtener(instr.id).reg
+        asi = instr.id
+        if isinstance(asi,ExpresionInicioSimple):
+            registro = ts.obtener(asi.id).reg
             valor  = self.resolver_expresion_aritmetica(instr.expNumerica,ts)
-        except :
-            print('error, no se pudo obtener el valor a asignar')
-
-        try:
-            if instr.tipo == "=":
-                self.CodigoGenerado += '\t'+registro+'='+str(valor)+';'+'\n'
-            elif instr.tipo =="+=":
-                self.CodigoGenerado += '\t'+registro+'='+registro+'+'+str(valor)+';'+'\n'
-            elif instr.tipo =="-=":
-                self.CodigoGenerado += '\t'+registro+'='+registro+'-'+str(valor)+';'+'\n'
-            elif instr.tipo =="*=":
-                self.CodigoGenerado += '\t'+registro+'='+registro+'*'+str(valor)+';'+'\n' 
-            elif instr.tipo =="/=":
-                self.CodigoGenerado += '\t'+registro+'='+registro+'/'+str(valor)+';'+'\n'
-            elif instr.tipo =="%=":
-                self.CodigoGenerado += '\t'+registro+'='+registro+'%'+str(valor)+';'+'\n'
-            elif instr.tipo =="<<=":
-                self.CodigoGenerado += '\t'+registro+'='+registro+'<<'+str(valor)+';'+'\n'
-            elif instr.tipo ==">>=":
-                self.CodigoGenerado += '\t'+registro+'='+registro+'>>'+str(valor)+';'+'\n'
-            elif instr.tipo =="&=":
-                self.CodigoGenerado += '\t'+registro+'='+registro+'&'+str(valor)+';'+'\n'
-            elif instr.tipo =="|=":
-                self.CodigoGenerado += '\t'+registro+'='+registro+'|'+str(valor)+';'+'\n'
-            elif instr.tipo =="^=":
-                self.CodigoGenerado += '\t'+registro+'='+registro+'^'+str(valor)+';'+'\n'
-        except :
-            print("Error, no se puede realizar la traduccion de esta asignacion")   
- 
+            try:
+                if instr.tipo == "=":
+                    self.CodigoGenerado += '\t'+registro+'='+str(valor)+';'+'\n'
+                elif instr.tipo =="+=":
+                    self.CodigoGenerado += '\t'+registro+'='+registro+'+'+str(valor)+';'+'\n'
+                elif instr.tipo =="-=":
+                    self.CodigoGenerado += '\t'+registro+'='+registro+'-'+str(valor)+';'+'\n'
+                elif instr.tipo =="*=":
+                    self.CodigoGenerado += '\t'+registro+'='+registro+'*'+str(valor)+';'+'\n' 
+                elif instr.tipo =="/=":
+                    self.CodigoGenerado += '\t'+registro+'='+registro+'/'+str(valor)+';'+'\n'
+                elif instr.tipo =="%=":
+                    self.CodigoGenerado += '\t'+registro+'='+registro+'%'+str(valor)+';'+'\n'
+                elif instr.tipo =="<<=":
+                    self.CodigoGenerado += '\t'+registro+'='+registro+'<<'+str(valor)+';'+'\n'
+                elif instr.tipo ==">>=":
+                    self.CodigoGenerado += '\t'+registro+'='+registro+'>>'+str(valor)+';'+'\n'
+                elif instr.tipo =="&=":
+                    self.CodigoGenerado += '\t'+registro+'='+registro+'&'+str(valor)+';'+'\n'
+                elif instr.tipo =="|=":
+                    self.CodigoGenerado += '\t'+registro+'='+registro+'|'+str(valor)+';'+'\n'
+                elif instr.tipo =="^=":
+                    self.CodigoGenerado += '\t'+registro+'='+registro+'^'+str(valor)+';'+'\n'
+            except :
+                print("Error, no se puede realizar la traduccion de esta asignacion")   
+        elif isinstance(asi,ExpresionListaIndices):
+            iden =ts.obtener(asi.id).reg
+            valor  = self.resolver_expresion_aritmetica(instr.expNumerica,ts)
+            for r in asi.listaindices:
+                iden +="["+str(self.resolver_expresion_aritmetica(r,ts))+"]"
+            try:
+                if instr.tipo == "=":
+                    self.CodigoGenerado += '\t'+iden+'='+str(valor)+';'+'\n'
+                elif instr.tipo =="+=":
+                    self.CodigoGenerado += '\t'+iden+'='+iden+'+'+str(valor)+';'+'\n'
+                elif instr.tipo =="-=":
+                    self.CodigoGenerado += '\t'+iden+'='+iden+'-'+str(valor)+';'+'\n'
+                elif instr.tipo =="*=":
+                    self.CodigoGenerado += '\t'+iden+'='+iden+'*'+str(valor)+';'+'\n' 
+                elif instr.tipo =="/=":
+                    self.CodigoGenerado += '\t'+iden+'='+iden+'/'+str(valor)+';'+'\n'
+                elif instr.tipo =="%=":
+                    self.CodigoGenerado += '\t'+iden+'='+iden+'%'+str(valor)+';'+'\n'
+                elif instr.tipo =="<<=":
+                    self.CodigoGenerado += '\t'+iden+'='+iden+'<<'+str(valor)+';'+'\n'
+                elif instr.tipo ==">>=":
+                    self.CodigoGenerado += '\t'+iden+'='+iden+'>>'+str(valor)+';'+'\n'
+                elif instr.tipo =="&=":
+                    self.CodigoGenerado += '\t'+iden+'='+iden+'&'+str(valor)+';'+'\n'
+                elif instr.tipo =="|=":
+                    self.CodigoGenerado += '\t'+iden+'='+iden+'|'+str(valor)+';'+'\n'
+                elif instr.tipo =="^=":
+                    self.CodigoGenerado += '\t'+iden+'='+iden+'^'+str(valor)+';'+'\n'
+            except:           
+                pass
+            
         return
    
     def procesar_mientras(self,instr, ts) :
@@ -599,6 +642,9 @@ class Ejecucion_MinorC ():
     def procesar_ifSimple (self, instr, ts):
         try:
             condicion = self.resolver_expresion_aritmetica(instr.cond,ts)
+        except:
+            print("Error al encontrar la condicion del if")
+        try:    
             etiVer = self.generaLabel()
             etiFal = self.generaLabel()
             etiSal = self.generaLabel()
@@ -607,11 +653,12 @@ class Ejecucion_MinorC ():
 
             self.CodigoGenerado +=etiVer+":"+"\n"
             self.procesar_sentencias(instr.bloqueSentenciasIf,ts)
-            self.CodigoGenerado +='\t'+"goto "+etiSal+";"+"\n"
+            #self.CodigoGenerado +='\t'+"goto "+etiSal+";"+"\n"
             self.CodigoGenerado +=etiFal+":"+"\n"
 
             return etiSal
         except :
+            print('error en if',instr.linea, instr.columna)
             return 0
 
     def procesar_While (self, instr, ts):
@@ -637,8 +684,10 @@ class Ejecucion_MinorC ():
             etiVer = self.generaLabel()
             etiFal = self.generaLabel()
             etiRep = self.generaLabel()
-            ts_local = TS.TablaDeSimbolos(ts.simbolos)
-            self.procesar_definicion(instr.definicion,ts_local)
+            #ts_local = TS.TablaDeSimbolos(ts.simbolos)
+            ts_local = copy.deepcopy(TS.TablaDeSimbolos(ts.simbolos))
+            if isinstance(instr.definicion, Definicion): self.procesar_definicion(instr.definicion,ts_local)
+            elif isinstance(instr.definicion,Asignacion): self.procesar_asignacion(instr.definicion,ts_local)
             self.CodigoGenerado += etiRep+":"+"\n"
             cond = self.resolver_expresion_logica(instr.condicion,ts_local)
             self.CodigoGenerado+='\t'+"if ("+cond+") goto "+etiVer+";"+"\n"
@@ -684,7 +733,7 @@ class Ejecucion_MinorC ():
         try:
             salida =self.procesar_ifSimple(instr.ifinst,ts) 
             self.procesar_sentencias(instr.elseinst,ts)
-            self.CodigoGenerado += salida +":"+"\n"
+            #self.CodigoGenerado += salida +":"+"\n"
             return 1
         except:
             print('error, no se puede traducir el if else')
@@ -1259,7 +1308,13 @@ class Ejecucion_MinorC ():
             for i in expNum.listaindices:
                 lista +="["+str(self.resolver_expresion_aritmetica(i,ts))+"]"
             self.CodigoGenerado += "\t"+registro+"="+r+lista+";"+"\n" 
+            expNum.tipo=td.INT
             return registro
+        
+        elif isinstance(expNum, ExpresionScan):
+
+            read = "read()"
+            return read
         else:
             print(expNum)
             err = 'Error, no existe un valor en el indice: ',expNum,' En la linea: ',expNum.linea,' En la columna: ',expNum.columna, 'Tipo: SEMANTICO'
@@ -1295,7 +1350,7 @@ class Ejecucion_MinorC ():
         self.CodigoGenerado += "main:"+"\n"
         try:
             self.procesar_sentencias(instr.sentencias,ts)
-            self.CodigoGenerado+='\t'+"exit();"+"\n"
+            #self.CodigoGenerado+='\t'+"exit;"+"\n"
         except :
             print('error, no se pueden ejecutar las sentencias dentro de main')
 
@@ -1384,7 +1439,7 @@ class Ejecucion_MinorC ():
 
         if len(parametrosGuardados.valor)==len(instr.parametros):
             for i in range(len(parametrosGuardados.valor)):
-                self.CodigoGenerado += "\t"+parametrosGuardados.valor[i]+"="+str(self.resolver_expresion_aritmetica(instr.parametros[i],ts))+"\n"
+                self.CodigoGenerado += "\t"+parametrosGuardados.valor[i]+"="+str(self.resolver_expresion_aritmetica(instr.parametros[i],ts))+";"+"\n"
 
         self.CodigoGenerado +="\t"+"goto "+instr.id+";"+"\n"    
         self.CodigoGenerado +=parametrosGuardados.reg+":"+"\n"

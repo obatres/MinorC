@@ -1,7 +1,7 @@
 
 
-lista = "prueba:	print($a0);	goto Label0; main: goto hola; Label1: print(\"ASDs\");"
+lista = "El resultado de la suma es:di"
 
-nuevo =lista.split("main:",1)
-print("main:",nuevo[1:][0])
-print(nuevo[:-1][0])
+nuevo =lista.split("%",1)
+
+print(nuevo[0][1:-1])
