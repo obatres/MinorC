@@ -377,4 +377,4 @@ class FuncionFor(Instruccion):
         self.incremento = incremento
         self.sentencias = sentencias
         self.linea = linea
-        self.columna = columna  
+        self.columna = columna 

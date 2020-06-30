@@ -27,6 +27,7 @@ class Ejecucion_MinorC ():
     contPar =0
     salidaParcial=''
     salidaTotal =''
+    Global=''
 #--------------------------------------METODOS/FUNCIONES DE EJECUCION EN INTERFAZ
     def ejecutar_asc(self, input):
         import gramaticaM as g
@@ -35,7 +36,8 @@ class Ejecucion_MinorC ():
         #print(self.instrucciones)
         self.procesar_instrucciones(self.instrucciones, self.ts_global)   
         self.salidaParcial =self.CodigoGenerado.split("main:",1)
-        self.salidaTotal+="main:"
+        self.salidaTotal+="main:"+"\n"
+        self.salidaTotal+=self.Global
         self.salidaTotal +=self.salidaParcial[1:][0]
         self.salidaTotal +=self.salidaParcial[:-1][0]
         
@@ -557,7 +559,201 @@ class Ejecucion_MinorC ():
         else:
             print(type(instr.id))
         return
-   
+#--------------------------------------------------------------------Definicion global
+    def procesar_definicion_global(self,instr, ts) :
+        tipoReg = instr.tipo
+        
+        for d in instr.listaid:
+            if isinstance (d,DefinicionSinValor): self.procesar_definicion_sinValor_global(d,ts,tipoReg)
+            elif isinstance(d,DefinicionConvalor): self.procesar_definicion_conValor_global(d,ts,tipoReg)
+            
+        return 
+
+    def procesar_definicion_sinValor_global(self, instr, ts, tipo):
+        temp = instr.id
+        if isinstance (temp,ExpresionInicioSimple):
+            registro =self.generarTemp()
+            if tipo ==td.INT:
+                nuevo = TS.Simbolo(temp.id,tipo,0,registro)
+                if ts.existeSimbolo(nuevo)==False:
+                    self.Global += '\t' + registro + '= 0;'+'\n'
+                    ts.agregar(nuevo)
+                elif ts.existeSimbolo(nuevo)==True:
+                    self.Global += '\t' + registro + '= 0;'+'\n'
+                    ts.actualizar(nuevo)
+            elif tipo == td.FLOAT:
+                nuevo = TS.Simbolo(temp.id,tipo,0.0,registro)
+                if ts.existeSimbolo(nuevo)==False:
+                    self.Global += '\t' + registro + '= 0.0;'+'\n'
+                    ts.agregar(nuevo)
+                elif ts.existeSimbolo(nuevo)==True:
+                    self.Global += '\t' + registro + '= 0.0;'+'\n'
+                    ts.actualizar(nuevo)
+            elif tipo == td.CADENA:
+                nuevo = TS.Simbolo(temp.id,tipo,"0",registro)
+                if ts.existeSimbolo(nuevo)==False:
+                    self.Global += '\t' + registro + '= \' \';'+'\n'
+                    ts.agregar(nuevo)
+                elif ts.existeSimbolo(nuevo)==True:
+                    self.Global += '\t' + registro + '= \' \';'+'\n'
+                    ts.actualizar(nuevo)
+            else:
+                print('Error, tipo '+str(tipo)+' no aplicable en la definicion')
+        
+        elif isinstance (temp,ExpresionListaIndices):
+            
+            if temp.listaindices[0]!=0:
+                registro = self.generarTemp()
+                nuevo = TS.Simbolo(temp.id,td.ARRAY,{},registro)
+                
+                if ts.existeSimbolo(nuevo)==False:
+                    self.Global += '\t'+registro+'='+'array()'+';'+'\n'
+                    ts.agregar(nuevo)   
+                    if len(temp.listaindices)==1:
+                        for i in temp.listaindices:
+                            indice = self.resolver_expresion_aritmetica(i,ts)
+                            if isinstance(indice,int):
+                                for i in range(indice):
+                                    self.Global += '\t'+registro+'['+str(i)+']=0;'+'\n'
+                    elif len(temp.listaindices)==2:
+                        indice1 = self.resolver_expresion_aritmetica(temp.listaindices[0],ts)
+                        indice2 = self.resolver_expresion_aritmetica(temp.listaindices[1],ts)
+                        for i in range(indice1):
+                            for j in range(indice2):
+                                self.Global+= '\t'+registro+'['+str(i)+']'+'['+str(j)+']=0;'+'\n'
+                    elif len(temp.listaindices)==3:
+                        indice1 = self.resolver_expresion_aritmetica(temp.listaindices[0],ts)
+                        indice2 = self.resolver_expresion_aritmetica(temp.listaindices[1],ts)
+                        indice3 = self.resolver_expresion_aritmetica(temp.listaindices[2],ts)
+                        for i in range(indice1):
+                            for j in range(indice2):
+                                for x in range(indice3):
+                                    self.Global+= '\t'+registro+'['+str(i)+']'+'['+str(j)+']'+'['+str(j)+']=0;'+'\n'
+                elif ts.existeSimbolo(nuevo)==True:
+                    print("Error, esta variable ya se declaro previamente o no tiene un registro asociado")
+            else:
+                print('Error, esta variable: '+temp.id+' debe contener un valor para ser inicializada')
+            return
+        else:
+            print(type(instr.id))
+        return
+    
+    def procesar_definicion_conValor_global(self,instr,ts,tipo):
+        temp = instr.id
+        if isinstance(temp,ExpresionInicioSimple):
+            registro = self.generarTemp()
+            valor  = self.resolver_expresion_aritmetica(instr.exp,ts)
+            nuevo = TS.Simbolo(temp.id,tipo,valor,registro)
+            if ts.existeSimbolo(nuevo)==False:
+                self.Global += '\t' + registro + '='+str(valor)+';'+'\n'
+                ts.agregar(nuevo)
+            elif ts.existeSimbolo(nuevo)==True:
+                self.Global += '\t' + registro + '='+str(valor)+';'+'\n'
+                ts.actualizar(nuevo)
+            return
+        elif isinstance(temp,ExpresionListaIndices):            
+            if temp.listaindices[0]==0:
+                valor = self.resolver_expresion_aritmetica(instr.exp,ts)
+                registro = self.generarTemp()
+                nuevo = TS.Simbolo(temp.id,tipo,valor,registro)
+                if ts.existeSimbolo(nuevo) == False:
+                    self.Global += '\t'+registro+ '='+str(valor)+';'+'\n'
+                    ts.agregar(nuevo)
+                elif ts.existeSimbolo(nuevo)==True:
+                    self.Global += '\t'+registro+ '='+str(valor)+';'+'\n'
+                    ts.actualizar(nuevo)
+                return
+            elif temp.listaindices[0]!=0:
+                registro = self.generarTemp()
+                nuevo = TS.Simbolo(temp.id,td.ARRAY,{},registro)
+                valores = []
+                self.Global += '\t'+registro+'='+'array()'+';'+'\n'
+                for i in instr.exp:
+                    i = self.resolver_expresion_aritmetica(i,ts)
+                    valores.append(i)
+                if ts.existeSimbolo(nuevo)==False:
+                    if len(temp.listaindices)==1:
+                        indice = self.resolver_expresion_aritmetica(temp.listaindices[0],ts)
+                        if(len(valores)==indice):
+                            ts.agregar(nuevo) 
+                            if isinstance(indice,int):
+                                for i in range(indice):
+                                    self.Global += '\t'+registro+'['+str(i)+']='+str(valores[i])+';'+'\n'
+                        else:
+                            print('Error, la cantidad de valores a asignar no es la misma con el tamaño del arreglo')
+                return
+            else:
+
+                print('mas indices')
+            return
+        else:
+            print(type(instr.id))
+        return
+
+    def procesar_asignacion_global(self,instr, ts) :
+        asi = instr.id
+        if isinstance(asi,ExpresionInicioSimple):
+            registro = ts.obtener(asi.id).reg
+            valor  = self.resolver_expresion_aritmetica(instr.expNumerica,ts)
+            try:
+                if instr.tipo == "=":
+                    self.Global += '\t'+registro+'='+str(valor)+';'+'\n'
+                elif instr.tipo =="+=":
+                    self.Global += '\t'+registro+'='+registro+'+'+str(valor)+';'+'\n'
+                elif instr.tipo =="-=":
+                    self.Global += '\t'+registro+'='+registro+'-'+str(valor)+';'+'\n'
+                elif instr.tipo =="*=":
+                    self.Global += '\t'+registro+'='+registro+'*'+str(valor)+';'+'\n' 
+                elif instr.tipo =="/=":
+                    self.Global += '\t'+registro+'='+registro+'/'+str(valor)+';'+'\n'
+                elif instr.tipo =="%=":
+                    self.Global += '\t'+registro+'='+registro+'%'+str(valor)+';'+'\n'
+                elif instr.tipo =="<<=":
+                    self.Global += '\t'+registro+'='+registro+'<<'+str(valor)+';'+'\n'
+                elif instr.tipo ==">>=":
+                    self.Global += '\t'+registro+'='+registro+'>>'+str(valor)+';'+'\n'
+                elif instr.tipo =="&=":
+                    self.Global += '\t'+registro+'='+registro+'&'+str(valor)+';'+'\n'
+                elif instr.tipo =="|=":
+                    self.Global += '\t'+registro+'='+registro+'|'+str(valor)+';'+'\n'
+                elif instr.tipo =="^=":
+                    self.Global += '\t'+registro+'='+registro+'^'+str(valor)+';'+'\n'
+            except :
+                print("Error, no se puede realizar la traduccion de esta asignacion")   
+        elif isinstance(asi,ExpresionListaIndices):
+            iden =ts.obtener(asi.id).reg
+            valor  = self.resolver_expresion_aritmetica(instr.expNumerica,ts)
+            for r in asi.listaindices:
+                iden +="["+str(self.resolver_expresion_aritmetica(r,ts))+"]"
+            try:
+                if instr.tipo == "=":
+                    self.Global += '\t'+iden+'='+str(valor)+';'+'\n'
+                elif instr.tipo =="+=":
+                    self.Global += '\t'+iden+'='+iden+'+'+str(valor)+';'+'\n'
+                elif instr.tipo =="-=":
+                    self.Global += '\t'+iden+'='+iden+'-'+str(valor)+';'+'\n'
+                elif instr.tipo =="*=":
+                    self.Global += '\t'+iden+'='+iden+'*'+str(valor)+';'+'\n' 
+                elif instr.tipo =="/=":
+                    self.Global += '\t'+iden+'='+iden+'/'+str(valor)+';'+'\n'
+                elif instr.tipo =="%=":
+                    self.Global += '\t'+iden+'='+iden+'%'+str(valor)+';'+'\n'
+                elif instr.tipo =="<<=":
+                    self.Global += '\t'+iden+'='+iden+'<<'+str(valor)+';'+'\n'
+                elif instr.tipo ==">>=":
+                    self.Global += '\t'+iden+'='+iden+'>>'+str(valor)+';'+'\n'
+                elif instr.tipo =="&=":
+                    self.Global += '\t'+iden+'='+iden+'&'+str(valor)+';'+'\n'
+                elif instr.tipo =="|=":
+                    self.Global += '\t'+iden+'='+iden+'|'+str(valor)+';'+'\n'
+                elif instr.tipo =="^=":
+                    self.Global += '\t'+iden+'='+iden+'^'+str(valor)+';'+'\n'
+            except:           
+                pass
+            
+        return
+       
+#---------------------------------------------------------------------------------- 
     def procesar_asignacion(self,instr, ts) :
         asi = instr.id
         if isinstance(asi,ExpresionInicioSimple):
@@ -648,11 +844,12 @@ class Ejecucion_MinorC ():
             etiVer = self.generaLabel()
             etiFal = self.generaLabel()
             etiSal = self.generaLabel()
-            self.CodigoGenerado += '\t'+'if ('+str(condicion)+') goto '+etiVer+';'+'\n'
-            self.CodigoGenerado += '\t'+'goto '+etiFal+ ';'+'\n'
-
-            self.CodigoGenerado +=etiVer+":"+"\n"
+            self.CodigoGenerado += '\t'+'if (!'+str(condicion)+') goto '+etiFal+';'+'\n'
             self.procesar_sentencias(instr.bloqueSentenciasIf,ts)
+            #self.CodigoGenerado += '\t'+'goto '+etiFal+ ';'+'\n'
+
+            #self.CodigoGenerado +=etiVer+":"+"\n"
+
             #self.CodigoGenerado +='\t'+"goto "+etiSal+";"+"\n"
             self.CodigoGenerado +=etiFal+":"+"\n"
 
@@ -710,11 +907,10 @@ class Ejecucion_MinorC ():
             elif isinstance(sent,While): self.procesar_While(sent,ts)
             elif isinstance(sent,IfSimple): 
                 sal =self.procesar_ifSimple(sent,ts)
+                self.CodigoGenerado += sal+":"+"\n"
                 if sal==0:
                     print("error en traducir if")
                     return
-                else:
-                    self.CodigoGenerado += sal+":"+"\n"
             elif isinstance(sent,IfElse): 
                 if self.procesar_ifElse(sent,ts) == 0:
                     print("error en traducir if else")
@@ -731,7 +927,7 @@ class Ejecucion_MinorC ():
     
     def procesar_ifElse(self,instr, ts) :
         try:
-            salida =self.procesar_ifSimple(instr.ifinst,ts) 
+            self.procesar_ifSimple(instr.ifinst,ts) 
             self.procesar_sentencias(instr.elseinst,ts)
             #self.CodigoGenerado += salida +":"+"\n"
             return 1
@@ -1467,21 +1663,21 @@ class Ejecucion_MinorC ():
 
             if ts.existeSimbolo(nuevo)==False:
                 ts.agregar(nuevo)
-                self.CodigoGenerado += '\t'+registro+'=array();'+'\n'
+                self.Global += '\t'+registro+'=array();'+'\n'
                 for e in struct.valor:
                     if e.tipo == td.INT:
-                        self.CodigoGenerado +='\t'+registro+'[\''+e.ide+'\']=0;'+'\n'
+                        self.Global +='\t'+registro+'[\''+e.ide+'\']=0;'+'\n'
                     elif e.tipo == td.FLOAT:
-                        self.CodigoGenerado +='\t'+registro+'[\''+e.ide+'\']=0.0;'+'\n'
+                        self.Global +='\t'+registro+'[\''+e.ide+'\']=0.0;'+'\n'
                     elif e.tipo == td.CADENA:
-                        self.CodigoGenerado +='\t'+registro+'[\''+e.ide+'\']=\"0\";'+'\n'
+                        self.Global +='\t'+registro+'[\''+e.ide+'\']=\"0\";'+'\n'
         except:
             print('error, nose puede traducir la declaracion de struct')
 
     def procesar_asignacion_struct(self,instr,ts):
         struct = ts.obtener(instr.TipoStruct)
         valor =self.resolver_expresion_aritmetica(instr.valor,ts)
-        self.CodigoGenerado += '\t'+struct.reg+'[\''+instr.ide+'\']='+str(valor)+";"+"\n"
+        self.Global += '\t'+struct.reg+'[\''+instr.ide+'\']='+str(valor)+";"+"\n"
 
     def ejecutar_expresiones_label(self,listainstrucciones,ts,listaglobal):
             for instr in listainstrucciones :
@@ -1513,8 +1709,8 @@ class Ejecucion_MinorC ():
 
         for instr in instrucciones :
             if isinstance(instr, Main) : self.procesar_main(instr,ts)
-            elif isinstance(instr, Definicion) : self.procesar_definicion(instr, ts)
-            elif isinstance(instr, Asignacion) : self.procesar_asignacion(instr, ts)
+            elif isinstance(instr, Definicion) : self.procesar_definicion_global(instr, ts)
+            elif isinstance(instr, Asignacion) : self.procesar_asignacion_global(instr, ts)
             elif isinstance(instr, Incremento) : self.procesar_incremento(instr, ts)
             elif isinstance(instr, DefinicionFuncion) : self.procesar_funcion(instr, ts)
             elif isinstance(instr, DefStruct) : self.procesar_def_struct(instr,ts)
