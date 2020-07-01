@@ -34,13 +34,22 @@ class Ejecucion_MinorC ():
         #self.gram = g.verGramatica()
         self.instrucciones = g.parse(input) 
         #print(self.instrucciones)
+
         self.procesar_instrucciones(self.instrucciones, self.ts_global)   
         self.salidaParcial =self.CodigoGenerado.split("main:",1)
         self.salidaTotal+="main:"+"\n"
         self.salidaTotal+=self.Global
         self.salidaTotal +=self.salidaParcial[1:][0]
         self.salidaTotal +=self.salidaParcial[:-1][0]
-        
+    
+    def GenerarAST(self):
+        try:
+            DibujarAST(self.instrucciones)
+            dot.view()
+        except :
+            print('error al imprimir arbol')
+            pass
+
     def errores_asc(self):
         import gramaticaM as g
         self.errores = g.retornalista()
@@ -272,11 +281,147 @@ class Ejecucion_MinorC ():
         self.dot.edge(root, nodo)
         cont = cont +1
         nodo1= 'nodo'+str(cont)
-        self.dot.node(nodo1,instr.id)
+        self.dot.node(nodo1,instr.id.id)
         self.dot.edge(nodo,nodo1)
+        
+        cont = cont +1
+        nodo2= 'nodo'+str(cont)
+        self.dot.node(nodo2,str(instr.tipo))
+        self.dot.edge(nodo,nodo2)
+
         cont = self.dibujar_expresion(instr.expNumerica,nodo,cont)
         return cont
 
+    def dibujar_definicion(self,instr,root,cont):
+        cont = cont+1
+        nodo = 'nodo'+str(cont)
+        self.dot.node(nodo,'Definicion')
+        self.dot.edge(root, nodo)
+        cont = cont +1
+        nodo1= 'nodo'+str(cont)
+        self.dot.node(nodo1,instr.tipo.name)
+        self.dot.edge(nodo,nodo1)
+
+        for d in instr.listaid:
+            if isinstance (d,DefinicionSinValor): cont = self.dibujar_definicion_sinValor(d,nodo,cont)
+            elif isinstance(d,DefinicionConvalor): cont = self.dibujar_definicion_conValor(d,nodo,cont)   
+       
+        return cont
+
+    def dibujar_definicion_sinValor(self,instr,root,cont):
+        cont = cont+1
+        nodo = 'nodo'+str(cont)
+        self.dot.node(nodo,'SinValor')
+        self.dot.edge(root, nodo)
+        cont = cont +1
+        nodo1= 'nodo'+str(cont)
+        self.dot.node(nodo1,str(instr.id.id))
+        self.dot.edge(nodo,nodo1)
+
+        return cont
+
+    def dibujar_definicion_conValor(self,instr,root,cont):
+        cont = cont+1
+        nodo = 'nodo'+str(cont)
+        self.dot.node(nodo,'ConValor')
+        self.dot.edge(root, nodo)
+        cont = cont +1
+        nodo1= 'nodo'+str(cont)
+        self.dot.node(nodo1,str(instr.id.id))
+        self.dot.edge(nodo,nodo1)
+
+        if not isinstance(instr.exp,list):
+            cont = self.dibujar_expresion(instr.exp,nodo,cont)
+        else:
+            for i in instr.exp:
+                cont=self.dibujar_expresion(i,nodo,cont)
+
+        return cont
+    
+    def dibujar_incremento(self, instr, root,cont):
+        cont=cont+1
+        nodo = 'nodo'+ str(cont)
+        self.dot.node(nodo,'Incre/decre')
+        self.dot.edge(root, nodo)
+        cont = cont +1
+        nodo1= 'nodo'+str(cont)
+        self.dot.node(nodo1,instr.exp)
+        self.dot.edge(nodo,nodo1)
+
+        cont = cont +1
+        nodo2= 'nodo'+str(cont)
+        self.dot.node(nodo2,instr.tipo)
+        self.dot.edge(nodo,nodo2)
+        return cont
+
+    def dibujar_def_struct(self,instr,root,cont):
+        cont=cont+1
+        nodo = 'nodo'+ str(cont)
+        self.dot.node(nodo,'Def Struct')
+        self.dot.edge(root, nodo)
+
+        cont = cont +1
+        nodo1= 'nodo'+str(cont)
+        self.dot.node(nodo1,instr.ide)
+        self.dot.edge(nodo,nodo1)
+
+        cont = cont +1
+        nodo2= 'nodo'+str(cont)
+        self.dot.node(nodo2,'elementos')
+        self.dot.edge(nodo,nodo2)
+
+        for i in instr.elementos:
+            cont = self.dibujar_elemento_struct(i,nodo2,cont)
+
+        return cont
+
+    def dibujar_elemento_struct(self,instr,root,cont):
+        cont = cont +1
+        nodo3= 'nodo'+str(cont)
+        self.dot.node(nodo3,instr.tipo.name)
+        self.dot.edge(root,nodo3)
+
+        cont = cont +1
+        nodo1= 'nodo'+str(cont)
+        self.dot.node(nodo1,instr.ide)
+        self.dot.edge(root,nodo1)
+        return cont
+
+    def dibujar_decla_struct(self,instr,root,cont):
+        cont=cont+1
+        nodo = 'nodo'+ str(cont)
+        self.dot.node(nodo,'Decla Struct')
+        self.dot.edge(root, nodo)
+
+        cont = cont +1
+        nodo1= 'nodo'+str(cont)
+        self.dot.node(nodo1,instr.TipoStruct)
+        self.dot.edge(nodo,nodo1)
+
+        cont = cont +1
+        nodo2= 'nodo'+str(cont)
+        self.dot.node(nodo2,instr.ide)
+        self.dot.edge(nodo,nodo2)
+        return cont
+
+    def dibujar_asignacion_struct(self,instr,root,cont):
+        cont=cont+1
+        nodo = 'nodo'+ str(cont)
+        self.dot.node(nodo,'Asig Struct')
+        self.dot.edge(root, nodo)
+
+        cont = cont +1
+        nodo1= 'nodo'+str(cont)
+        self.dot.node(nodo1,instr.TipoStruct)
+        self.dot.edge(nodo,nodo1)
+
+        cont = cont +1
+        nodo2= 'nodo'+str(cont)
+        self.dot.node(nodo2,instr.ide)
+        self.dot.edge(nodo,nodo2)
+
+        cont = self.dibujar_expresion(instr.valor,nodo,cont)
+        return cont
     def dibujar_print(self,instr,root,cont):
         cont=cont+1
         nodo = 'nodo'+ str(cont)
@@ -299,6 +444,8 @@ class Ejecucion_MinorC ():
         if isinstance(instr,ExpresionNumero):
             self.dot.node(nodo1,str(instr.val))  
         elif isinstance(instr, ExpresionTemporal):  
+            self.dot.node(nodo1,instr.id)
+        elif isinstance(instr,ExpresionId):
             self.dot.node(nodo1,instr.id)
         elif isinstance(instr,ExpresionBinaria):    
             cont = self.dibujar_expresion(instr.exp1,nodo1,cont) 
@@ -374,27 +521,41 @@ class Ejecucion_MinorC ():
                 cont = self.dibujar_expresion(i,nodo2,cont)
         elif isinstance(instr,Read):
             self.dot.node(nodo1,"Read ( )") 
-
+        elif isinstance(instr,ExpresionInicioSimple):
+            self.dot.node(nodo1,instr.id)
+        elif isinstance(instr,ExpresionAccesoStruct):
+            self.dot.node(nodo1,instr.idPadre+"."+instr.idHijo)
+        else:
+            print(instr)
         self.dot.edge(nodo,nodo1)
 
         return cont
 
+
     def DibujarAST(self,instrucciones):
         cont = 1
         root = 'nodo'+ str(cont)
-        self.dot.node(root, 'AUGUS')
+        self.dot.node(root, 'MINORC')
         for instr in instrucciones:
-            if isinstance(instr,Asignacion) : cont = self.dibujar_asignacion(instr,root,cont)
-            elif isinstance(instr,Imprimir) : cont = self.dibujar_print(instr,root,cont)
-            elif isinstance(instr,If): cont = self.dibujar_if(instr,root,cont)
-            elif isinstance(instr,Unset): cont = self.dibujar_unset(instr,root,cont)
-            elif isinstance(instr,AsignaValorPila): cont = self.dibujar_AsignaValorPila(instr,root,cont)
-            elif isinstance(instr,AsignacionExtra): cont = self.dibujar_AsignaRegistro(instr,root,cont)
-            elif isinstance(instr,Main): cont = self.dibujar_main(instr,root,cont)
-            elif isinstance(instr,Asigna_arreglo): cont=self.dibujar_Asigna_arreglo(instr,root,cont)
-            elif isinstance(instr,Label): cont=self.dibujar_Label(instr,root,cont)
-            elif isinstance(instr,Goto): cont=self.dibujar_Goto(instr,root,cont)
-            elif isinstance(instr,Exit): cont=self.dibujar_exit(instr,root,cont)
+            #if isinstance(instr,Asignacion) : cont = self.dibujar_asignacion(instr,root,cont)
+            #elif isinstance(instr,Imprimir) : cont = self.dibujar_print(instr,root,cont)
+            #elif isinstance(instr,If): cont = self.dibujar_if(instr,root,cont)
+            #elif isinstance(instr,Unset): cont = self.dibujar_unset(instr,root,cont)
+            #elif isinstance(instr,AsignaValorPila): cont = self.dibujar_AsignaValorPila(instr,root,cont)
+            #elif isinstance(instr,AsignacionExtra): cont = self.dibujar_AsignaRegistro(instr,root,cont)
+            #elif isinstance(instr,Main): cont = self.dibujar_main(instr,root,cont)
+            #elif isinstance(instr,Asigna_arreglo): cont=self.dibujar_Asigna_arreglo(instr,root,cont)
+            #elif isinstance(instr,Label): cont=self.dibujar_Label(instr,root,cont)
+            #elif isinstance(instr,Goto): cont=self.dibujar_Goto(instr,root,cont)
+
+
+            if isinstance(instr, Definicion) : cont = self.dibujar_definicion(instr, root,cont)
+            elif isinstance(instr, Asignacion) : cont = self.dibujar_asignacion(instr, root,cont)
+            elif isinstance(instr, inc) : cont = self.dibujar_incremento(instr, root,cont)
+            #elif isinstance(instr, DefinicionFuncion) : cont = self.procesar_funcion(instr, ts)
+            elif isinstance(instr, DefStruct) : cont = self.dibujar_def_struct(instr, root,cont)
+            elif isinstance(instr, DeclaracionStruct) : cont = self.dibujar_decla_struct(instr, root,cont)
+            elif isinstance(instr, AsignacionStruct) : cont = self.dibujar_asignacion_struct(instr, root,cont)
             else : 
                 print('')
         #print(dot.source)
@@ -1664,7 +1825,7 @@ class Ejecucion_MinorC ():
                 self.CodigoGenerado +="exit;"+"\n"
             elif isinstance(instr, Definicion) : self.procesar_definicion_global(instr, ts)
             elif isinstance(instr, Asignacion) : self.procesar_asignacion_global(instr, ts)
-            elif isinstance(instr, Incremento) : self.procesar_incremento(instr, ts)
+            elif isinstance(instr, inc) : self.procesar_incremento(instr, ts)
             elif isinstance(instr, DefinicionFuncion) : self.procesar_funcion(instr, ts)
             elif isinstance(instr, DefStruct) : self.procesar_def_struct(instr,ts)
             elif isinstance(instr, DeclaracionStruct) : self.procesar_decla_struct(instr, ts)
@@ -1739,4 +1900,5 @@ a = Ejecucion_MinorC()
 f = open("./entrada.txt", "r")
 input = f.read()
 a.ejecutar_asc(input)
+a.GenerarAST()
 print(a.salidaTotal)

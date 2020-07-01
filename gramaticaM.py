@@ -274,6 +274,7 @@ def p_instruccion(t) :
                         | FUNCMAIN
                         | INCREMENTO PTCOMA
                         | STRUCTDECLA
+                        | ASIGNA_STRUCT
                         '''
     t[0] = t[1]
     if isinstance(t[1],Asignacion): asc.append('instruccion - asignacion_instr')
@@ -766,7 +767,7 @@ def p_error(t):
                      # Get the next token
          if not tok or tok.type == 'PTCOMA': break
     pars.errok()
-    err = "Error en el token \'" + str(t.value) +"\' en la linea: "+ str(t.lineno) + ' de tipo: SINTACTICO'
+    err = "Error en el token \'" + str(t.value) +"\' en la linea: "+ str(t.lexer.lineno) + ' de tipo: SINTACTICO'
     lista_errores.append(err)
     print("Error sintactico en el token ",t.value,t.lineno)
      # Return SEMI to the parser as the next lookahead token
