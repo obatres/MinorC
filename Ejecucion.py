@@ -1661,7 +1661,7 @@ class Ejecucion_MinorC ():
         for instr in instrucciones :
             if isinstance(instr, Main) : 
                 self.procesar_main(instr,ts)
-                self.CodigoGenerado +="exit;"
+                self.CodigoGenerado +="exit;"+"\n"
             elif isinstance(instr, Definicion) : self.procesar_definicion_global(instr, ts)
             elif isinstance(instr, Asignacion) : self.procesar_asignacion_global(instr, ts)
             elif isinstance(instr, Incremento) : self.procesar_incremento(instr, ts)
@@ -1738,5 +1738,5 @@ a = Ejecucion_MinorC()
 
 f = open("./entrada.txt", "r")
 input = f.read()
-#a.ejecutar_asc(input)
-#print(a.salidaTotal)
+a.ejecutar_asc(input)
+print(a.salidaTotal)

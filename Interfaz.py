@@ -366,11 +366,11 @@ class MainWindow(QMainWindow):
 
         #self.toolbar.addAction(EjecutarPLY)
 
-        EjecutarDesc = QAction(QIcon(os.path.join('images', 'Run.png')), "AUGUS", self)  
-        EjecutarDesc.setStatusTip("Ejecutar AUGUS")
-        EjecutarDesc.triggered.connect(self.EjecutarAsc)  
-        Ejecutar_menu.addAction(EjecutarDesc)
-        Ejec_toolbar.addAction(EjecutarDesc)
+        #EjecutarDesc = QAction(QIcon(os.path.join('images', 'Run.png')), "AUGUS", self)  
+        #EjecutarDesc.setStatusTip("Ejecutar AUGUS")
+        #EjecutarDesc.triggered.connect(self.EjecutarAsc)  
+        #Ejecutar_menu.addAction(EjecutarDesc)
+        #Ejec_toolbar.addAction(EjecutarDesc)
 
         EjecutarDeb = QAction(QIcon(os.path.join('images', 'debug.png')), "Debug", self)  
         EjecutarDeb.setStatusTip("Ejecutar Debug")
@@ -569,7 +569,7 @@ class MainWindow(QMainWindow):
             self.editor.print_(dlg.printer())
 
     def update_title(self):
-        self.setWindowTitle("AUGUS IDE")
+        self.setWindowTitle("MINOR C IDE")
 
     def edit_toggle_wrap(self):
         self.editor.setLineWrapMode( 1 if self.editor.lineWrapMode() == 0 else 0 )
