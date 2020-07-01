@@ -209,7 +209,7 @@ def get_clomuna(input, token):
      #     
 def t_error(t):
     print("Error Lexico en el token: '%s'" % t.value[0])
-    err = "Error Lexico en el token: '%s'" % t.value[0]
+    err = "Error Lexico en el token: '%s'" % t.value[0]+str(t.lexer.lineno)
     lista_errores.append(err)
     t.lexer.skip(1)
 
@@ -225,8 +225,9 @@ lexer = lex.lex()
 
 # Asociación de operadores y precedencia
 precedence = (
-    ('right','NOTLOG'),
-    ('left','ANDLOG','ORLOG','XORLOG'),
+    
+    ('left','ORLOG','XORLOG'),
+    ('left','ANDLOG'),
     ('left','IGUALQUE','NIGUALQUE'),
     ('left','MENQUE','MAYQUE'),
     ('left','MAYORIG','MENORIG'),
@@ -237,7 +238,8 @@ precedence = (
     ('left','MAS','MENOS'),
     ('left','POR','DIVIDIDO'),
     ('left','RES','ABS'),
-    ('right','UMENOS'),
+    ('right','UMENOS','NOTLOG','NOTBIT'),
+    ('left','PARIZQ','PARDER'),
     )
 
 # Definición de la gramática
@@ -538,7 +540,7 @@ def p_instrucciones_if_else(t):
     t[0] = IfElse(t[1],t[2],t.lineno(1),0)
 
 def p_if_instr(t) :
-    'if_instr           : IF expresion_numerica BLOQUE'
+    'if_instr           : IF expresion_log_relacional BLOQUE'
     t[0] = IfSimple(t[2],t[3],t.lineno(1),get_clomuna(entry,t.slice[1]))
     asc.append('if_instr  - IF expresion_numerica DEFINEGOTO')
 
@@ -673,7 +675,7 @@ def p_expresion_apuntador(t):
 
 def p_expresion_conversion(t):
     'expresion_numerica : TIPOCONVERSION expresion_log_relacional'
-    t[0] = ExpresionConversion(t[1],t[2],t.lineno(1),get_clomuna(entry,t.slice[2]))
+    t[0] = ExpresionConversion(t[1],t[2],t.lineno(1))
     asc.append('expresion_numerica - TIPOCONVERSION expresion_numerica ')
 
 def p_expresion_acceso_arreglo(t):

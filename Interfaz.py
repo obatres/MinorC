@@ -597,7 +597,8 @@ class MainWindow(QMainWindow):
         self.consola.clear()
         f.ejecutar_asc(self.editorAUGUS.toPlainText())
         s = f.RecibirSalida()
-        self.consola.setPlainText(s)
+        salidaconsola = s.replace("\\n","\n")
+        self.consola.setPlainText(salidaconsola)
     def EjecutarAsc(self):
         import principal as f
         self.consola.clear()

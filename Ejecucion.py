@@ -852,7 +852,7 @@ class Ejecucion_MinorC ():
 
             #self.CodigoGenerado +='\t'+"goto "+etiSal+";"+"\n"
             self.CodigoGenerado +=etiFal+":"+"\n"
-
+            self.CodigoGenerado +='\t'+"goto "+etiSal+";"+"\n"
             return etiSal
         except :
             print('error en if',instr.linea, instr.columna)
@@ -927,9 +927,9 @@ class Ejecucion_MinorC ():
     
     def procesar_ifElse(self,instr, ts) :
         try:
-            self.procesar_ifSimple(instr.ifinst,ts) 
+            salida= self.procesar_ifSimple(instr.ifinst,ts) 
             self.procesar_sentencias(instr.elseinst,ts)
-            #self.CodigoGenerado += salida +":"+"\n"
+            self.CodigoGenerado += salida +":"+"\n"
             return 1
         except:
             print('error, no se puede traducir el if else')
@@ -1184,73 +1184,24 @@ class Ejecucion_MinorC ():
             return expNum.val
 
         elif isinstance (expNum,ExpresionConversion):
-            temp = self.resolver_expresion_aritmetica(expNum.exp,ts) 
+            reg = self.resolver_expresion_aritmetica(expNum.exp,ts) 
             conv = expNum.tipo
-            if conv=='int':
-                if expNum.exp.tipo==TS.TIPO_DATO.CADENA:
-                    expNum.val = ord(temp[0])
-                    expNum.tipo = TS.TIPO_DATO.INT
-                    return expNum.val 
-                elif expNum.exp.tipo==TS.TIPO_DATO.FLOAT:
-                    expNum.val = int(Decimal(temp))
-                    expNum.tipo = TS.TIPO_DATO.INT
-                    return expNum.val 
-                elif expNum.exp.tipo==TS.TIPO_DATO.INT:
-                    expNum.val = temp
-                    expNum.tipo = TS.TIPO_DATO.INT
-                    return expNum.val
-                else:
-                    print('la conversion a (int) de ',temp,'no se puede realizar por error de tipo')
-                    err = 'Error la conversion a (int) de ',temp,'no se puede realizar por error de tipo',' En la linea: ',expNum.linea,' En la columna: ',expNum.columna, 'Tipo: SEMANTICO'
-                    self.errores.append(err)
+            if conv=="int":
+                expNum.Tipo = td.INT
+            elif conv == "float":
+                expNum.Tipo = td.FLOAT
+            elif conv == "char":
+                expNum.Tipo = td.CADENA
+            r = self.generarTemp()
+            self.CodigoGenerado+='\t'+r+"=("+conv+")"+reg+";"+"\n"
             
-            elif conv=='float':
-                if expNum.exp.tipo==TS.TIPO_DATO.CADENA:
-                    temp1 = ord(temp[0])
-                    expNum.val = str(temp1) + '.0'
-                    expNum.tipo = TS.TIPO_DATO.FLOAT
-                    return float(expNum.val)
-                elif expNum.exp.tipo==TS.TIPO_DATO.FLOAT:
-                    expNum.val = temp
-                    expNum.tipo = TS.TIPO_DATO.FLOAT
-                    return expNum.val 
-                elif expNum.exp.tipo==TS.TIPO_DATO.INT:
-                    expNum.val = str(temp) + '.0'
-                    expNum.tipo = TS.TIPO_DATO.FLOAT
-                    return float(expNum.val) 
-                else:
-                    print('la conversion a (float) de ',temp,'no se puede realizar por error de tipo')
-            
-            elif conv=='char':
-                if expNum.exp.tipo==TS.TIPO_DATO.CADENA:
-                    expNum.val = temp[0]
-                    expNum.tipo = TS.TIPO_DATO.CADENA
-                    return expNum.val
-                elif expNum.exp.tipo==TS.TIPO_DATO.FLOAT:
-                    temp2 = int(Decimal(temp))
-                    if temp2>=0 and temp2<255: expNum.val = chr(temp2)                    
-                    elif temp2>=256:          expNum.val = chr(temp2%256)
-
-                    expNum.tipo = TS.TIPO_DATO.CADENA
-                    return expNum.val
-                elif expNum.exp.tipo==TS.TIPO_DATO.INT:
-                    
-                    if temp>=0 and temp<255: expNum.val = chr(temp)                    
-                    elif temp>=256:          expNum.val = chr(temp%256)
-
-                    expNum.tipo = TS.TIPO_DATO.CADENA
-                    return expNum.val
-                else:
-                    print('la conversion a (char) de ',temp,'no se puede realizar por error de tipo')
-            
-            else:
-                print('La conversion de tipo',expNum.tipo,'No es posible ejecutarla')
+            return r
             
         elif isinstance (expNum, ExpresionLogicaNot):
             temp = self.resolver_expresion_aritmetica(expNum.exp,ts)
             expNum.tipo=TS.TIPO_DATO.INT
             temporal = self.generarTemp()
-            self.CodigoGenerado += '\t'+temp+'= !'+str(temp)+'\n'
+            self.CodigoGenerado += '\t'+temporal+'= !'+str(temp)+";"+'\n'
             return temporal
     
         elif isinstance (expNum, ExpresionLogicaXOR):
@@ -1708,7 +1659,9 @@ class Ejecucion_MinorC ():
         ## lista de instrucciones recolectadas.
 
         for instr in instrucciones :
-            if isinstance(instr, Main) : self.procesar_main(instr,ts)
+            if isinstance(instr, Main) : 
+                self.procesar_main(instr,ts)
+                self.CodigoGenerado +="exit;"
             elif isinstance(instr, Definicion) : self.procesar_definicion_global(instr, ts)
             elif isinstance(instr, Asignacion) : self.procesar_asignacion_global(instr, ts)
             elif isinstance(instr, Incremento) : self.procesar_incremento(instr, ts)
@@ -1785,5 +1738,5 @@ a = Ejecucion_MinorC()
 
 f = open("./entrada.txt", "r")
 input = f.read()
-a.ejecutar_asc(input)
-print(a.salidaTotal)
+#a.ejecutar_asc(input)
+#print(a.salidaTotal)
