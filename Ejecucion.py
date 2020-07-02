@@ -335,7 +335,11 @@ class Ejecucion_MinorC ():
             cont = self.dibujar_expresion(instr.exp,nodo,cont)
         else:
             for i in instr.exp:
-                cont=self.dibujar_expresion(i,nodo,cont)
+                if isinstance(i,list):
+                        for j in i:
+                            cont=self.dibujar_expresion(j,nodo,cont)
+                else:
+                    cont=self.dibujar_expresion(i,nodo,cont)
 
         return cont
     
@@ -1975,6 +1979,6 @@ a = Ejecucion_MinorC()
 
 f = open("./entrada.txt", "r")
 input = f.read()
-#a.ejecutar_asc(input)
-#a.GenerarAST()
-#print(a.salidaTotal)
+a.ejecutar_asc(input)
+a.GenerarAST()
+print(a.salidaTotal)
