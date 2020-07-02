@@ -25,6 +25,7 @@ class Ejecucion_MinorC ():
     cont = 0
     contLabel=0
     contPar =0
+    contRet =0
     salidaParcial=''
     salidaTotal =''
     Global=''
@@ -635,33 +636,24 @@ class Ejecucion_MinorC ():
             
             if temp.listaindices[0]!=0:
                 registro = self.generarTemp()
-                nuevo = TS.Simbolo(temp.id,td.ARRAY,{},registro)
-                
-                if ts.existeSimbolo(nuevo)==False:
-                    self.CodigoGenerado += '\t'+registro+'='+'array()'+';'+'\n'
-                    ts.agregar(nuevo)   
-                    if len(temp.listaindices)==1:
-                        for i in temp.listaindices:
-                            indice = self.resolver_expresion_aritmetica(i,ts)
-                            if isinstance(indice,int):
-                                for i in range(indice):
-                                    self.CodigoGenerado += '\t'+registro+'['+str(i)+']=0;'+'\n'
-                    elif len(temp.listaindices)==2:
-                        indice1 = self.resolver_expresion_aritmetica(temp.listaindices[0],ts)
-                        indice2 = self.resolver_expresion_aritmetica(temp.listaindices[1],ts)
-                        for i in range(indice1):
-                            for j in range(indice2):
-                                self.CodigoGenerado+= '\t'+registro+'['+str(i)+']'+'['+str(j)+']=0;'+'\n'
-                    elif len(temp.listaindices)==3:
-                        indice1 = self.resolver_expresion_aritmetica(temp.listaindices[0],ts)
-                        indice2 = self.resolver_expresion_aritmetica(temp.listaindices[1],ts)
-                        indice3 = self.resolver_expresion_aritmetica(temp.listaindices[2],ts)
-                        for i in range(indice1):
-                            for j in range(indice2):
-                                for x in range(indice3):
-                                    self.CodigoGenerado+= '\t'+registro+'['+str(i)+']'+'['+str(j)+']'+'['+str(j)+']=0;'+'\n'
-                elif ts.existeSimbolo(nuevo)==True:
-                    print("Error, esta variable ya se declaro previamente o no tiene un registro asociado")
+                nuevo = TS.Simbolo(temp.id,tipo,{},registro)
+                self.CodigoGenerado += '\t'+registro+'='+'array()'+';'+'\n'
+                dim=1
+                ind=[]
+                for i in temp.listaindices:
+                    ind.append(self.resolver_expresion_aritmetica(i,ts))
+                    dim *=self.resolver_expresion_aritmetica(i,ts)
+                if tipo==td.INT:
+                    for j in range(dim):
+                        self.CodigoGenerado+='\t'+registro+"["+str(j)+"]"+"=0;"+"\n"
+                elif tipo==td.FLOAT:
+                    for j in range(dim):
+                        self.CodigoGenerado+='\t'+registro+"["+str(j)+"]"+"=0.0;"+"\n"
+                elif tipo==td.CADENA:
+                    for j in range(dim):
+                        self.CodigoGenerado+='\t'+registro+"["+str(j)+"]"+"=\'0\';"+"\n"
+                nuevo.valor=ind
+                ts.agregar(nuevo)
             else:
                 print('Error, esta variable: '+temp.id+' debe contener un valor para ser inicializada')
             return
@@ -696,22 +688,26 @@ class Ejecucion_MinorC ():
                 return
             elif temp.listaindices[0]!=0:
                 registro = self.generarTemp()
-                nuevo = TS.Simbolo(temp.id,td.ARRAY,{},registro)
-                valores = []
+                nuevo = TS.Simbolo(temp.id,tipo,{},registro)
                 self.CodigoGenerado += '\t'+registro+'='+'array()'+';'+'\n'
-                for i in instr.exp:
-                    i = self.resolver_expresion_aritmetica(i,ts)
-                    valores.append(i)
-                if ts.existeSimbolo(nuevo)==False:
-                    if len(temp.listaindices)==1:
-                        indice = self.resolver_expresion_aritmetica(temp.listaindices[0],ts)
-                        if(len(valores)==indice):
-                            ts.agregar(nuevo) 
-                            if isinstance(indice,int):
-                                for i in range(indice):
-                                    self.CodigoGenerado += '\t'+registro+'['+str(i)+']='+str(valores[i])+';'+'\n'
-                        else:
-                            print('Error, la cantidad de valores a asignar no es la misma con el tamaño del arreglo')
+                dim=1
+                ind=[]
+                for i in temp.listaindices:
+                    ind.append(self.resolver_expresion_aritmetica(i,ts))
+                    dim*=self.resolver_expresion_aritmetica(i,ts)
+                valores=[]
+                for j in instr.exp:
+                    if isinstance(j,list):
+                        for x in j:
+                            valores.append(x)
+                    else:
+                        valores.append(j)
+                if len(valores)==dim:
+                    for k in range(dim):
+                        val = self.resolver_expresion_aritmetica(valores[k],ts)
+                        self.CodigoGenerado +='\t'+registro+"["+str(k)+"]="+str(val)+";"+"\n"
+                nuevo.valor=ind
+                ts.agregar(nuevo)
                 return
             else:
 
@@ -765,33 +761,25 @@ class Ejecucion_MinorC ():
             
             if temp.listaindices[0]!=0:
                 registro = self.generarTemp()
-                nuevo = TS.Simbolo(temp.id,td.ARRAY,{},registro)
-                
-                if ts.existeSimbolo(nuevo)==False:
-                    self.Global += '\t'+registro+'='+'array()'+';'+'\n'
-                    ts.agregar(nuevo)   
-                    if len(temp.listaindices)==1:
-                        for i in temp.listaindices:
-                            indice = self.resolver_expresion_aritmetica(i,ts)
-                            if isinstance(indice,int):
-                                for i in range(indice):
-                                    self.Global += '\t'+registro+'['+str(i)+']=0;'+'\n'
-                    elif len(temp.listaindices)==2:
-                        indice1 = self.resolver_expresion_aritmetica(temp.listaindices[0],ts)
-                        indice2 = self.resolver_expresion_aritmetica(temp.listaindices[1],ts)
-                        for i in range(indice1):
-                            for j in range(indice2):
-                                self.Global+= '\t'+registro+'['+str(i)+']'+'['+str(j)+']=0;'+'\n'
-                    elif len(temp.listaindices)==3:
-                        indice1 = self.resolver_expresion_aritmetica(temp.listaindices[0],ts)
-                        indice2 = self.resolver_expresion_aritmetica(temp.listaindices[1],ts)
-                        indice3 = self.resolver_expresion_aritmetica(temp.listaindices[2],ts)
-                        for i in range(indice1):
-                            for j in range(indice2):
-                                for x in range(indice3):
-                                    self.Global+= '\t'+registro+'['+str(i)+']'+'['+str(j)+']'+'['+str(x)+']=0;'+'\n'
-                elif ts.existeSimbolo(nuevo)==True:
-                    print("Error, esta variable ya se declaro previamente o no tiene un registro asociado")
+                nuevo = TS.Simbolo(temp.id,tipo,{},registro)
+                self.Global += '\t'+registro+'='+'array()'+';'+'\n'
+                dim=1
+                ind=[]
+                for i in temp.listaindices:
+                    ind.append(self.resolver_expresion_aritmetica(i,ts))
+                    dim *=self.resolver_expresion_aritmetica(i,ts)
+                if tipo==td.INT:
+                    for j in range(dim):
+                        self.Global+='\t'+registro+"["+str(j)+"]"+"=0;"+"\n"
+                elif tipo==td.FLOAT:
+                    for j in range(dim):
+                        self.Global+='\t'+registro+"["+str(j)+"]"+"=0.0;"+"\n"
+                elif tipo==td.CADENA:
+                    for j in range(dim):
+                        self.Global+='\t'+registro+"["+str(j)+"]"+"=\'0\';"+"\n"
+                nuevo.valor=ind
+                ts.agregar(nuevo)
+                return
             else:
                 registro = self.generarTemp()
                 nuevo = TS.Simbolo(temp.id,tipo,{},registro)
@@ -834,22 +822,26 @@ class Ejecucion_MinorC ():
                 return
             elif temp.listaindices[0]!=0:
                 registro = self.generarTemp()
-                nuevo = TS.Simbolo(temp.id,td.ARRAY,{},registro)
-                valores = []
+                nuevo = TS.Simbolo(temp.id,tipo,{},registro)
                 self.Global += '\t'+registro+'='+'array()'+';'+'\n'
-                for i in instr.exp:
-                    i = self.resolver_expresion_aritmetica(i,ts)
-                    valores.append(i)
-                if ts.existeSimbolo(nuevo)==False:
-                    if len(temp.listaindices)==1:
-                        indice = self.resolver_expresion_aritmetica(temp.listaindices[0],ts)
-                        if(len(valores)==indice):
-                            ts.agregar(nuevo) 
-                            if isinstance(indice,int):
-                                for i in range(indice):
-                                    self.Global += '\t'+registro+'['+str(i)+']='+str(valores[i])+';'+'\n'
-                        else:
-                            print('Error, la cantidad de valores a asignar no es la misma con el tamaño del arreglo')
+                dim=1
+                ind=[]
+                for i in temp.listaindices:
+                    ind.append(self.resolver_expresion_aritmetica(i,ts))
+                    dim*=self.resolver_expresion_aritmetica(i,ts)
+                valores=[]
+                for j in instr.exp:
+                    if isinstance(j,list):
+                        for x in j:
+                            valores.append(x)
+                    else:
+                        valores.append(j)
+                if len(valores)==dim:
+                    for k in range(dim):
+                        val = self.resolver_expresion_aritmetica(valores[k],ts)
+                        self.Global +='\t'+registro+"["+str(k)+"]="+str(val)+";"+"\n"
+                nuevo.valor=ind
+                ts.agregar(nuevo)
                 return
             else:
 
@@ -1092,6 +1084,7 @@ class Ejecucion_MinorC ():
             elif isinstance(sent, ExpresionLlamada): self.procesar_llamada_funcion(sent,ts)
             elif isinstance(sent, DeclaracionStructArr) : self.procesar_decla_struct_arr(sent, ts)
             elif isinstance(sent, AsignacionStructArray): self.procesar_asignacion_struct_arr(sent,ts)
+            elif isinstance(sent, Return): self.procesar_return(sent,ts)
             else:
                 print(sent)
                 print('error, sentencia no posible de realizar')
@@ -1626,15 +1619,23 @@ class Ejecucion_MinorC ():
             self.CodigoGenerado += '\t'+temporal+'='+padre.reg+"["+str(pos)+"]"+'[\''+str(hijo)+'\']'+';'+'\n'
             return temporal
         elif isinstance(expNum, ExpresionListaIndices):
-            registro  = self.generarTemp()
-
-            r = ts.obtener(expNum.id).reg
-            lista =""
-            for i in expNum.listaindices:
-                lista +="["+str(self.resolver_expresion_aritmetica(i,ts))+"]"
-            self.CodigoGenerado += "\t"+registro+"="+r+lista+";"+"\n" 
-            expNum.tipo=td.INT
-            return registro
+            array = ts.obtener(expNum.id)
+            #calculo de la primera posicion
+            t1  = self.generarTemp()
+            pos1= self.resolver_expresion_aritmetica(expNum.listaindices[0],ts)
+            self.CodigoGenerado+= '\t'+t1+"="+str(pos1)+";"+"\n"
+            
+            #calculo de la segunda posicion
+            t2 = self.generarTemp()
+            n2 = array.valor[1]
+            self.CodigoGenerado+= '\t'+t2+"="+t1+"*"+str(n2)+";"+"\n"
+            t3 = self.generarTemp()
+            pos2 =self.resolver_expresion_aritmetica(expNum.listaindices[1],ts)
+            self.CodigoGenerado+= '\t'+t3+"="+t2+"+"+str(pos2)+";"+"\n"
+            t4 = self.generarTemp()
+            self.CodigoGenerado+= '\t'+t4+"="+array.reg+"["+t3+"];"+"\n"
+            expNum.tipo = array.tipo
+            return t4
         
         elif isinstance(expNum, ExpresionScan):
 
@@ -1872,6 +1873,12 @@ class Ejecucion_MinorC ():
                     err = 'Error: instrucción no válida', instr,' En la linea: ',instr.linea,' En la columna: ',instr.columna, 'Tipo: SEMANTICO'
                     self.errores.append(err) 
 
+    def procesar_return(self,instr,ts):
+        r = self.resolver_expresion_aritmetica(instr.exp,ts)
+        ret = self.generaRetorno()
+        self.CodigoGenerado+='\t'+ret+"="+str(r)+";"+"\n"
+        return
+        
     def procesar_instrucciones(self,instrucciones, ts) :
         ## lista de instrucciones recolectadas.
 
@@ -1888,7 +1895,7 @@ class Ejecucion_MinorC ():
             elif isinstance(instr, AsignacionStruct) : self.procesar_asignacion_struct(instr,ts)
             elif isinstance(instr, DeclaracionStructArr) : self.procesar_decla_struct_arr(instr, ts)
             elif isinstance(instr, AsignacionStructArray): self.procesar_asignacion_struct_arr(instr,ts)
-            #elif isinstance(instr,AsignaPunteroPila): self.procesar_asignacion_punteropila(instr,ts)
+            elif isinstance(instr, Return): self.procesar_return(instr,ts)
             #elif isinstance(instr,AsignaValorPila): self.procesar_asignacion_pila(instr,ts)
             #elif isinstance(instr, AsignacionExtra): self.procesar_asignacion_extra(instr,ts)
             #elif isinstance(instr, Main): self.Etiqueta = 'Main'
@@ -1951,6 +1958,11 @@ class Ejecucion_MinorC ():
     def generaPar(self):
         eti = '$a'+str(self.contPar)
         self.contPar+=1
+        return eti
+
+    def generaRetorno(self):
+        eti = '$v'+str(self.contRet)
+        self.contRet+=1
         return eti
 
 a = Ejecucion_MinorC()
