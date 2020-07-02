@@ -1,15 +1,25 @@
-int a,c=654, b=654,s,d;
-float k,ds,sa_0=021;
-char sad,sda,sa2;
-double as,sd,fds54;
-char ab[]= "asd",b2[]="Asdsad";
-int bfact[5];
-int bfib[6][3][2];
-int assaASd[3]={0,2,1020,{2,0}};
+void Declaracion(int a, float b, char c)
+{
+    printf("========= Metodo Declaracion =========\n");
+    int n4 = 2;
+    double db4 = 0.0;
+    double db1 = db4;
+    char chr4 = 's';
+    if (db1 == db4){
+        printf( "Declaraciones Bien :D\n");
+        n4 = n4 + 5;
+    }else {
+        printf("Problemas en el metodo declaracion :(\n");
+    }
+    printf("======================================\n");
+    
+}
+
+
 int main()
 {
-    int az=10;
-
+    printf("ASd",2,3,4);
+    return 0;
 }
 
 
