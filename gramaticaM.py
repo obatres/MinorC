@@ -370,12 +370,17 @@ def p_id_struct_def(t):
     t[0]=[t[1]]
 
 def p_elemento_struct(t):
-    'ELESTRUCT : TIPO_VAR ID PTCOMA'
-    t[0]=ElementoStruct(t[1],t[2],t.lineno(1),get_clomuna(entry,t.slice[2]))
+    'ELESTRUCT : TIPO_VAR LISTAID PTCOMA'
+    t[0]=ElementoStruct(t[1],t[2],t.lineno(1),get_clomuna(entry,t.slice[3]))
+
 
 def p_struct_declaracion(t):
     'STRUCTDECLA : STRUCT ID ID PTCOMA'
     t[0]= DeclaracionStruct(t[2],t[3],t.lineno(1),get_clomuna(entry,t.slice[2]))
+
+def p_struct_declaracion_array(t):
+    'STRUCTDECLA : STRUCT ID ID LIND PTCOMA'
+    t[0]=DeclaracionStructArr(t[2],t[3],t[4],t.lineno(1),get_clomuna(entry,t.slice[1]))
 
 def p_tipo_variable(t):
     '''TIPO_VAR :  INT
@@ -397,6 +402,10 @@ def p_asignacion_instr(t) :
 def p_asignacion_struct(t):
     'ASIGNA_STRUCT : ID PUNTO ID IGUAL expresion_log_relacional PTCOMA'
     t[0]=AsignacionStruct(t[1],t[3],t[5],t.lineno(1),get_clomuna(entry,t.slice[1]))
+
+def p_asignacion_struct_array(t):
+    'ASIGNA_STRUCT : ID CORIZQ expresion_log_relacional CORDER PUNTO ID IGUAL expresion_log_relacional PTCOMA'
+    t[0]=AsignacionStructArray(t[1],t[3],t[6],t[8],t.lineno(1),get_clomuna(entry,t.slice[1]))
 
 def p_tipo_asigna(t):
     '''TIPO_AS :  IGUAL
@@ -669,6 +678,10 @@ def p_expresion_acceso_struct(t):
     t[0]=ExpresionAccesoStruct(t[1],t[3],t.lineno(1),get_clomuna(entry,t.slice[1]))
     asc.append('expresion_numerica - ID PUNTO ID')
 
+def p_expresion_acceso_struct_arr(t):
+    'expresion_numerica : ID CORIZQ  expresion_log_relacional CORDER PUNTO ID'
+    t[0]=ExpresionAccesoStructArr(t[1],t[3],t[6],t.lineno(1),get_clomuna(entry,t.slice[1]))
+    asc.append('expresion_numerica - ID PUNTO ID')
 def p_expresion_apuntador(t):
     'expresion_numerica : ANDBIT ID'
     t[0] = ExpresionPuntero(t[2],t.lineno(1),get_clomuna(entry,t.slice[1]))

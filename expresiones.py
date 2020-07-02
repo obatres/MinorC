@@ -128,6 +128,18 @@ class ExpresionAccesoStruct(ExpresionNumerica):
         self.linea = linea
         self.columna = columna
 
+class ExpresionAccesoStructArr(ExpresionNumerica):
+    '''
+        Esta clase representa el acceso al contenido de un struct array
+    '''
+
+    def __init__(self, idPadre,pos, idHijo ,  linea =0, columna=0) :
+        self.idPadre = idPadre
+        self.pos = pos
+        self.idHijo = idHijo
+        self.linea = linea
+        self.columna = columna
+        
 class ExpresionLlamada(ExpresionNumerica):
     '''
         Esta clase representa la llamada a una funcion-metodo

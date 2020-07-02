@@ -355,6 +355,17 @@ class DeclaracionStruct(Instruccion):
         self.linea = linea
         self.columna = columna   
 
+class DeclaracionStructArr(Instruccion):
+    '''
+        Esta clase representa la declaracion de un Struct array
+    '''
+    def __init__(self, TipoStruct, ide,indices,linea =0, columna=0) :
+        self.TipoStruct = TipoStruct
+        self.ide = ide
+        self.indices = indices
+        self.linea = linea
+        self.columna = columna   
+
 class AsignacionStruct(Instruccion):
     '''
         Esta clase representa la asignacion de valor 
@@ -362,6 +373,19 @@ class AsignacionStruct(Instruccion):
     '''
     def __init__(self, TipoStruct, ide,valor,linea =0, columna=0) :
         self.TipoStruct = TipoStruct
+        self.ide = ide
+        self.valor = valor
+        self.linea = linea
+        self.columna = columna  
+
+class AsignacionStructArray(Instruccion):
+    '''
+        Esta clase representa la asignacion de valor 
+        a un elemnto de un Struct
+    '''
+    def __init__(self, Struct,indice, ide,valor,linea =0, columna=0) :
+        self.Struct = Struct
+        self.indice = indice
         self.ide = ide
         self.valor = valor
         self.linea = linea

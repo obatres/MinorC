@@ -623,10 +623,10 @@ class Ejecucion_MinorC ():
             elif tipo == td.CADENA:
                 nuevo = TS.Simbolo(temp.id,tipo,"0",registro)
                 if ts.existeSimbolo(nuevo)==False:
-                    self.CodigoGenerado += '\t' + registro + '= \' \';'+'\n'
+                    self.CodigoGenerado += '\t' + registro + '= \'0 \';'+'\n'
                     ts.agregar(nuevo)
                 elif ts.existeSimbolo(nuevo)==True:
-                    self.CodigoGenerado += '\t' + registro + '= \' \';'+'\n'
+                    self.CodigoGenerado += '\t' + registro + '= \' 0\';'+'\n'
                     ts.actualizar(nuevo)
             else:
                 print('Error, tipo '+str(tipo)+' no aplicable en la definicion')
@@ -753,10 +753,10 @@ class Ejecucion_MinorC ():
             elif tipo == td.CADENA:
                 nuevo = TS.Simbolo(temp.id,tipo,"0",registro)
                 if ts.existeSimbolo(nuevo)==False:
-                    self.Global += '\t' + registro + '= \' \';'+'\n'
+                    self.Global += '\t' + registro + '= \' 0\';'+'\n'
                     ts.agregar(nuevo)
                 elif ts.existeSimbolo(nuevo)==True:
-                    self.Global += '\t' + registro + '= \' \';'+'\n'
+                    self.Global += '\t' + registro + '= \' 0\';'+'\n'
                     ts.actualizar(nuevo)
             else:
                 print('Error, tipo '+str(tipo)+' no aplicable en la definicion')
@@ -789,11 +789,19 @@ class Ejecucion_MinorC ():
                         for i in range(indice1):
                             for j in range(indice2):
                                 for x in range(indice3):
-                                    self.Global+= '\t'+registro+'['+str(i)+']'+'['+str(j)+']'+'['+str(j)+']=0;'+'\n'
+                                    self.Global+= '\t'+registro+'['+str(i)+']'+'['+str(j)+']'+'['+str(x)+']=0;'+'\n'
                 elif ts.existeSimbolo(nuevo)==True:
                     print("Error, esta variable ya se declaro previamente o no tiene un registro asociado")
             else:
-                print('Error, esta variable: '+temp.id+' debe contener un valor para ser inicializada')
+                registro = self.generarTemp()
+                nuevo = TS.Simbolo(temp.id,tipo,{},registro)
+                if ts.existeSimbolo(nuevo) == False:
+                    self.Global += '\t'+registro+ '='+"\' 0\'"+';'+'\n'
+                    ts.agregar(nuevo)
+                elif ts.existeSimbolo(nuevo)==True:
+                    self.Global += '\t'+registro+ '='+"\' 0\'"+';'+'\n'
+                    ts.actualizar(nuevo)
+                return
             return
         else:
             print(type(instr.id))
@@ -1082,6 +1090,8 @@ class Ejecucion_MinorC ():
             elif isinstance(sent, AsignacionStruct) : self.procesar_asignacion_struct(sent,ts)
             elif isinstance(sent, FuncionFor): self.procesar_for(sent,ts)
             elif isinstance(sent, ExpresionLlamada): self.procesar_llamada_funcion(sent,ts)
+            elif isinstance(sent, DeclaracionStructArr) : self.procesar_decla_struct_arr(sent, ts)
+            elif isinstance(sent, AsignacionStructArray): self.procesar_asignacion_struct_arr(sent,ts)
             else:
                 print(sent)
                 print('error, sentencia no posible de realizar')
@@ -1607,7 +1617,14 @@ class Ejecucion_MinorC ():
             temporal = self.generarTemp()
             self.CodigoGenerado += '\t'+temporal+'='+padre.reg+'[\''+str(hijo)+'\']'+';'+'\n'
             return temporal
-        
+        elif isinstance(expNum,ExpresionAccesoStructArr):
+            padre = ts.obtener(expNum.idPadre)
+            pos = self.resolver_expresion_aritmetica(expNum.pos,ts)
+            hijo = expNum.idHijo
+            expNum.tipo = padre.tipo
+            temporal = self.generarTemp()
+            self.CodigoGenerado += '\t'+temporal+'='+padre.reg+"["+str(pos)+"]"+'[\''+str(hijo)+'\']'+';'+'\n'
+            return temporal
         elif isinstance(expNum, ExpresionListaIndices):
             registro  = self.generarTemp()
 
@@ -1755,7 +1772,13 @@ class Ejecucion_MinorC ():
     def procesar_def_struct(self, instr, ts):
 
         try:
-            nuevo = TS.Simbolo(instr.ide,td.STRUCT,instr.elementos,'struct')
+            elementos =[]
+            for i in instr.elementos:
+                t=i.tipo
+                for e in i.ide:
+                    iden =e.id.id
+                    elementos.append([t,iden])
+            nuevo = TS.Simbolo(instr.ide,td.STRUCT,elementos,'struct')
             if ts.existeSimbolo(nuevo)==False:
                 ts.agregar(nuevo)
         except :
@@ -1765,7 +1788,6 @@ class Ejecucion_MinorC ():
     def procesar_decla_struct(self,instr,ts):
         try:
             struct = ts.obtener(instr.TipoStruct)
-
         except :
             print('error, el struct no esta definidio previamente')
 
@@ -1776,13 +1798,41 @@ class Ejecucion_MinorC ():
             if ts.existeSimbolo(nuevo)==False:
                 ts.agregar(nuevo)
                 self.Global += '\t'+registro+'=array();'+'\n'
-                for e in struct.valor:
-                    if e.tipo == td.INT:
-                        self.Global +='\t'+registro+'[\''+e.ide+'\']=0;'+'\n'
-                    elif e.tipo == td.FLOAT:
-                        self.Global +='\t'+registro+'[\''+e.ide+'\']=0.0;'+'\n'
-                    elif e.tipo == td.CADENA:
-                        self.Global +='\t'+registro+'[\''+e.ide+'\']=\"0\";'+'\n'
+
+                for i in struct.valor:
+                    if i[0] == td.INT:
+                        self.Global +='\t'+registro+'[\''+i[1]+'\']=0;'+'\n'
+                    elif i[0]== td.FLOAT:
+                        self.Global +='\t'+registro+'[\''+i[1]+'\']=0.0;'+'\n'
+                    elif i[0] == td.CADENA:
+                        self.Global +='\t'+registro+'[\''+i[1]+'\']=\"0\";'+'\n'
+                                 
+        except:
+            print('error, nose puede traducir la declaracion de struct')
+    
+    def procesar_decla_struct_arr(self,instr, ts):
+        try:
+            struct = ts.obtener(instr.TipoStruct)
+        except :
+            print('error, el struct no esta definidio previamente')
+        try:    
+            registro = self.generarTemp()
+            nuevo = TS.Simbolo(instr.ide,td.STRUCT,{},registro)
+            if ts.existeSimbolo(nuevo)==False:
+                ts.agregar(nuevo)
+                self.Global += '\t'+registro+'=array();'+'\n'
+                for ind in instr.indices:
+                    indice = self.resolver_expresion_aritmetica(ind,ts)
+                
+                for i in range(indice):
+                    for e in struct.valor:
+                        if e[0]==td.INT:
+                            self.Global +='\t'+registro+"["+str(i)+"][\'"+e[1]+"\']=0;"+"\n"
+                        elif e[0]==td.FLOAT:
+                            self.Global +='\t'+registro+"["+str(i)+"][\'"+e[1]+"\']=0.0;"+"\n"
+                        elif e[0]==td.CADENA:
+                            self.Global +='\t'+registro+"["+str(i)+"][\'"+e[1]+"\']=\'0\';"+"\n"     
+        
         except:
             print('error, nose puede traducir la declaracion de struct')
 
@@ -1790,6 +1840,12 @@ class Ejecucion_MinorC ():
         struct = ts.obtener(instr.TipoStruct)
         valor =self.resolver_expresion_aritmetica(instr.valor,ts)
         self.Global += '\t'+struct.reg+'[\''+instr.ide+'\']='+str(valor)+";"+"\n"
+
+    def procesar_asignacion_struct_arr(self,instr,ts):
+        struct = ts.obtener(instr.Struct)
+        valor =self.resolver_expresion_aritmetica(instr.valor,ts)
+        ind = self.resolver_expresion_aritmetica(instr.indice,ts)
+        self.Global += '\t'+struct.reg+"["+str(ind)+"]"+'[\''+instr.ide+'\']='+str(valor)+";"+"\n"
 
     def ejecutar_expresiones_label(self,listainstrucciones,ts,listaglobal):
             for instr in listainstrucciones :
@@ -1830,6 +1886,8 @@ class Ejecucion_MinorC ():
             elif isinstance(instr, DefStruct) : self.procesar_def_struct(instr,ts)
             elif isinstance(instr, DeclaracionStruct) : self.procesar_decla_struct(instr, ts)
             elif isinstance(instr, AsignacionStruct) : self.procesar_asignacion_struct(instr,ts)
+            elif isinstance(instr, DeclaracionStructArr) : self.procesar_decla_struct_arr(instr, ts)
+            elif isinstance(instr, AsignacionStructArray): self.procesar_asignacion_struct_arr(instr,ts)
             #elif isinstance(instr,AsignaPunteroPila): self.procesar_asignacion_punteropila(instr,ts)
             #elif isinstance(instr,AsignaValorPila): self.procesar_asignacion_pila(instr,ts)
             #elif isinstance(instr, AsignacionExtra): self.procesar_asignacion_extra(instr,ts)
@@ -1899,6 +1957,6 @@ a = Ejecucion_MinorC()
 
 f = open("./entrada.txt", "r")
 input = f.read()
-a.ejecutar_asc(input)
-a.GenerarAST()
-print(a.salidaTotal)
+#a.ejecutar_asc(input)
+#a.GenerarAST()
+#print(a.salidaTotal)
