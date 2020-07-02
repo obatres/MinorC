@@ -8,6 +8,7 @@ import copy
 import os
 import sys
 import uuid
+import re
 
 FONT_SIZES = [7, 8, 9, 10, 11, 12, 13, 14, 18, 24, 36, 48, 64, 72, 96, 144, 288]
 IMAGE_EXTENSIONS = ['.jpg','.png','.bmp']
@@ -599,7 +600,8 @@ class MainWindow(QMainWindow):
         s = f.RecibirSalida()
         salidaconsola = s.replace("\\n","\n")
         salidaconsola1 = salidaconsola.replace("\\t","\t")
-        self.consola.setPlainText(salidaconsola1)
+        salida3= re.sub("%d|%s|%i|%c","",salidaconsola1)
+        self.consola.setPlainText(salida3)
     def EjecutarAsc(self):
         import principal as f
         self.consola.clear()

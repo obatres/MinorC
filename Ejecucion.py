@@ -423,6 +423,7 @@ class Ejecucion_MinorC ():
 
         cont = self.dibujar_expresion(instr.valor,nodo,cont)
         return cont
+    
     def dibujar_print(self,instr,root,cont):
         cont=cont+1
         nodo = 'nodo'+ str(cont)
@@ -572,9 +573,8 @@ class Ejecucion_MinorC ():
                 patronParametro = re.compile('\$[a]([0-9]+)')
                 patronRetorno = re.compile('\$[r][a]')
                 if not (patronTemporal.match(res) or patronParametro.match(res) or patronRetorno.match(res) ):
-                    sal =res.split("%",1)
-                    sal =sal[0][1:-1]
-                    self.CodigoGenerado += '\t'+'print(\''+str(sal)+'\');'+"\n" 
+
+                    self.CodigoGenerado += '\t'+'print('+str(res)+');'+"\n" 
                 else:
                     self.CodigoGenerado += '\t'+'print('+str(res)+');'+"\n"    
             #print(instr.exp)         
@@ -1620,23 +1620,29 @@ class Ejecucion_MinorC ():
             return temporal
         elif isinstance(expNum, ExpresionListaIndices):
             array = ts.obtener(expNum.id)
-            #calculo de la primera posicion
-            t1  = self.generarTemp()
-            pos1= self.resolver_expresion_aritmetica(expNum.listaindices[0],ts)
-            self.CodigoGenerado+= '\t'+t1+"="+str(pos1)+";"+"\n"
-            
-            #calculo de la segunda posicion
-            t2 = self.generarTemp()
-            n2 = array.valor[1]
-            self.CodigoGenerado+= '\t'+t2+"="+t1+"*"+str(n2)+";"+"\n"
-            t3 = self.generarTemp()
-            pos2 =self.resolver_expresion_aritmetica(expNum.listaindices[1],ts)
-            self.CodigoGenerado+= '\t'+t3+"="+t2+"+"+str(pos2)+";"+"\n"
-            t4 = self.generarTemp()
-            self.CodigoGenerado+= '\t'+t4+"="+array.reg+"["+t3+"];"+"\n"
-            expNum.tipo = array.tipo
-            return t4
-        
+            if len(expNum.listaindices)>=2:
+                #calculo de la primera posicion
+                t1  = self.generarTemp()
+                pos1= self.resolver_expresion_aritmetica(expNum.listaindices[0],ts)
+                self.CodigoGenerado+= '\t'+t1+"="+str(pos1)+";"+"\n"
+                
+                #calculo de la segunda posicion
+                t2 = self.generarTemp()
+                n2 = array.valor[1]
+                self.CodigoGenerado+= '\t'+t2+"="+t1+"*"+str(n2)+";"+"\n"
+                t3 = self.generarTemp()
+                pos2 =self.resolver_expresion_aritmetica(expNum.listaindices[1],ts)
+                self.CodigoGenerado+= '\t'+t3+"="+t2+"+"+str(pos2)+";"+"\n"
+                t4 = self.generarTemp()
+                self.CodigoGenerado+= '\t'+t4+"="+array.reg+"["+t3+"];"+"\n"
+                expNum.tipo = array.tipo
+                return t4
+            elif len(expNum.listaindices)==1:
+                t1  = self.generarTemp()
+                pos1= self.resolver_expresion_aritmetica(expNum.listaindices[0],ts)
+                self.CodigoGenerado+= '\t'+t1+"="+array.reg+"["+str(pos1)+"];"+"\n"
+                expNum.tipo = array.tipo
+                return t1
         elif isinstance(expNum, ExpresionScan):
 
             read = "read()"

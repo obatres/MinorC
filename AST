@@ -1,59 +1,51 @@
 digraph AST {
 	nodo1 [label=MINORC]
-	nodo2 [label="Def Struct"]
+	nodo2 [label=Definicion]
 	nodo1 -> nodo2
-	nodo3 [label=punto]
+	nodo3 [label=INT]
 	nodo2 -> nodo3
-	nodo4 [label=elementos]
+	nodo4 [label=ConValor]
 	nodo2 -> nodo4
-	nodo5 [label=INT]
+	nodo5 [label=arreglo]
 	nodo4 -> nodo5
-	nodo6 [label=alto]
+	nodo6 [label=Exp]
 	nodo4 -> nodo6
-	nodo7 [label=INT]
-	nodo4 -> nodo7
-	nodo8 [label=ancho]
+	nodo7 [label=658]
+	nodo6 -> nodo7
+	nodo8 [label=Exp]
 	nodo4 -> nodo8
-	nodo9 [label="Def Struct"]
-	nodo1 -> nodo9
-	nodo10 [label=movies_t]
-	nodo9 -> nodo10
-	nodo11 [label=elementos]
-	nodo9 -> nodo11
-	nodo12 [label=CADENA]
-	nodo11 -> nodo12
-	nodo13 [label=title]
-	nodo11 -> nodo13
-	nodo14 [label=INT]
-	nodo11 -> nodo14
-	nodo15 [label=year]
-	nodo11 -> nodo15
-	nodo16 [label="Decla Struct"]
-	nodo1 -> nodo16
-	nodo17 [label=punto]
+	nodo9 [label=245]
+	nodo8 -> nodo9
+	nodo10 [label=Exp]
+	nodo4 -> nodo10
+	nodo11 [label=654]
+	nodo10 -> nodo11
+	nodo12 [label=Exp]
+	nodo4 -> nodo12
+	nodo13 [label=956]
+	nodo12 -> nodo13
+	nodo14 [label=Exp]
+	nodo4 -> nodo14
+	nodo15 [label=5]
+	nodo14 -> nodo15
+	nodo16 [label=Exp]
+	nodo4 -> nodo16
+	nodo17 [label=754]
 	nodo16 -> nodo17
-	nodo18 [label=mipunto]
-	nodo16 -> nodo18
-	nodo19 [label="Decla Struct"]
-	nodo1 -> nodo19
-	nodo20 [label=punto]
-	nodo19 -> nodo20
-	nodo21 [label=otropunto]
-	nodo19 -> nodo21
-	nodo22 [label="Decla Struct"]
-	nodo1 -> nodo22
-	nodo23 [label=movies_t]
+	nodo18 [label=Exp]
+	nodo4 -> nodo18
+	nodo19 [label=100]
+	nodo18 -> nodo19
+	nodo20 [label=Exp]
+	nodo4 -> nodo20
+	nodo21 [label=89]
+	nodo20 -> nodo21
+	nodo22 [label=Exp]
+	nodo4 -> nodo22
+	nodo23 [label=98]
 	nodo22 -> nodo23
-	nodo24 [label=movie]
-	nodo22 -> nodo24
-	nodo25 [label="Asig Struct"]
-	nodo1 -> nodo25
-	nodo26 [label=mipunto]
-	nodo25 -> nodo26
-	nodo27 [label=alto]
-	nodo25 -> nodo27
-	nodo28 [label=Exp]
-	nodo25 -> nodo28
-	nodo29 [label="otropunto.alto"]
-	nodo28 -> nodo29
+	nodo24 [label=Exp]
+	nodo4 -> nodo24
+	nodo25 [label=120]
+	nodo24 -> nodo25
 }

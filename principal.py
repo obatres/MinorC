@@ -28,7 +28,7 @@ def procesar_imprimir(instr, ts) :
             if salida=="\\n":
                 resultado+='\n'
             else:
-                resultado += str(salida)
+                resultado += str(salida)+" "
             return  str(salida) + '\n'
 
     except:
