@@ -209,7 +209,7 @@ def get_clomuna(input, token):
      #     
 def t_error(t):
     print("Error Lexico en el token: '%s'" % t.value[0])
-    err = "Error Lexico en el token: '%s'" % t.value[0]
+    err = "Error Lexico en el token: '%s'" % t.value[0]+str(t.lexer.lineno)
     lista_errores.append(err)
     t.lexer.skip(1)
 
@@ -225,8 +225,9 @@ lexer = lex.lex()
 
 # Asociación de operadores y precedencia
 precedence = (
-    ('right','NOTLOG'),
-    ('left','ANDLOG','ORLOG','XORLOG'),
+    
+    ('left','ORLOG','XORLOG'),
+    ('left','ANDLOG'),
     ('left','IGUALQUE','NIGUALQUE'),
     ('left','MENQUE','MAYQUE'),
     ('left','MAYORIG','MENORIG'),
@@ -237,7 +238,8 @@ precedence = (
     ('left','MAS','MENOS'),
     ('left','POR','DIVIDIDO'),
     ('left','RES','ABS'),
-    ('right','UMENOS'),
+    ('right','UMENOS','NOTLOG','NOTBIT'),
+    ('left','PARIZQ','PARDER'),
     )
 
 # Definición de la gramática
@@ -272,6 +274,7 @@ def p_instruccion(t) :
                         | FUNCMAIN
                         | INCREMENTO PTCOMA
                         | STRUCTDECLA
+                        | ASIGNA_STRUCT
                         '''
     t[0] = t[1]
     if isinstance(t[1],Asignacion): asc.append('instruccion - asignacion_instr')
@@ -296,9 +299,9 @@ def p_Goto(t):
     asc.append('DEFINEGOTO - GOTO ID PTCOMA')
 
 def p_instruccion_imprimir(t) :
-    'imprimir_instr     : PRINT PARIZQ expresion_log_relacional PARDER PTCOMA'
+    'imprimir_instr     : PRINT PARIZQ LISTA_PRINT PARDER PTCOMA'
     t[0] =Imprimir(t[3],t.lineno(1),get_clomuna(entry,t.slice[1]))
-    asc.append('imprimir_instr  - PRINT PARIZQ expresion_log_relacional PARDER PTCOMA')
+    asc.append('imprimir_instr  - PRINT PARIZQ LISTA_PRINT PARDER PTCOMA')
 
 def p_lista_expresiones_print(t):
     'LISTA_PRINT : LISTA_PRINT COMA expresion_log_relacional'
@@ -367,12 +370,17 @@ def p_id_struct_def(t):
     t[0]=[t[1]]
 
 def p_elemento_struct(t):
-    'ELESTRUCT : TIPO_VAR ID PTCOMA'
-    t[0]=ElementoStruct(t[1],t[2],t.lineno(1),get_clomuna(entry,t.slice[2]))
+    'ELESTRUCT : TIPO_VAR LISTAID PTCOMA'
+    t[0]=ElementoStruct(t[1],t[2],t.lineno(1),get_clomuna(entry,t.slice[3]))
+
 
 def p_struct_declaracion(t):
     'STRUCTDECLA : STRUCT ID ID PTCOMA'
     t[0]= DeclaracionStruct(t[2],t[3],t.lineno(1),get_clomuna(entry,t.slice[2]))
+
+def p_struct_declaracion_array(t):
+    'STRUCTDECLA : STRUCT ID ID LIND PTCOMA'
+    t[0]=DeclaracionStructArr(t[2],t[3],t[4],t.lineno(1),get_clomuna(entry,t.slice[1]))
 
 def p_tipo_variable(t):
     '''TIPO_VAR :  INT
@@ -387,13 +395,17 @@ def p_tipo_variable(t):
     elif t[1] == 'void' : t[0]=TS.TIPO_DATO.VOID
     
 def p_asignacion_instr(t) :
-    'asignacion_instr   : ID TIPO_AS expresion_log_relacional PTCOMA'
-    t[0] =Asignacion(t[1], t[2],t[3],t.lineno(1),get_clomuna(entry,t.slice[1]))
+    'asignacion_instr   : IDT TIPO_AS expresion_log_relacional PTCOMA'
+    t[0] =Asignacion(t[1], t[2],t[3],t.lineno(1),get_clomuna(entry,t.slice[4]))
     asc.append('asignacion_instr   : TEMPORAL IGUAL expresion_log_relacional PTCOMA')
 
 def p_asignacion_struct(t):
     'ASIGNA_STRUCT : ID PUNTO ID IGUAL expresion_log_relacional PTCOMA'
     t[0]=AsignacionStruct(t[1],t[3],t[5],t.lineno(1),get_clomuna(entry,t.slice[1]))
+
+def p_asignacion_struct_array(t):
+    'ASIGNA_STRUCT : ID CORIZQ expresion_log_relacional CORDER PUNTO ID IGUAL expresion_log_relacional PTCOMA'
+    t[0]=AsignacionStructArray(t[1],t[3],t[6],t[8],t.lineno(1),get_clomuna(entry,t.slice[1]))
 
 def p_tipo_asigna(t):
     '''TIPO_AS :  IGUAL
@@ -480,7 +492,7 @@ def p_param_vacio(t):
     'PARAM : '
     t[0]= 0
 def p_for_fun(t):
-    'FORF : FOR PARIZQ definicion_instr expresion_log_relacional PTCOMA INCREMENTO PARDER BLOQUE '
+    'FORF : FOR PARIZQ SENTENCIA expresion_log_relacional PTCOMA INCREMENTO PARDER BLOQUE '
     t[0]=FuncionFor(t[3],t[4],t[6],t[8],t.lineno(1),get_clomuna(entry,t.slice[1]))
     
 def p_do_while_fun(t):
@@ -538,7 +550,7 @@ def p_instrucciones_if_else(t):
     t[0] = IfElse(t[1],t[2],t.lineno(1),0)
 
 def p_if_instr(t) :
-    'if_instr           : IF expresion_numerica BLOQUE'
+    'if_instr           : IF expresion_log_relacional BLOQUE'
     t[0] = IfSimple(t[2],t[3],t.lineno(1),get_clomuna(entry,t.slice[1]))
     asc.append('if_instr  - IF expresion_numerica DEFINEGOTO')
 
@@ -666,6 +678,10 @@ def p_expresion_acceso_struct(t):
     t[0]=ExpresionAccesoStruct(t[1],t[3],t.lineno(1),get_clomuna(entry,t.slice[1]))
     asc.append('expresion_numerica - ID PUNTO ID')
 
+def p_expresion_acceso_struct_arr(t):
+    'expresion_numerica : ID CORIZQ  expresion_log_relacional CORDER PUNTO ID'
+    t[0]=ExpresionAccesoStructArr(t[1],t[3],t[6],t.lineno(1),get_clomuna(entry,t.slice[1]))
+    asc.append('expresion_numerica - ID PUNTO ID')
 def p_expresion_apuntador(t):
     'expresion_numerica : ANDBIT ID'
     t[0] = ExpresionPuntero(t[2],t.lineno(1),get_clomuna(entry,t.slice[1]))
@@ -673,7 +689,7 @@ def p_expresion_apuntador(t):
 
 def p_expresion_conversion(t):
     'expresion_numerica : TIPOCONVERSION expresion_log_relacional'
-    t[0] = ExpresionConversion(t[1],t[2],t.lineno(1),get_clomuna(entry,t.slice[2]))
+    t[0] = ExpresionConversion(t[1],t[2],t.lineno(1))
     asc.append('expresion_numerica - TIPOCONVERSION expresion_numerica ')
 
 def p_expresion_acceso_arreglo(t):
@@ -687,6 +703,10 @@ def p_expresion_Valores_arreglo_lista(t):
     'LISTA_VALORES_ARREGLO : LISTA_VALORES_ARREGLO COMA expresion_log_relacional'
     t[1].append(t[3])
     t[0]=t[1]
+
+def p_expresion_Scanf(t):
+    'expresion_numerica : SCAN PARIZQ PARDER'
+    t[0] = ExpresionScan(t.lineno(1),get_clomuna(entry,t.slice[1]))
 
 def p_expresion_Valor_arreglo(t):
     'LISTA_VALORES_ARREGLO : expresion_log_relacional'
@@ -760,7 +780,7 @@ def p_error(t):
                      # Get the next token
          if not tok or tok.type == 'PTCOMA': break
     pars.errok()
-    err = "Error en el token \'" + str(t.value) +"\' en la linea: "+ str(t.lineno) + ' de tipo: SINTACTICO'
+    err = "Error en el token \'" + str(t.value) +"\' en la linea: "+ str(t.lexer.lineno) + ' de tipo: SINTACTICO'
     lista_errores.append(err)
     print("Error sintactico en el token ",t.value,t.lineno)
      # Return SEMI to the parser as the next lookahead token

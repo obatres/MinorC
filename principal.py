@@ -24,10 +24,11 @@ def procesar_imprimir(instr, ts) :
             salida = resolver_expresion_aritmetica(instr.exp,ts)
             print('>', salida)
             global resultado
+            
             if salida=="\\n":
                 resultado+='\n'
             else:
-                resultado += str(salida)
+                resultado += str(salida)+" "
             return  str(salida) + '\n'
 
     except:

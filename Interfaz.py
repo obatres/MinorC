@@ -8,6 +8,7 @@ import copy
 import os
 import sys
 import uuid
+import re
 
 FONT_SIZES = [7, 8, 9, 10, 11, 12, 13, 14, 18, 24, 36, 48, 64, 72, 96, 144, 288]
 IMAGE_EXTENSIONS = ['.jpg','.png','.bmp']
@@ -366,11 +367,11 @@ class MainWindow(QMainWindow):
 
         #self.toolbar.addAction(EjecutarPLY)
 
-        EjecutarDesc = QAction(QIcon(os.path.join('images', 'Run.png')), "AUGUS", self)  
-        EjecutarDesc.setStatusTip("Ejecutar AUGUS")
-        EjecutarDesc.triggered.connect(self.EjecutarAsc)  
-        Ejecutar_menu.addAction(EjecutarDesc)
-        Ejec_toolbar.addAction(EjecutarDesc)
+        #EjecutarDesc = QAction(QIcon(os.path.join('images', 'Run.png')), "AUGUS", self)  
+        #EjecutarDesc.setStatusTip("Ejecutar AUGUS")
+        #EjecutarDesc.triggered.connect(self.EjecutarAsc)  
+        #Ejecutar_menu.addAction(EjecutarDesc)
+        #Ejec_toolbar.addAction(EjecutarDesc)
 
         EjecutarDeb = QAction(QIcon(os.path.join('images', 'debug.png')), "Debug", self)  
         EjecutarDeb.setStatusTip("Ejecutar Debug")
@@ -569,7 +570,7 @@ class MainWindow(QMainWindow):
             self.editor.print_(dlg.printer())
 
     def update_title(self):
-        self.setWindowTitle("AUGUS IDE")
+        self.setWindowTitle("MINOR C IDE")
 
     def edit_toggle_wrap(self):
         self.editor.setLineWrapMode( 1 if self.editor.lineWrapMode() == 0 else 0 )
@@ -592,12 +593,15 @@ class MainWindow(QMainWindow):
         mc = EC()
         mc.ejecutar_asc(self.editor.toPlainText())
         s= mc.RecibirSalida
-        self.editorAUGUS.setPlainText(mc.CodigoGenerado)
+        self.editorAUGUS.setPlainText(mc.salidaTotal)
         
         self.consola.clear()
         f.ejecutar_asc(self.editorAUGUS.toPlainText())
         s = f.RecibirSalida()
-        self.consola.setPlainText(s)
+        salidaconsola = s.replace("\\n","\n")
+        salidaconsola1 = salidaconsola.replace("\\t","\t")
+        salida3= re.sub("%d|%s|%i|%c","",salidaconsola1)
+        self.consola.setPlainText(salida3)
     def EjecutarAsc(self):
         import principal as f
         self.consola.clear()
