@@ -32,7 +32,7 @@ class Ejecucion_MinorC ():
 #--------------------------------------METODOS/FUNCIONES DE EJECUCION EN INTERFAZ
     def ejecutar_asc(self, input):
         import gramaticaM as g
-        #self.gram = g.verGramatica()
+        self.gram = g.verGramatica()
         self.instrucciones = g.parse(input) 
         #print(self.instrucciones)
 
@@ -72,13 +72,13 @@ class Ejecucion_MinorC ():
             #s.OkMessage()
             #s.cerrar()
 #----------------------------------------------------------------------REPORTES
-    def ReporteGramatical(self):
-        generado = '<<table border=\'0\' cellborder=\'1\' color=\'blue\' cellspacing='+'\'0\''+'><tr><td colspan=\'2\'>REPORTE GRAMATICAL</td></tr><tr><td>No.</td><td>Producciones</td></tr>'
+    def ReporteGramatical(self): 
+        generado = '<<table border=\'0\' bgcolor=\' #ebf5fb \' cellborder=\'1\' color=\'#7fb3d5\' cellspacing='+'\'0\''+'><tr><td colspan=\'3\'>REPORTE GRAMATICAL</td></tr><tr><td>No.</td><td>Produccion</td><td>Produce</td></tr>'
         cont = 0
 
         aux = list(reversed(self.gram))
         for i in aux:
-            generado += '<tr><td>'+str(cont)+'</td><td align = \'left\'>'+str(i)+'</td></tr>'
+            generado += '<tr><td>'+str(cont)+'</td><td align = \'left\'>'+str(i[0])+'</td><td align = \'left\'>'+str(i[1])+'</td></tr>'
             cont +=1
         generado +=' </table>>'
 
@@ -2222,6 +2222,7 @@ a = Ejecucion_MinorC()
 
 f = open("./entrada.txt", "r")
 input = f.read()
-#a.ejecutar_asc(input)
+a.ejecutar_asc(input)
 #a.GenerarAST()
-#print(a.salidaTotal)
+a.ReporteGramatical()
+print(a.salidaTotal)

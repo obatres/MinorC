@@ -1,7 +1,8 @@
 
 
-entrada = 10-15 >= 0 and 44.44 == 44.44
+entrada = []
+
+entrada.append(["aS","A213"])
 
 
-
-print(entrada)
+print(entrada[0][1])
