@@ -227,16 +227,94 @@ class Ejecucion_MinorC ():
         self.dot.node(nodo3,"Sentencias")
         self.dot.edge(nodo, nodo3)
 
-        #BLOQUE DE SENTENCIAS
+        cont = self.dibujar_Sentencias(instr.sentencias,nodo3,cont)
         return cont 
     
-
     def dibujar_Sentencias(self,instr, root,cont):
 
         for sent in instr:
             if isinstance(sent,Imprimir): cont = self.dibujar_print(sent,root,cont)
+            elif isinstance(sent, Definicion) : cont = self.dibujar_definicion(sent, root,cont)
+            elif isinstance(sent, Asignacion) : cont = self.dibujar_asignacion(sent, root,cont)
+            elif isinstance(sent, inc) : cont = self.dibujar_incremento(sent, root,cont)
+            elif isinstance(sent, DeclaracionStruct) : cont = self.dibujar_decla_struct(sent, root,cont)
+            elif isinstance(sent, AsignacionStruct) : cont = self.dibujar_asignacion_struct(sent, root,cont)
+            elif isinstance(sent, DeclaracionStructArr) : cont =self.dibujar_decla_struct_arr(sent, root,cont)
+            elif isinstance(sent, AsignacionStructArray): cont= self.dibujar_asignacion_struct_arr(sent, root,cont)
+            elif isinstance(sent, Return): cont = self.dibujar_return(sent, root,cont)
+            elif isinstance(sent, IfSimple): cont = self.dibujar_ifSimple(sent, root,cont)
+            elif isinstance(sent, IfElse): cont = self.dibujar_ifElse(sent,root,cont)
+            elif isinstance(sent, While): cont = self.dibujar_While(sent,root,cont)
+            elif isinstance(sent, Goto): cont = self.dibujar_Goto(sent,root,cont)
+            elif isinstance(sent, Label): cont = self.dibujar_Label(sent,root,cont)
+            elif isinstance(sent, FuncionFor): cont = self.dibujar_for(sent,root,cont)
+            elif isinstance(sent, ExpresionLlamada): cont = self.dibujar_llamada(sent,root,cont)
+
         return cont
 
+    def dibujar_llamada(self, instr, root,cont):
+        cont=cont+1
+        nodo = 'nodo'+ str(cont)
+        self.dot.node(nodo,'Llamada Func')
+        self.dot.edge(root, nodo)
+
+        cont=cont+1
+        nodo1 = 'nodo'+ str(cont)
+        self.dot.node(nodo1,instr.id)
+        self.dot.edge(nodo, nodo1)
+
+        cont=cont+1
+        nodo2 = 'nodo'+ str(cont)
+        self.dot.node(nodo2,'Parametros llamada')
+        self.dot.edge(nodo, nodo2)
+
+        for i in instr.parametros:
+            if i!=0:
+                cont = self.dibujar_expresion(i,nodo2,cont)
+
+        return cont
+    
+    def dibujar_for(self,instr,root,cont):
+        cont=cont+1
+        nodo = 'nodo'+ str(cont)
+        self.dot.node(nodo,'For')
+        self.dot.edge(root, nodo)
+
+        cont = self.dibujar_Sentencias([instr.definicion],nodo,cont)
+
+        cont = self.dibujar_expresion(instr.condicion,nodo,cont)
+
+        cont = self.dibujar_Sentencias([instr.incremento],nodo,cont)
+
+        cont=cont+1
+        nodo1 = 'nodo'+ str(cont)
+        self.dot.node(nodo1,'Sentencias')
+        self.dot.edge(nodo, nodo1)
+
+        cont = self.dibujar_Sentencias(instr.sentencias,nodo1,cont)
+
+        return cont
+
+    def dibujar_While(self,instr,root,cont):
+        cont=cont+1
+        nodo = 'nodo'+ str(cont)
+        self.dot.node(nodo,'While')
+        self.dot.edge(root, nodo)
+
+        cont=cont+1
+        nodo1 = 'nodo'+ str(cont)
+        self.dot.node(nodo1,'Condicion')
+        self.dot.edge(nodo, nodo1)
+        cont = self.dibujar_expresion(instr.condicion,nodo1,cont)
+
+        cont=cont+1
+        nodo1 = 'nodo'+ str(cont)
+        self.dot.node(nodo1,'Instrucciones')
+        self.dot.edge(nodo, nodo1)
+        cont = self.dibujar_Sentencias(instr.instrucciones,nodo1,cont)
+
+        return cont
+    
     def dibujar_AsignaRegistro(self,instr,root,cont):
         cont=cont+1
         nodo = 'nodo'+ str(cont)
@@ -308,18 +386,43 @@ class Ejecucion_MinorC ():
         self.dot.edge(nodo, nodo1)
         return cont
 
-    def dibujar_if(self,instr,root,cont):
+    def dibujar_ifSimple(self,instr,root,cont):
         cont=cont+1
         nodo = 'nodo'+ str(cont)
         self.dot.node(nodo,'If')
         self.dot.edge(root, nodo)
 
-        cont = self.dibujar_expresion(instr.exp,nodo,cont)
+        cont=cont+1
+        nodo1 = 'nodo'+ str(cont)
+        self.dot.node(nodo1,'Condicion')
+        self.dot.edge(nodo, nodo1)
+        cont = self.dibujar_expresion(instr.cond,nodo1,cont)
 
-        cont= self.dibujar_Goto(instr.goto,nodo,cont)
+        cont=cont+1
+        nodo1 = 'nodo'+ str(cont)
+        self.dot.node(nodo1,'Sentencias')
+        self.dot.edge(nodo, nodo1)
+        cont = self.dibujar_Sentencias(instr.bloqueSentenciasIf,nodo1,cont)
 
         return cont
 
+    def dibujar_ifElse(self, instr, root, cont):
+        cont=cont+1
+        nodo = 'nodo'+ str(cont)
+        self.dot.node(nodo,'If')
+        self.dot.edge(root, nodo)
+
+        cont = self.dibujar_ifSimple(instr.ifinst,nodo,cont)
+
+        cont=cont+1
+        nodo1 = 'nodo'+ str(cont)
+        self.dot.node(nodo1,'Else')
+        self.dot.edge(nodo, nodo1)
+
+        cont = self.dibujar_Sentencias(instr.elseinst,nodo1,cont)
+
+        return cont
+    
     def dibujar_asignacion(self,instr,root,cont):
         cont=cont+1
         nodo = 'nodo'+ str(cont)
@@ -522,7 +625,7 @@ class Ejecucion_MinorC ():
         cont=cont+1
         nodo1 = 'nodo'+ str(cont)
         self.dot.node(nodo1,'expresiones print')
-        self.dot.edge(root, nodo1)
+        self.dot.edge(nodo, nodo1)
         for i in instr.exp:
             cont = self.dibujar_expresion(i,nodo1,cont)
 
@@ -603,7 +706,7 @@ class Ejecucion_MinorC ():
             cont = self.dibujar_expresion(instr.exp2,nodo1,cont)  
         elif isinstance(instr,ExpresionLogicaNot):
             self.dot.node(nodo1,'!')
-            cont = dibujar_expresion(instr.exp,nodo1,cont)
+            cont = self.dibujar_expresion(instr.exp,nodo1,cont)
         elif isinstance(instr,Expresion_param):
             self.dot.node(nodo1,instr.id)
         elif isinstance(instr,AccesoValorArray):
@@ -621,12 +724,62 @@ class Ejecucion_MinorC ():
             self.dot.node(nodo1,instr.id)
         elif isinstance(instr,ExpresionAccesoStruct):
             self.dot.node(nodo1,instr.idPadre+"."+instr.idHijo)
+        elif isinstance(instr, ExpresionConversion):
+            self.dot.node(nodo1,'conversion')
+            cont = self.dibujar_tipo_conver(instr.tipo,nodo1,cont)
+            cont = self.dibujar_expresion(instr.exp,nodo1,cont)
+        elif isinstance(instr, ExpresionListaIndices):
+            self.dot.node(nodo1,instr.id)
+            cont= self.dibujar_Listaindices(instr.listaindices,nodo1,cont)
+        elif isinstance(instr, ExpresionAccesoStructArr):
+            self.dot.node(nodo1,'AccesoAtructArr')
+            cont = self.dibujar_AccesoStructArr(instr,nodo1,cont)
+        elif isinstance(instr, ExpresionScan):
+            self.dot.node(nodo1,"Scanf( )") 
         else:
             print(instr)
         self.dot.edge(nodo,nodo1)
 
         return cont
 
+    def dibujar_AccesoStructArr(self,instr,root,cont):
+        cont=cont+1
+        nodo = 'nodo'+ str(cont)
+        self.dot.node(nodo,instr.idPadre)
+        self.dot.edge(root, nodo)
+
+        cont=cont+1
+        nodo = 'nodo'+ str(cont)
+        self.dot.node(nodo,instr.pos.id)
+        self.dot.edge(root, nodo)
+
+        cont=cont+1
+        nodo = 'nodo'+ str(cont)
+        self.dot.node(nodo,instr.idHijo)
+        self.dot.edge(root, nodo)
+
+        return cont
+    
+    def dibujar_Listaindices(self, instr,root,cont):
+        for i in instr:
+            cont=cont+1
+            nodo = 'nodo'+ str(cont)
+            self.dot.node(nodo,str(i.id))
+            self.dot.edge(root, nodo)  
+        return cont
+
+    def dibujar_tipo_conver(self, instr, root, cont):
+        cont=cont+1
+        nodo = 'nodo'+ str(cont)
+        self.dot.node(nodo,'tipo conver')
+        self.dot.edge(root, nodo)
+
+        cont=cont+1
+        nodo1 = 'nodo'+ str(cont)
+        self.dot.node(nodo1,instr)
+        self.dot.edge(nodo, nodo1)
+        return cont
+    
     def dibujar_return(self,instr,root,cont):
         cont=cont+1
         nodo = 'nodo'+ str(cont)
@@ -667,8 +820,7 @@ class Ejecucion_MinorC ():
                 patronTemporal = re.compile('\$(t[0-9]+)')
                 patronParametro = re.compile('\$[a]([0-9]+)')
                 patronRetorno = re.compile('\$[r][a]')
-                if not (patronTemporal.match(res) or patronParametro.match(res) or patronRetorno.match(res) ):
-
+                if not (patronTemporal.match(str(res)) or patronParametro.match(str(res)) or patronRetorno.match(str(res)) ):
                     self.CodigoGenerado += '\t'+'print('+str(res)+');'+"\n" 
                 else:
                     self.CodigoGenerado += '\t'+'print('+str(res)+');'+"\n"    
@@ -1284,7 +1436,6 @@ class Ejecucion_MinorC ():
             if (expNum.exp1.tipo==td.INT):
 
                 if(expNum.exp2.tipo==td.INT):
-
 
                     if expNum.operador == OPERACION_ARITMETICA.MAS : 
                         expNum.tipo = TS.TIPO_DATO.INT

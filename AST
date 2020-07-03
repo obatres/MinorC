@@ -1,47 +1,345 @@
 digraph AST {
 	nodo1 [label=MINORC]
-	nodo2 [label="Metodo/Fun"]
+	nodo2 [label=Main]
 	nodo1 -> nodo2
-	nodo3 [label=Declaracion]
+	nodo3 [label="Sentencias Main"]
 	nodo2 -> nodo3
-	nodo4 [label=Parametros]
-	nodo2 -> nodo4
-	nodo5 [label=INT]
+	nodo4 [label=Etiqueta]
+	nodo3 -> nodo4
+	nodo5 [label=inicio]
 	nodo4 -> nodo5
-	nodo6 [label=a]
-	nodo4 -> nodo6
-	nodo7 [label=FLOAT]
-	nodo4 -> nodo7
-	nodo8 [label=b]
-	nodo4 -> nodo8
-	nodo9 [label=CADENA]
-	nodo4 -> nodo9
-	nodo10 [label=c]
-	nodo4 -> nodo10
-	nodo11 [label=Sentencias]
-	nodo2 -> nodo11
-	nodo12 [label=Main]
-	nodo1 -> nodo12
-	nodo13 [label="Sentencias Main"]
+	nodo6 [label=Print]
+	nodo3 -> nodo6
+	nodo7 [label="expresiones print"]
+	nodo6 -> nodo7
+	nodo8 [label=Exp]
+	nodo7 -> nodo8
+	nodo9 [label="\"Ingrese el primer numero:\n\""]
+	nodo8 -> nodo9
+	nodo10 [label=Definicion]
+	nodo3 -> nodo10
+	nodo11 [label=INT]
+	nodo10 -> nodo11
+	nodo12 [label=ConValor]
+	nodo10 -> nodo12
+	nodo13 [label=primer_numero]
 	nodo12 -> nodo13
-	nodo14 [label=Print]
-	nodo13 -> nodo14
-	nodo15 [label="expresiones print"]
-	nodo13 -> nodo15
-	nodo16 [label=Exp]
-	nodo15 -> nodo16
-	nodo17 [label="\"ASd\""]
+	nodo14 [label=Exp]
+	nodo12 -> nodo14
+	nodo15 [label="Scanf( )"]
+	nodo14 -> nodo15
+	nodo16 [label=Print]
+	nodo3 -> nodo16
+	nodo17 [label="expresiones print"]
 	nodo16 -> nodo17
 	nodo18 [label=Exp]
-	nodo15 -> nodo18
-	nodo19 [label=2]
+	nodo17 -> nodo18
+	nodo19 [label="\"\n\""]
 	nodo18 -> nodo19
-	nodo20 [label=Exp]
-	nodo15 -> nodo20
-	nodo21 [label=3]
+	nodo20 [label=Print]
+	nodo3 -> nodo20
+	nodo21 [label="expresiones print"]
 	nodo20 -> nodo21
 	nodo22 [label=Exp]
-	nodo15 -> nodo22
-	nodo23 [label=4]
+	nodo21 -> nodo22
+	nodo23 [label="\"Ingrese el segundo numero:\n\""]
 	nodo22 -> nodo23
+	nodo24 [label=Definicion]
+	nodo3 -> nodo24
+	nodo25 [label=INT]
+	nodo24 -> nodo25
+	nodo26 [label=ConValor]
+	nodo24 -> nodo26
+	nodo27 [label=segundo_numero]
+	nodo26 -> nodo27
+	nodo28 [label=Exp]
+	nodo26 -> nodo28
+	nodo29 [label="Scanf( )"]
+	nodo28 -> nodo29
+	nodo30 [label=Print]
+	nodo3 -> nodo30
+	nodo31 [label="expresiones print"]
+	nodo30 -> nodo31
+	nodo32 [label=Exp]
+	nodo31 -> nodo32
+	nodo33 [label="\"\n\""]
+	nodo32 -> nodo33
+	nodo34 [label=Print]
+	nodo3 -> nodo34
+	nodo35 [label="expresiones print"]
+	nodo34 -> nodo35
+	nodo36 [label=Exp]
+	nodo35 -> nodo36
+	nodo37 [label="\"Que opcion desea realizar?\n\""]
+	nodo36 -> nodo37
+	nodo38 [label=Print]
+	nodo3 -> nodo38
+	nodo39 [label="expresiones print"]
+	nodo38 -> nodo39
+	nodo40 [label=Exp]
+	nodo39 -> nodo40
+	nodo41 [label="\"+, -, *, /\n\""]
+	nodo40 -> nodo41
+	nodo42 [label=Definicion]
+	nodo3 -> nodo42
+	nodo43 [label=CADENA]
+	nodo42 -> nodo43
+	nodo44 [label=ConValor]
+	nodo42 -> nodo44
+	nodo45 [label=signo]
+	nodo44 -> nodo45
+	nodo46 [label=Exp]
+	nodo44 -> nodo46
+	nodo47 [label="Scanf( )"]
+	nodo46 -> nodo47
+	nodo48 [label=Print]
+	nodo3 -> nodo48
+	nodo49 [label="expresiones print"]
+	nodo48 -> nodo49
+	nodo50 [label=Exp]
+	nodo49 -> nodo50
+	nodo51 [label="\"\n\""]
+	nodo50 -> nodo51
+	nodo52 [label=If]
+	nodo3 -> nodo52
+	nodo53 [label=If]
+	nodo52 -> nodo53
+	nodo54 [label=Condicion]
+	nodo53 -> nodo54
+	nodo55 [label=Exp]
+	nodo54 -> nodo55
+	nodo57 [label=Exp]
+	nodo56 -> nodo57
+	nodo58 [label=signo]
+	nodo57 -> nodo58
+	nodo56 [label=IGUAL]
+	nodo59 [label=Exp]
+	nodo56 -> nodo59
+	nodo60 [label="\"+\""]
+	nodo59 -> nodo60
+	nodo55 -> nodo56
+	nodo61 [label=Sentencias]
+	nodo53 -> nodo61
+	nodo62 [label=Print]
+	nodo61 -> nodo62
+	nodo63 [label="expresiones print"]
+	nodo62 -> nodo63
+	nodo64 [label=Exp]
+	nodo63 -> nodo64
+	nodo65 [label="\"El resultado de la suma es: %d\n\""]
+	nodo64 -> nodo65
+	nodo66 [label=Exp]
+	nodo63 -> nodo66
+	nodo68 [label=Exp]
+	nodo67 -> nodo68
+	nodo69 [label=primer_numero]
+	nodo68 -> nodo69
+	nodo67 [label=MAS]
+	nodo70 [label=Exp]
+	nodo67 -> nodo70
+	nodo71 [label=segundo_numero]
+	nodo70 -> nodo71
+	nodo66 -> nodo67
+	nodo72 [label=Else]
+	nodo52 -> nodo72
+	nodo73 [label=If]
+	nodo72 -> nodo73
+	nodo74 [label=If]
+	nodo73 -> nodo74
+	nodo75 [label=Condicion]
+	nodo74 -> nodo75
+	nodo76 [label=Exp]
+	nodo75 -> nodo76
+	nodo78 [label=Exp]
+	nodo77 -> nodo78
+	nodo79 [label=signo]
+	nodo78 -> nodo79
+	nodo77 [label=IGUAL]
+	nodo80 [label=Exp]
+	nodo77 -> nodo80
+	nodo81 [label="\"-\""]
+	nodo80 -> nodo81
+	nodo76 -> nodo77
+	nodo82 [label=Sentencias]
+	nodo74 -> nodo82
+	nodo83 [label=Print]
+	nodo82 -> nodo83
+	nodo84 [label="expresiones print"]
+	nodo83 -> nodo84
+	nodo85 [label=Exp]
+	nodo84 -> nodo85
+	nodo86 [label="\"El resultado de la resta es: %d\n\""]
+	nodo85 -> nodo86
+	nodo87 [label=Exp]
+	nodo84 -> nodo87
+	nodo89 [label=Exp]
+	nodo88 -> nodo89
+	nodo90 [label=primer_numero]
+	nodo89 -> nodo90
+	nodo88 [label=MENOS]
+	nodo91 [label=Exp]
+	nodo88 -> nodo91
+	nodo92 [label=segundo_numero]
+	nodo91 -> nodo92
+	nodo87 -> nodo88
+	nodo93 [label=Else]
+	nodo73 -> nodo93
+	nodo94 [label=If]
+	nodo93 -> nodo94
+	nodo95 [label=If]
+	nodo94 -> nodo95
+	nodo96 [label=Condicion]
+	nodo95 -> nodo96
+	nodo97 [label=Exp]
+	nodo96 -> nodo97
+	nodo99 [label=Exp]
+	nodo98 -> nodo99
+	nodo100 [label=signo]
+	nodo99 -> nodo100
+	nodo98 [label=IGUAL]
+	nodo101 [label=Exp]
+	nodo98 -> nodo101
+	nodo102 [label="\"*\""]
+	nodo101 -> nodo102
+	nodo97 -> nodo98
+	nodo103 [label=Sentencias]
+	nodo95 -> nodo103
+	nodo104 [label=Print]
+	nodo103 -> nodo104
+	nodo105 [label="expresiones print"]
+	nodo104 -> nodo105
+	nodo106 [label=Exp]
+	nodo105 -> nodo106
+	nodo107 [label="\"El resultado de la multiplicacion es: %d\n\""]
+	nodo106 -> nodo107
+	nodo108 [label=Exp]
+	nodo105 -> nodo108
+	nodo110 [label=Exp]
+	nodo109 -> nodo110
+	nodo111 [label=primer_numero]
+	nodo110 -> nodo111
+	nodo109 [label=POR]
+	nodo112 [label=Exp]
+	nodo109 -> nodo112
+	nodo113 [label=segundo_numero]
+	nodo112 -> nodo113
+	nodo108 -> nodo109
+	nodo114 [label=Else]
+	nodo94 -> nodo114
+	nodo115 [label=If]
+	nodo114 -> nodo115
+	nodo116 [label=Condicion]
+	nodo115 -> nodo116
+	nodo117 [label=Exp]
+	nodo116 -> nodo117
+	nodo119 [label=Exp]
+	nodo118 -> nodo119
+	nodo120 [label=signo]
+	nodo119 -> nodo120
+	nodo118 [label=IGUAL]
+	nodo121 [label=Exp]
+	nodo118 -> nodo121
+	nodo122 [label="\"/\""]
+	nodo121 -> nodo122
+	nodo117 -> nodo118
+	nodo123 [label=Sentencias]
+	nodo115 -> nodo123
+	nodo124 [label=Print]
+	nodo123 -> nodo124
+	nodo125 [label="expresiones print"]
+	nodo124 -> nodo125
+	nodo126 [label=Exp]
+	nodo125 -> nodo126
+	nodo127 [label="\"El resultado de la division es: %d\n\""]
+	nodo126 -> nodo127
+	nodo128 [label=Exp]
+	nodo125 -> nodo128
+	nodo130 [label=Exp]
+	nodo129 -> nodo130
+	nodo131 [label=primer_numero]
+	nodo130 -> nodo131
+	nodo129 [label=DIVIDIDO]
+	nodo132 [label=Exp]
+	nodo129 -> nodo132
+	nodo133 [label=segundo_numero]
+	nodo132 -> nodo133
+	nodo128 -> nodo129
+	nodo134 [label=Print]
+	nodo114 -> nodo134
+	nodo135 [label="expresiones print"]
+	nodo134 -> nodo135
+	nodo136 [label=Exp]
+	nodo135 -> nodo136
+	nodo137 [label="\"Â¿Deseas continuar? Y/N\n\""]
+	nodo136 -> nodo137
+	nodo138 [label=Definicion]
+	nodo114 -> nodo138
+	nodo139 [label=CADENA]
+	nodo138 -> nodo139
+	nodo140 [label=ConValor]
+	nodo138 -> nodo140
+	nodo141 [label=respuesta]
+	nodo140 -> nodo141
+	nodo142 [label=Exp]
+	nodo140 -> nodo142
+	nodo143 [label="Scanf( )"]
+	nodo142 -> nodo143
+	nodo144 [label=If]
+	nodo114 -> nodo144
+	nodo145 [label=If]
+	nodo144 -> nodo145
+	nodo146 [label=Condicion]
+	nodo145 -> nodo146
+	nodo147 [label=Exp]
+	nodo146 -> nodo147
+	nodo149 [label=Exp]
+	nodo148 -> nodo149
+	nodo151 [label=Exp]
+	nodo150 -> nodo151
+	nodo152 [label=respuesta]
+	nodo151 -> nodo152
+	nodo150 [label=IGUAL]
+	nodo153 [label=Exp]
+	nodo150 -> nodo153
+	nodo154 [label="\"Y\""]
+	nodo153 -> nodo154
+	nodo149 -> nodo150
+	nodo148 [label=Or]
+	nodo155 [label=Exp]
+	nodo148 -> nodo155
+	nodo157 [label=Exp]
+	nodo156 -> nodo157
+	nodo158 [label=respuesta]
+	nodo157 -> nodo158
+	nodo156 [label=IGUAL]
+	nodo159 [label=Exp]
+	nodo156 -> nodo159
+	nodo160 [label="\"y\""]
+	nodo159 -> nodo160
+	nodo155 -> nodo156
+	nodo147 -> nodo148
+	nodo161 [label=Sentencias]
+	nodo145 -> nodo161
+	nodo162 [label=Print]
+	nodo161 -> nodo162
+	nodo163 [label="expresiones print"]
+	nodo162 -> nodo163
+	nodo164 [label=Exp]
+	nodo163 -> nodo164
+	nodo165 [label="\"\n\""]
+	nodo164 -> nodo165
+	nodo166 [label=Goto]
+	nodo161 -> nodo166
+	nodo167 [label=inicio]
+	nodo166 -> nodo167
+	nodo168 [label=Else]
+	nodo144 -> nodo168
+	nodo169 [label=Print]
+	nodo168 -> nodo169
+	nodo170 [label="expresiones print"]
+	nodo169 -> nodo170
+	nodo171 [label=Exp]
+	nodo170 -> nodo171
+	nodo172 [label="\"Adios\n\""]
+	nodo171 -> nodo172
 }
