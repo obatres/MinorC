@@ -97,11 +97,12 @@ class Ejecucion_MinorC ():
             pass
 
     def ReporteErrores(self):
-        generado = '<<table border=\'0\' cellborder=\'1\' color=\'blue\' cellspacing='+'\'0\''+'><tr><td colspan=\'2\'>LISTADO DE ERRORES</td></tr><tr><td>No.</td><td>Error</td></tr>'
+        print(self.errores)
+        generado = '<<table border=\'0\' bgcolor=\' #ebf5fb \' cellborder=\'1\' color=\'blue\' cellspacing='+'\'0\''+'><tr><td colspan=\'4\'>LISTADO DE ERRORES</td></tr><tr><td>No.</td><td>Error</td><td>Linea,columna</td><td>Tipo</td></tr>'
         cont = 0
 
         for i in self.errores:
-            generado +='<tr><td>'+str(cont)+'</td><td>'+str(i)+'</td></tr>'
+            generado +='<tr><td>'+str(cont)+'</td><td>'+str(i[0])+'</td><td>'+str(i[1])+'</td><td>'+str(i[2])+'</td></tr>'
             cont +=1
         
         generado +=' </table>>'
@@ -111,11 +112,11 @@ class Ejecucion_MinorC ():
         dotErr.view()
 
     def ReporteTS(self):
-        generado = '<<table border=\'0\' cellborder=\'1\' color=\'blue\' cellspacing='+'\'0\''+'><tr><td colspan=\'5\'>TABLA DE SIMBOLOS</td></tr><tr><td>No.</td><td>identificador</td><td>valor</td><td>tipo</td><td>Etiqueta</td></tr>'
+        generado = '<<table border=\'0\' bgcolor=\' #ebf5fb \' cellborder=\'1\' color=\'#7fb3d5\' cellspacing='+'\'0\''+'><tr><td colspan=\'5\'>TABLA DE SIMBOLOS</td></tr><tr><td>No.</td><td>identificador</td><td>valor</td><td>tipo</td><td>Registro</td></tr>'
         cont = 0
 
         for i in self.ts_global.simbolos:
-            generado += '<tr><td>'+str(cont)+'</td><td>'+str(self.ts_global.obtener(i).id)+'</td><td>'+str(self.ts_global.obtener(i).valor)+'</td><td>'+str(self.ts_global.obtener(i).tipo.name)+'</td><td>'+str(self.ts_global.obtener(i).amb)+'</td></tr>'
+            generado += '<tr><td>'+str(cont)+'</td><td>'+str(self.ts_global.obtener(i).id)+'</td><td>'+str(self.ts_global.obtener(i).valor)+'</td><td>'+str(self.ts_global.obtener(i).tipo.name)+'</td><td>'+str(self.ts_global.obtener(i).reg)+'</td></tr>'
             cont +=1
         generado +=' </table>>'
 
@@ -830,8 +831,7 @@ class Ejecucion_MinorC ():
             return 
         except:
             print('error de impresion, valor o variabe no encontrados: ',instr.exp.id ) 
-            print(instr.linea,instr.columna)
-            err = 'Error de impresion, valor o variabe no encontrados: ',instr.exp.id ,'En la linea: ',instr.linea,'En la columna: ',instr.columna, 'Tipo: SEMANTICO'
+            err = ['Error de impresion, valor o variabe no encontrados: '+instr.exp.id ,str(instr.linea)+','+str(instr.columna), 'SEMANTICO']
             self.errores.append(err)
             pass
     
@@ -878,7 +878,8 @@ class Ejecucion_MinorC ():
                     ts.actualizar(nuevo)
             else:
                 print('Error, tipo '+str(tipo)+' no aplicable en la definicion')
-        
+                err = ['Error, tipo '+str(tipo)+' no aplicable en la definicion',str(instr.linea)+','+str(instr.columna),'SEMANTICO']
+                self.errores.append(err)
         elif isinstance (temp,ExpresionListaIndices):
             
             if temp.listaindices[0]!=0:
@@ -903,6 +904,7 @@ class Ejecucion_MinorC ():
                 ts.agregar(nuevo)
             else:
                 print('Error, esta variable: '+temp.id+' debe contener un valor para ser inicializada')
+                
             return
         else:
             print(type(instr.id))
@@ -1247,6 +1249,8 @@ class Ejecucion_MinorC ():
         try:
             condicion = self.resolver_expresion_aritmetica(instr.cond,ts)
         except:
+            err = ["Error al encontrar la condicion del if",str(instr.linea)+","+str(instr.columna),'SEMANTICO']
+            self.errores.append(err)
             print("Error al encontrar la condicion del if")
         try:    
             etiVer = self.generaLabel()
@@ -1841,6 +1845,8 @@ class Ejecucion_MinorC ():
                 return registro.reg
             except:
                 print('Error, la variable solicitada no existe o no tiene un registro asociado')
+                err = ['Error, la variable solicitada no existe o no tiene un registro asociado',str(expNum.linea)+","+str(expNum.columna),"SEMANTICO"]
+                self.errores.append(err)
                 return
         elif isinstance(expNum,ExpresionInicioSimple):
             try:
@@ -1848,6 +1854,8 @@ class Ejecucion_MinorC ():
                 expNum.tipo = registro.tipo
                 return registro.reg
             except:
+                err = ['Error, la variable solicitada no existe o no tiene un registro asociado',str(expNum.linea)+","+str(expNum.columna),"SEMANTICO"]
+                self.errores.append(err)
                 print('Error, la variable solicitada no existe o no tiene un registro asociado')
                 return
         elif isinstance(expNum,ExpresionAccesoStruct):
@@ -2222,7 +2230,12 @@ a = Ejecucion_MinorC()
 
 f = open("./entrada.txt", "r")
 input = f.read()
+a.errores_asc()
 a.ejecutar_asc(input)
+
+print(a.errores)
 #a.GenerarAST()
-a.ReporteGramatical()
+#a.ReporteGramatical()
+#a.ReporteTS()
+a.ReporteErrores()
 print(a.salidaTotal)

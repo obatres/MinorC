@@ -209,7 +209,7 @@ def get_clomuna(input, token):
      #     
 def t_error(t):
     print("Error Lexico en el token: '%s'" % t.value[0])
-    err = "Error Lexico en el token: '%s'" % t.value[0]+str(t.lexer.lineno)
+    err = ["Error Lexico en el token: "+t.value[0],str(t.lexer.lineno),"LEXICO"]
     lista_errores.append(err)
     t.lexer.skip(1)
 
@@ -815,7 +815,7 @@ def p_error(t):
                      # Get the next token
          if not tok or tok.type == 'PTCOMA': break
     pars.errok()
-    err = "Error en el token \'" + str(t.value) +"\' en la linea: "+ str(t.lexer.lineno) + ' de tipo: SINTACTICO'
+    err = ["Error en el token \'" + str(t.value) +"\' en la linea: ", str(t.lineno) , ' SINTACTICO']
     lista_errores.append(err)
     print("Error sintactico en el token ",t.value,t.lineno)
      # Return SEMI to the parser as the next lookahead token
