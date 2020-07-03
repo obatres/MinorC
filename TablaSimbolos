@@ -1,0 +1,4 @@
+digraph "Tabla de simbolos" {
+	node [shape=plaintext]
+	"node" [label=<<table border='0' cellborder='1' color='blue' cellspacing='0'><tr><td colspan='5'>TABLA DE SIMBOLOS</td></tr><tr><td>No.</td><td>identificador</td><td>valor</td><td>tipo</td><td>Etiqueta</td></tr><tr><td>0</td><td>arreglo</td><td>[10]</td><td>INT</td><td>global</td></tr><tr><td>1</td><td>arregloLength</td><td>10</td><td>INT</td><td>global</td></tr><tr><td>2</td><td>burbuja10</td><td>{}</td><td>FUNCION</td><td>global</td></tr><tr><td>3</td><td>i</td><td>0</td><td>INT</td><td>global</td></tr><tr><td>4</td><td>j</td><td>0</td><td>INT</td><td>global</td></tr><tr><td>5</td><td>aux</td><td>0</td><td>INT</td><td>global</td></tr><tr><td>6</td><td>imprimirBurbuja10</td><td>{}</td><td>FUNCION</td><td>global</td></tr><tr><td>7</td><td>imprimirBurbuja11</td><td>{}</td><td>FUNCION</td><td>global</td></tr><tr><td>8</td><td>$t0</td><td>{}</td><td>ARRAY</td><td>global</td></tr> </table>>]
+}
