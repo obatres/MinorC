@@ -1308,6 +1308,7 @@ class Ejecucion_MinorC ():
             
     def procesar_sentencias(self,sentencias,ts):
         for sent in sentencias:
+         
             if isinstance(sent,Imprimir): self.procesar_imprimir(sent,ts)
             elif isinstance(sent,Definicion): self.procesar_definicion(sent,ts)
             elif isinstance(sent,Asignacion): self.procesar_asignacion(sent,ts)
@@ -2221,6 +2222,6 @@ a = Ejecucion_MinorC()
 
 f = open("./entrada.txt", "r")
 input = f.read()
-a.ejecutar_asc(input)
-a.GenerarAST()
-print(a.salidaTotal)
+#a.ejecutar_asc(input)
+#a.GenerarAST()
+#print(a.salidaTotal)

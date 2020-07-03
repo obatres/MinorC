@@ -226,19 +226,21 @@ lexer = lex.lex()
 # Asociación de operadores y precedencia
 precedence = (
     
-    ('left','ORLOG','XORLOG'),
+    ('left','ORLOG'),
     ('left','ANDLOG'),
+    ('left','ORBIT'),
+    ('left','XORBIT','XORLOG'),
+    ('left','ANDBIT'),
     ('left','IGUALQUE','NIGUALQUE'),
-    ('left','MENQUE','MAYQUE'),
-    ('left','MAYORIG','MENORIG'),
-    ('right','NOTBIT'),
-    ('left','XORBIT'),
-    ('left','ANDBIT','ORBIT'),
+    ('left','MENQUE','MAYQUE','MAYORIG','MENORIG'),
+
     ('left','IZQBIT','DERBIT'),
+    
     ('left','MAS','MENOS'),
-    ('left','POR','DIVIDIDO'),
-    ('left','RES','ABS'),
-    ('right','UMENOS','NOTLOG','NOTBIT'),
+    ('left','POR','DIVIDIDO','RES'),
+    #('right','UMENOS','NOTLOG','NOTBIT'),
+    
+    ('right','MASMAS','MENOSMENOS','UMENOS','NOTLOG','NOTBIT'),
     ('left','PARIZQ','PARDER'),
     )
 
