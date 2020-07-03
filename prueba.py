@@ -1,7 +1,8 @@
 
 
-entrada = 1 and 1 or 0 and 0 and 0 or not 1
+entrada = []
+
+entrada.append(["aS","A213"])
 
 
-
-print(entrada)
+print(entrada[0][1])

@@ -1,0 +1,4 @@
+digraph "Optimizaciones por mirilla" {
+	node [shape=plaintext]
+	"node" [label=<<table border='0' bgcolor=' #ebf5fb ' cellborder='1' color='#7fb3d5' cellspacing='0'><tr><td colspan='4'>Optimizaciones</td></tr><tr><td>No.</td><td>Regla</td><td>linea</td><td>segmento/etiqueta/registro</td></tr><tr><td>0</td><td>Regla 3</td><td>12</td><td>Label7</td></tr> </table>>]
+}

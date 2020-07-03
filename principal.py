@@ -375,8 +375,8 @@ def resolver_expresion_aritmetica(expNum, ts) :
         
     elif isinstance (expNum, ExpresionLogicaNot):
         temp = resolver_expresion_aritmetica(expNum.exp,ts)
-        if temp==false: expNum.val=true
-        elif temp==true: expNum.val=false
+        if temp==0: expNum.val=1
+        elif temp==1: expNum.val=0
         else: 
             expNum.val=1964
             print('Valor',temp,' no asociado a una condicion logica')
@@ -836,7 +836,9 @@ def procesar_instrucciones_debugger(instrucciones, ts, i) :
             elif isinstance(instrucciones[i], Definicion) : procesar_definicion(instrucciones[i], ts)
             elif isinstance(instrucciones[i], Asignacion) : procesar_asignacion(instrucciones[i], ts)
             elif isinstance(instrucciones[i], Mientras) : procesar_mientras(instrucciones[i], ts)
-            elif isinstance(instrucciones[i], If) : procesar_if(instrucciones[i], ts)
+            elif isinstance(instrucciones[i], If) : 
+                if procesar_if(instrucciones[1], ts)==0:
+                    return
             elif isinstance(instrucciones[i], IfElse) : procesar_if_else(instrucciones[i], ts)
             elif isinstance(instrucciones[i], Unset) : procesar_unset(instrucciones[i],ts)
             elif isinstance(instrucciones[i],IniciaPila): procesar_inicioPila(instrucciones[i],ts)

@@ -48,4 +48,366 @@ digraph AST {
 	nodo4 -> nodo24
 	nodo25 [label=120]
 	nodo24 -> nodo25
+	nodo26 [label=Definicion]
+	nodo1 -> nodo26
+	nodo27 [label=INT]
+	nodo26 -> nodo27
+	nodo28 [label=ConValor]
+	nodo26 -> nodo28
+	nodo29 [label=arregloLength]
+	nodo28 -> nodo29
+	nodo30 [label=Exp]
+	nodo28 -> nodo30
+	nodo31 [label=10]
+	nodo30 -> nodo31
+	nodo32 [label="Metodo/Fun"]
+	nodo1 -> nodo32
+	nodo33 [label=burbuja10]
+	nodo32 -> nodo33
+	nodo34 [label=Parametros]
+	nodo32 -> nodo34
+	nodo35 [label=Sentencias]
+	nodo32 -> nodo35
+	nodo36 [label=Definicion]
+	nodo35 -> nodo36
+	nodo37 [label=INT]
+	nodo36 -> nodo37
+	nodo38 [label=SinValor]
+	nodo36 -> nodo38
+	nodo39 [label=i]
+	nodo38 -> nodo39
+	nodo40 [label=SinValor]
+	nodo36 -> nodo40
+	nodo41 [label=j]
+	nodo40 -> nodo41
+	nodo42 [label=SinValor]
+	nodo36 -> nodo42
+	nodo43 [label=aux]
+	nodo42 -> nodo43
+	nodo44 [label=For]
+	nodo35 -> nodo44
+	nodo45 [label=Asignacion]
+	nodo44 -> nodo45
+	nodo46 [label=i]
+	nodo45 -> nodo46
+	nodo47 [label="="]
+	nodo45 -> nodo47
+	nodo48 [label=Exp]
+	nodo45 -> nodo48
+	nodo49 [label=0]
+	nodo48 -> nodo49
+	nodo50 [label=Exp]
+	nodo44 -> nodo50
+	nodo52 [label=Exp]
+	nodo51 -> nodo52
+	nodo53 [label=i]
+	nodo52 -> nodo53
+	nodo51 [label=MENOR_QUE]
+	nodo54 [label=Exp]
+	nodo51 -> nodo54
+	nodo56 [label=Exp]
+	nodo55 -> nodo56
+	nodo57 [label=arregloLength]
+	nodo56 -> nodo57
+	nodo55 [label=MENOS]
+	nodo58 [label=Exp]
+	nodo55 -> nodo58
+	nodo59 [label=1]
+	nodo58 -> nodo59
+	nodo54 -> nodo55
+	nodo50 -> nodo51
+	nodo60 [label="Incre/decre"]
+	nodo44 -> nodo60
+	nodo61 [label=i]
+	nodo60 -> nodo61
+	nodo62 [label="++"]
+	nodo60 -> nodo62
+	nodo63 [label=Sentencias]
+	nodo44 -> nodo63
+	nodo64 [label=For]
+	nodo63 -> nodo64
+	nodo65 [label=Asignacion]
+	nodo64 -> nodo65
+	nodo66 [label=j]
+	nodo65 -> nodo66
+	nodo67 [label="="]
+	nodo65 -> nodo67
+	nodo68 [label=Exp]
+	nodo65 -> nodo68
+	nodo69 [label=0]
+	nodo68 -> nodo69
+	nodo70 [label=Exp]
+	nodo64 -> nodo70
+	nodo72 [label=Exp]
+	nodo71 -> nodo72
+	nodo73 [label=j]
+	nodo72 -> nodo73
+	nodo71 [label=MENOR_QUE]
+	nodo74 [label=Exp]
+	nodo71 -> nodo74
+	nodo76 [label=Exp]
+	nodo75 -> nodo76
+	nodo78 [label=Exp]
+	nodo77 -> nodo78
+	nodo79 [label=arregloLength]
+	nodo78 -> nodo79
+	nodo77 [label=MENOS]
+	nodo80 [label=Exp]
+	nodo77 -> nodo80
+	nodo81 [label=i]
+	nodo80 -> nodo81
+	nodo76 -> nodo77
+	nodo75 [label=MENOS]
+	nodo82 [label=Exp]
+	nodo75 -> nodo82
+	nodo83 [label=1]
+	nodo82 -> nodo83
+	nodo74 -> nodo75
+	nodo70 -> nodo71
+	nodo84 [label="Incre/decre"]
+	nodo64 -> nodo84
+	nodo85 [label=j]
+	nodo84 -> nodo85
+	nodo86 [label="++"]
+	nodo84 -> nodo86
+	nodo87 [label=Sentencias]
+	nodo64 -> nodo87
+	nodo88 [label=If]
+	nodo87 -> nodo88
+	nodo89 [label=Condicion]
+	nodo88 -> nodo89
+	nodo90 [label=Exp]
+	nodo89 -> nodo90
+	nodo92 [label=Exp]
+	nodo91 -> nodo92
+	nodo93 [label=arreglo]
+	nodo92 -> nodo93
+	nodo91 [label=MENOR_QUE]
+	nodo94 [label=Exp]
+	nodo91 -> nodo94
+	nodo95 [label=arreglo]
+	nodo96 [label=Exp]
+	nodo95 -> nodo96
+	nodo96 -> nodo97
+	nodo94 -> nodo95
+	nodo90 -> nodo91
+	nodo98 [label=Sentencias]
+	nodo88 -> nodo98
+	nodo99 [label=Asignacion]
+	nodo98 -> nodo99
+	nodo100 [label=aux]
+	nodo99 -> nodo100
+	nodo101 [label="="]
+	nodo99 -> nodo101
+	nodo102 [label=Exp]
+	nodo99 -> nodo102
+	nodo103 [label=arreglo]
+	nodo102 -> nodo103
+	nodo104 [label=Asignacion]
+	nodo98 -> nodo104
+	nodo105 [label=arreglo]
+	nodo104 -> nodo105
+	nodo106 [label="="]
+	nodo104 -> nodo106
+	nodo107 [label=Exp]
+	nodo104 -> nodo107
+	nodo108 [label=arreglo]
+	nodo109 [label=Exp]
+	nodo108 -> nodo109
+	nodo109 -> nodo110
+	nodo107 -> nodo108
+	nodo111 [label=Asignacion]
+	nodo98 -> nodo111
+	nodo112 [label=arreglo]
+	nodo111 -> nodo112
+	nodo113 [label="="]
+	nodo111 -> nodo113
+	nodo114 [label=Exp]
+	nodo111 -> nodo114
+	nodo115 [label=aux]
+	nodo114 -> nodo115
+	nodo116 [label="Metodo/Fun"]
+	nodo1 -> nodo116
+	nodo117 [label=imprimirBurbuja10]
+	nodo116 -> nodo117
+	nodo118 [label=Parametros]
+	nodo116 -> nodo118
+	nodo119 [label=Sentencias]
+	nodo116 -> nodo119
+	nodo120 [label=For]
+	nodo119 -> nodo120
+	nodo121 [label=Definicion]
+	nodo120 -> nodo121
+	nodo122 [label=INT]
+	nodo121 -> nodo122
+	nodo123 [label=ConValor]
+	nodo121 -> nodo123
+	nodo124 [label=i]
+	nodo123 -> nodo124
+	nodo125 [label=Exp]
+	nodo123 -> nodo125
+	nodo126 [label=0]
+	nodo125 -> nodo126
+	nodo127 [label=Exp]
+	nodo120 -> nodo127
+	nodo129 [label=Exp]
+	nodo128 -> nodo129
+	nodo130 [label=i]
+	nodo129 -> nodo130
+	nodo128 [label=MENOR_QUE]
+	nodo131 [label=Exp]
+	nodo128 -> nodo131
+	nodo132 [label=arregloLength]
+	nodo131 -> nodo132
+	nodo127 -> nodo128
+	nodo133 [label="Incre/decre"]
+	nodo120 -> nodo133
+	nodo134 [label=i]
+	nodo133 -> nodo134
+	nodo135 [label="++"]
+	nodo133 -> nodo135
+	nodo136 [label=Sentencias]
+	nodo120 -> nodo136
+	nodo137 [label=Print]
+	nodo136 -> nodo137
+	nodo138 [label="expresiones print"]
+	nodo137 -> nodo138
+	nodo139 [label=Exp]
+	nodo138 -> nodo139
+	nodo140 [label="\"posicion %d: %i\n\""]
+	nodo139 -> nodo140
+	nodo141 [label=Exp]
+	nodo138 -> nodo141
+	nodo142 [label=i]
+	nodo141 -> nodo142
+	nodo143 [label=Exp]
+	nodo138 -> nodo143
+	nodo144 [label=arreglo]
+	nodo145 [label=Exp]
+	nodo144 -> nodo145
+	nodo145 -> nodo146
+	nodo143 -> nodo144
+	nodo147 [label=Print]
+	nodo136 -> nodo147
+	nodo148 [label="expresiones print"]
+	nodo147 -> nodo148
+	nodo149 [label=Exp]
+	nodo148 -> nodo149
+	nodo150 [label="\"\n\""]
+	nodo149 -> nodo150
+	nodo151 [label="Metodo/Fun"]
+	nodo1 -> nodo151
+	nodo152 [label=imprimirBurbuja11]
+	nodo151 -> nodo152
+	nodo153 [label=Parametros]
+	nodo151 -> nodo153
+	nodo154 [label=Sentencias]
+	nodo151 -> nodo154
+	nodo155 [label=For]
+	nodo154 -> nodo155
+	nodo156 [label=Definicion]
+	nodo155 -> nodo156
+	nodo157 [label=INT]
+	nodo156 -> nodo157
+	nodo158 [label=ConValor]
+	nodo156 -> nodo158
+	nodo159 [label=i]
+	nodo158 -> nodo159
+	nodo160 [label=Exp]
+	nodo158 -> nodo160
+	nodo161 [label=0]
+	nodo160 -> nodo161
+	nodo162 [label=Exp]
+	nodo155 -> nodo162
+	nodo164 [label=Exp]
+	nodo163 -> nodo164
+	nodo165 [label=i]
+	nodo164 -> nodo165
+	nodo163 [label=MENOR_QUE]
+	nodo166 [label=Exp]
+	nodo163 -> nodo166
+	nodo167 [label=arregloLength]
+	nodo166 -> nodo167
+	nodo162 -> nodo163
+	nodo168 [label="Incre/decre"]
+	nodo155 -> nodo168
+	nodo169 [label=i]
+	nodo168 -> nodo169
+	nodo170 [label="++"]
+	nodo168 -> nodo170
+	nodo171 [label=Sentencias]
+	nodo155 -> nodo171
+	nodo172 [label=Print]
+	nodo171 -> nodo172
+	nodo173 [label="expresiones print"]
+	nodo172 -> nodo173
+	nodo174 [label=Exp]
+	nodo173 -> nodo174
+	nodo175 [label="\"posicion %d: %i\n\""]
+	nodo174 -> nodo175
+	nodo176 [label=Exp]
+	nodo173 -> nodo176
+	nodo177 [label=i]
+	nodo176 -> nodo177
+	nodo178 [label=Exp]
+	nodo173 -> nodo178
+	nodo179 [label=arreglo]
+	nodo180 [label=Exp]
+	nodo179 -> nodo180
+	nodo180 -> nodo181
+	nodo178 -> nodo179
+	nodo182 [label=Print]
+	nodo171 -> nodo182
+	nodo183 [label="expresiones print"]
+	nodo182 -> nodo183
+	nodo184 [label=Exp]
+	nodo183 -> nodo184
+	nodo185 [label="\"\n\""]
+	nodo184 -> nodo185
+	nodo186 [label=Main]
+	nodo1 -> nodo186
+	nodo187 [label="Sentencias Main"]
+	nodo186 -> nodo187
+	nodo188 [label=Print]
+	nodo187 -> nodo188
+	nodo189 [label="expresiones print"]
+	nodo188 -> nodo189
+	nodo190 [label=Exp]
+	nodo189 -> nodo190
+	nodo191 [label="\"Arreglo Desordenado\n\""]
+	nodo190 -> nodo191
+	nodo192 [label="Llamada Func"]
+	nodo187 -> nodo192
+	nodo193 [label=imprimirBurbuja10]
+	nodo192 -> nodo193
+	nodo194 [label="Parametros llamada"]
+	nodo192 -> nodo194
+	nodo195 [label=Print]
+	nodo187 -> nodo195
+	nodo196 [label="expresiones print"]
+	nodo195 -> nodo196
+	nodo197 [label=Exp]
+	nodo196 -> nodo197
+	nodo198 [label="\"---------------------------\n\""]
+	nodo197 -> nodo198
+	nodo199 [label="Llamada Func"]
+	nodo187 -> nodo199
+	nodo200 [label=burbuja10]
+	nodo199 -> nodo200
+	nodo201 [label="Parametros llamada"]
+	nodo199 -> nodo201
+	nodo202 [label=Print]
+	nodo187 -> nodo202
+	nodo203 [label="expresiones print"]
+	nodo202 -> nodo203
+	nodo204 [label=Exp]
+	nodo203 -> nodo204
+	nodo205 [label="\"Arreglo Desordenado\n\""]
+	nodo204 -> nodo205
+	nodo206 [label="Llamada Func"]
+	nodo187 -> nodo206
+	nodo207 [label=imprimirBurbuja11]
+	nodo206 -> nodo207
+	nodo208 [label="Parametros llamada"]
+	nodo206 -> nodo208
 }
