@@ -41,13 +41,13 @@ class Resaltado(QSyntaxHighlighter):
 
         patrones += [
                 (r'\d+(\.\d+)?',0, format('darkBlue')), 
-                (r'[a-zA-Z_][a-zA-Z_0-9]*',0, format('darkRed')),
+                (r'[a-zA-Z_][a-zA-Z_0-9]*',0, format('darkGreen')),
                 ('if',0,format('darkMagenta')),
                 ('else' ,0,format('darkMagenta')),
                 ('main',0,format('darkMagenta')),
                 ('goto',0,format('darkMagenta')),
                 ('unset',0,format('darkMagenta')),
-                ('print',0,format('darkMagenta')),
+                ('printf',0,format('darkMagenta')),
                 ('read',0,format('darkMagenta')),
                 ('exit',0,format('darkMagenta')),
                 ('int',0,format('darkMagenta')),
@@ -56,24 +56,32 @@ class Resaltado(QSyntaxHighlighter):
                 ('array',0,format('darkMagenta')),
                 ('abs',0,format('darkMagenta')),
                 ('xor',0,format('darkMagenta')),
-
-                (r'!',0,format('darkGray')),
-                (r'&&',0,format('darkGray')),
-                (r'\|\|',0,format('darkGray')),
-                (r'~',0,format('darkGray')),
-                (r'&',0,format('darkGray')),
-                (r'\|',0,format('darkGray')),
-                ( r'\^',0,format('darkGray')),
-                ( r'<<',0,format('darkGray')),
-                ( r'>>',0,format('darkGray')),
-                ( r'\$(t[0-9]+)',0,format('darkCyan')),
-                ( r'\&\$(t[0-9]+)',0,format('darkCyan')),
-                ( r'\$[a][0-9]+',0,format('darkCyan')),
-                ( r'\$[v][0-9]+',0,format('darkCyan')),
-                ( r'\$[r][a]',0,format('darkCyan')),
-                ( r'\$[s][0-9]+',0,format('darkCyan')),             
-                ( r'\$[s][p]',0,format('darkCyan')),  
-                ( r'[r][0-9]+',0,format('darkCyan')),  
+                ('for',0,format('darkMagenta')),
+                ('scanf',0,format('darkMagenta')),
+                (r'!',0,format('darkYellow')),
+                (r'&&',0,format('darkYellow')),
+                (r'==',0,format('darkYellow')),
+                (r'=',0,format('darkYellow')),     
+                (r'\+=',0,format('darkYellow')),
+                (r'\*=',0,format('darkYellow')),
+                (r'\/=',0,format('darkYellow')),
+                (r'\%=',0,format('darkYellow')),   
+                (r'(\{|\}|\/|\'|\"|\;)',0,format('darkYellow')),                                          
+                (r'\|\|',0,format('darkYellow')),
+                (r'~',0,format('darkYellow')),
+                (r'&',0,format('darkYellow')),
+                (r'\|',0,format('darkYellow')),
+                ( r'\^',0,format('darkYellow')),
+                ( r'<<',0,format('darkYellow')),
+                ( r'>>',0,format('darkYellow')),
+                ( r'\$(t[0-9]+)',0,format('darkYellow')),
+                ( r'\&\$(t[0-9]+)',0,format('darkYellow')),
+                ( r'\$[a][0-9]+',0,format('darkYellow')),
+                ( r'\$[v][0-9]+',0,format('darkYellow')),
+                ( r'\$[r][a]',0,format('darkYellow')),
+                ( r'\$[s][0-9]+',0,format('darkYellow')),             
+                ( r'\$[s][p]',0,format('darkYellow')),  
+                ( r'[r][0-9]+',0,format('darkYellow')),  
                 ( r'\'.*?\'',0,format('darkYellow')), 
                 ( r'\".*?\"',0,format('darkYellow')),
 
@@ -161,6 +169,10 @@ class PlainTextEdit(QPlainTextEdit):
         self.updateRequest.connect(self.updateLineNumberArea)
         self.cursorPositionChanged.connect(self.highlightCurrentLine)
         self.updateLineNumberAreaWidth(0)
+
+        p = self.viewport().palette()
+        p.setColor(self.viewport().backgroundRole(),QColor(224,224,224))
+        self.viewport().setPalette(p)
 
     def lineNumberAreaWidth(self):
         digits = 1
@@ -364,20 +376,44 @@ class MainWindow(QMainWindow):
         
         Ejecutar_menu.addAction(EjecutarPLY)
         Ejec_toolbar.addAction(EjecutarPLY)
-
-        #self.toolbar.addAction(EjecutarPLY)
-
-        #EjecutarDesc = QAction(QIcon(os.path.join('images', 'Run.png')), "AUGUS", self)  
-        #EjecutarDesc.setStatusTip("Ejecutar AUGUS")
-        #EjecutarDesc.triggered.connect(self.EjecutarAsc)  
-        #Ejecutar_menu.addAction(EjecutarDesc)
-        #Ejec_toolbar.addAction(EjecutarDesc)
+ 
+        EjecutarDesc = QAction(QIcon(os.path.join('images', 'Run.png')), "AUGUS", self)  
+        EjecutarDesc.setStatusTip("Ejecutar AUGUS")
+        EjecutarDesc.triggered.connect(self.EjecutarDesc)  
+        Ejecutar_menu.addAction(EjecutarDesc)
+        Ejec_toolbar.addAction(EjecutarDesc)
 
         EjecutarDeb = QAction(QIcon(os.path.join('images', 'debug.png')), "Debug", self)  
         EjecutarDeb.setStatusTip("Ejecutar Debug")
         EjecutarDeb.triggered.connect(self.EjecutarDeb)  
         Ejecutar_menu.addAction(EjecutarDeb)
         Ejec_toolbar.addAction(EjecutarDeb)
+
+#-------------------------------------------------------------------------------BOTONES PARA REPORTES
+        Rep_toolbar = QToolBar("Reportes")
+        Rep_toolbar.setIconSize(QSize(16, 16))
+        self.addToolBar(Rep_toolbar)
+        Reporte_menu = self.menuBar().addMenu("&Reportes")
+
+        ReporteAST = QAction(QIcon(os.path.join('images', 'arrow-continue.png')), "AST", self)  
+        ReporteAST.setStatusTip("AST")
+        ReporteAST.triggered.connect(self.ReporteAST)  
+        Reporte_menu.addAction(ReporteAST)
+
+        ReporteTS = QAction(QIcon(os.path.join('images', 'arrow-continue.png')), "Tabla de simbolos", self)  
+        ReporteTS.setStatusTip("Tabla de simbolos")
+        ReporteTS.triggered.connect(self.ReporteTS)  
+        Reporte_menu.addAction(ReporteTS)
+
+        ReporteGramatical = QAction(QIcon(os.path.join('images', 'arrow-continue.png')), "Gramatical", self)  
+        ReporteGramatical.setStatusTip("Gramatical")
+        ReporteGramatical.triggered.connect(self.ReporteGramatical)  
+        Reporte_menu.addAction(ReporteGramatical)
+
+        Reporteop = QAction(QIcon(os.path.join('images', 'arrow-continue.png')), "Optimizacion", self)  
+        Reporteop.setStatusTip("Optimizacion")
+        Reporteop.triggered.connect(self.ReporteOP)  
+        Reporte_menu.addAction(Reporteop)
 
 #-----------------------------------------------------------------------------BOTON FORMATO
         format_toolbar = QToolBar("Format")
@@ -587,10 +623,11 @@ class MainWindow(QMainWindow):
     
     def getTexto(self):
         return self.editor.toPlainText()
-
+    ref =""
     def EjecutarMinorC(self):
         import principal as f
         mc = EC()
+        self.ref =mc
         mc.ejecutar_asc(self.editor.toPlainText())
         s= mc.RecibirSalida
         self.editorAUGUS.setPlainText(mc.salidaTotal)
@@ -602,6 +639,21 @@ class MainWindow(QMainWindow):
         salidaconsola1 = salidaconsola.replace("\\t","\t")
         salida3= re.sub("%d|%s|%i|%c","",salidaconsola1)
         self.consola.setPlainText(salida3)
+        mc.errores_asc()
+        mc.ReporteErrores()
+    def ReporteAST(self):
+
+        self.ref.GenerarAST()
+
+    def ReporteOP(self):
+        self.ref.ReporteOp()
+
+    def ReporteTS(self):
+        self.ref.ReporteTS()
+
+    def ReporteGramatical(self):
+        self.ref.ReporteGramatical()
+
     def EjecutarAsc(self):
         import principal as f
         self.consola.clear()
@@ -623,32 +675,34 @@ class MainWindow(QMainWindow):
         return 
 
     def EjecutarDesc(self):
-        import principal as j
         self.consola.clear()
         try:
-            j.ejecutar_desc(self.editor.toPlainText())
-            j.errores_desc()
-            j.ReporteErrores()
-            j.ReporteTS()
-            j.ReporteGramatical()
-            j.GenerarAST()
-            s = j.RecibirSalida()
-            self.consola.setPlainText(s)
+            mc = EC()
+            mc.ejecutar_asc(self.editor.toPlainText())
+            s= mc.RecibirSalida
+            self.editorAUGUS.setPlainText(mc.salidaTotal)
+            
         except:
             btn = QMessageBox.information(self, 'FIN',
                 'no se puede realizar la ejecucion del descendente',
                 QMessageBox.Yes)
     
+    
     def EjecutarDeb(self):
         import principal as de 
         self.consola.clear()
         try:
-            de.ejecutar_debug(self.editor.toPlainText(),self.i)
+            de.ejecutar_debug(self.editorAUGUS.toPlainText(),self.i)
             de.ReporteTS()
             de.ReporteErrores()
             self.i =  self.i + 1
             s = de.RecibirSalida()
-            self.consola.setPlainText(s)
+
+            salidaconsola = s.replace("\\n","\n")
+            salidaconsola1 = salidaconsola.replace("\\t","\t")
+            salida3= re.sub("%d|%s|%i|%c","",salidaconsola1)
+            self.consola.setPlainText(salida3)
+
         except :
             btn = QMessageBox.information(self, 'FIN',
                 'no se puede realizar la ejecucion del debug',

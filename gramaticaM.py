@@ -577,7 +577,7 @@ def p_instrucciones_if_listaelseif_else(t):
 
 def p_instrucciones_if_else(t):
     'IFFUN :  if_instr else_instr'
-    t[0] = IfElse(t[1],t[2],t.lineno(1),0)
+    t[0] = IfElse(t[1],t[2],t.lineno(2),0)
     asc.append(['IFFUN   ','if_instr else_instr  '])
 def p_if_instr(t) :
     'if_instr           : IF expresion_log_relacional BLOQUE'
